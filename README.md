@@ -527,6 +527,8 @@ or `.empty-state` locally.
 Moving race avatars are resolved in the renderer from the theme's sprite-sheet id. To replace a
 theme sprite, keep the declared frame grid in [packages/shared/src/themes.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/packages/shared/src/themes.ts) aligned with the asset in [apps/desktop/src/renderer/assets/sprites](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/renderer/assets/sprites): row `0` is the slower animation and row `1` is the faster animation by default.
 
+The projector `Fiercely Local` mark is loaded from [apps/desktop/public/brand/fiercely-local-logo.svg](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/public/brand/fiercely-local-logo.svg). Replace that placeholder with the real logo when ready. If the asset is not SVG, use the same basename with `.png`, `.webp`, or `.jpg`; the race display checks those fallbacks automatically.
+
 The DOS-inspired `Oregon Trail '90` theme also bundles an IBM VGA bitmap recreation so the intended projector typography does not depend on fonts installed on the host machine.
 
 ## Tournament Bracket Layouts

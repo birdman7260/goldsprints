@@ -798,15 +798,24 @@ p {
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: clamp(0.8rem, 1.8vw, 1.4rem);
+  margin-top: clamp(0.45rem, 1vh, 0.9rem);
+  margin-bottom: clamp(0.9rem, 1.9vh, 1.5rem);
+  padding-bottom: clamp(0.45rem, 0.9vh, 0.85rem);
   font-size: clamp(1.65rem, 3vw, 3.1rem);
+  line-height: 1;
+  transform: translateY(clamp(-0.7rem, -1vh, -0.35rem));
 }
 
 .race-page__local-mark--footer span:first-child {
+  align-self: center;
   justify-self: end;
+  transform: translateY(clamp(0.85rem, 1.25vw, 1.35rem));
 }
 
 .race-page__local-mark--footer span:last-child {
+  align-self: center;
   justify-self: start;
+  transform: translateY(clamp(0.85rem, 1.25vw, 1.35rem));
 }
 
 .race-page__local-mark--corner {
@@ -820,11 +829,31 @@ p {
   text-align: center;
 }
 
-.race-page__logo-placeholder {
+.race-page__local-logo {
   display: inline-grid;
-  width: clamp(3.2rem, 5vw, 5.4rem);
-  aspect-ratio: 1;
+  width: clamp(4.2rem, 7vw, 7.5rem);
+  height: clamp(3rem, 5vw, 5.4rem);
   place-items: center;
+  border-radius: 0.75rem;
+}
+
+.race-page__local-mark--footer .race-page__local-logo {
+  transform: translateY(clamp(-0.35rem, -0.45vw, -0.18rem));
+}
+
+.race-page__local-mark--corner .race-page__local-logo {
+  width: clamp(4.8rem, 7vw, 7.4rem);
+  height: clamp(3.2rem, 4.8vw, 5rem);
+}
+
+.race-page__local-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 1.2rem color-mix(in srgb, var(--theme-accent) 24%, transparent));
+}
+
+.race-page__local-logo--missing {
   border: 0.18rem solid color-mix(in srgb, var(--theme-accent) 72%, transparent);
   border-radius: 999px;
   background:
@@ -835,6 +864,14 @@ p {
     ),
     color-mix(in srgb, var(--theme-surface-alt) 70%, transparent);
   box-shadow: 0 0 2rem color-mix(in srgb, var(--theme-accent) 24%, transparent);
+}
+
+.race-page__local-logo-fallback {
+  width: 40%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-accent) 72%, transparent);
+  box-shadow: 0 0 1rem color-mix(in srgb, var(--theme-accent) 40%, transparent);
 }
 
 .race-page__stage {

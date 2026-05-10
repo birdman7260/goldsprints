@@ -240,9 +240,10 @@ Requirements:
 - Horizontal race themes must show `Gold Sprints` centered at the top, optionally show the active
   event name underneath, reserve the main middle area for the race/bracket visualizer, show one or
   two full-width racer cards above the footer, and show a centered `Fiercely Local` footer with a
-  logo placeholder between the words. `Implemented`
+  real logo asset between the words. The logo should be loaded from the desktop public brand asset
+  directory with SVG preferred and raster fallbacks supported. `Implemented`
 - Vertical race themes must show `Gold Sprints` and the optional event name in the top-left,
-  `Fiercely Local` with the logo placeholder in the top-right, keep the race indicator centered
+  `Fiercely Local` with the same logo asset in the top-right, keep the race indicator centered
   from top to bottom, and place racer cards at the bottom on either side of the race indicator.
   `Implemented`
 - Admin must be able to toggle whether the event name appears on the projector race display.

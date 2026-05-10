@@ -29,6 +29,12 @@ const BRACKET_RETURN_FOCUS_DELAY_MS = 1050;
 const WINNER_ADVANCE_ANIMATION_MS = 1200;
 const BRACKET_HOLD_AFTER_ADVANCE_MS = 5000;
 const BRACKET_ZOOM_OUT_MS = 950;
+const LOCAL_LOGO_SOURCES = [
+  "/brand/fiercely-local-logo.svg",
+  "/brand/fiercely-local-logo.png",
+  "/brand/fiercely-local-logo.webp",
+  "/brand/fiercely-local-logo.jpg"
+];
 
 type PostRaceSequencePhase = "confetti" | "source" | "advance" | "hold" | "zoom-out";
 
@@ -163,16 +169,43 @@ function LocalMark({ variant }: { variant: "footer" | "corner" }) {
       {variant === "footer" ? (
         <>
           <span>Fiercely</span>
-          <span className="race-page__logo-placeholder" aria-label="Sponsor logo placeholder" />
+          <LocalLogo />
           <span>Local</span>
         </>
       ) : (
         <>
           <span>Fiercely Local</span>
-          <span className="race-page__logo-placeholder" aria-label="Sponsor logo placeholder" />
+          <LocalLogo />
         </>
       )}
     </div>
+  );
+}
+
+function LocalLogo() {
+  const [assetIndex, setAssetIndex] = useState(0);
+  const hasLogoCandidate = assetIndex < LOCAL_LOGO_SOURCES.length;
+  const src = hasLogoCandidate ? LOCAL_LOGO_SOURCES[assetIndex] : null;
+
+  return (
+    <span
+      className={`race-page__local-logo ${src == null ? "race-page__local-logo--missing" : ""}`}
+      aria-label="Fiercely Local logo"
+      role="img"
+    >
+      {src ? (
+        <img
+          src={src}
+          alt=""
+          draggable={false}
+          onError={() => {
+            setAssetIndex((current) => current + 1);
+          }}
+        />
+      ) : (
+        <span className="race-page__local-logo-fallback" aria-hidden="true" />
+      )}
+    </span>
   );
 }
 
