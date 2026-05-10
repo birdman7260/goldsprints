@@ -1,6 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import http from "node:http";
+import net from "node:net";
+import tls from "node:tls";
+import type { Duplex } from "node:stream";
 import express from "express";
 import cors from "cors";
 import multer from "multer";
@@ -54,6 +57,57 @@ async function proxyDevRequest(
   res.send(body);
 }
 
+function formatProxyHeaders(headers: http.IncomingHttpHeaders, targetHost: string): string {
+  return Object.entries({
+    ...headers,
+    host: targetHost
+  })
+    .flatMap(([name, value]) => {
+      if (Array.isArray(value)) {
+        return value.map((entry) => `${name}: ${entry}`);
+      }
+      return [`${name}: ${value}`];
+    })
+    .join("\r\n");
+}
+
+function proxyDevWebSocketUpgrade(
+  rendererDevUrl: string,
+  req: http.IncomingMessage,
+  socket: Duplex,
+  head: Buffer
+): void {
+  const target = new URL(req.url ?? "/", rendererDevUrl);
+  const targetPort = Number(target.port || (target.protocol === "https:" ? "443" : "80"));
+  const connectOptions = {
+    host: target.hostname,
+    port: targetPort
+  };
+  const upstream =
+    target.protocol === "https:" ? tls.connect(connectOptions) : net.connect(connectOptions);
+
+  upstream.on("connect", () => {
+    // Vite's HMR websocket is only needed in dev; proxying it keeps public tunnel testing quiet.
+    upstream.write(
+      `${req.method ?? "GET"} ${target.pathname}${target.search} HTTP/${req.httpVersion}\r\n${formatProxyHeaders(
+        req.headers,
+        target.host
+      )}\r\n\r\n`
+    );
+    if (head.length > 0) {
+      upstream.write(head);
+    }
+    socket.pipe(upstream).pipe(socket);
+  });
+
+  upstream.on("error", () => {
+    socket.destroy();
+  });
+  socket.on("error", () => {
+    upstream.destroy();
+  });
+}
+
 export function createBackendServer(options: BackendServerOptions): BackendServer {
   fs.mkdirSync(options.dataDir, { recursive: true });
   const service = new GoldsprintsApp({
@@ -78,11 +132,25 @@ export function createBackendServer(options: BackendServerOptions): BackendServe
   });
   const upload = multer({ storage });
 
-  const wsServer = new WebSocketServer({
-    server: httpServer,
-    path: WS_PATH
-  });
+  const wsServer = new WebSocketServer({ noServer: true });
   const debugEnabled = process.env.GOLDSPRINTS_DEBUG === "1";
+
+  httpServer.on("upgrade", (req, socket, head) => {
+    const pathname = new URL(req.url ?? "/", "http://localhost").pathname;
+    if (pathname === WS_PATH) {
+      wsServer.handleUpgrade(req, socket, head, (ws) => {
+        wsServer.emit("connection", ws, req);
+      });
+      return;
+    }
+
+    if (options.rendererDevUrl) {
+      proxyDevWebSocketUpgrade(options.rendererDevUrl, req, socket, head);
+      return;
+    }
+
+    socket.destroy();
+  });
 
   service.onSnapshot((snapshot: AppSnapshot) => {
     // Every surface hydrates from the same snapshot stream so admin, projector, and phones stay in sync.
@@ -293,6 +361,18 @@ export function createBackendServer(options: BackendServerOptions): BackendServe
 
   app.post(`${API_PREFIX}/tunnel/stop`, (_req, res) => {
     res.json(service.stopTunnel());
+  });
+
+  app.get(`${API_PREFIX}/tunnel/diagnostics`, (_req, res) => {
+    res.json(service.getTunnelDiagnostics());
+  });
+
+  app.post(`${API_PREFIX}/tunnel/install-cloudflared`, async (_req, res, next) => {
+    try {
+      res.json(await service.installCloudflared());
+    } catch (error) {
+      next(error);
+    }
   });
 
   if (options.rendererDistDir) {

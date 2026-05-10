@@ -1,8 +1,14 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { AppSnapshot } from "@goldsprints/shared/types";
 import { Button, Panel, StatPill } from "@goldsprints/shared-ui";
-import { rotatePhotoBoothPairing, startTunnel, stopTunnel, updateSettings } from "../../lib/api";
+import {
+  installCloudflared,
+  rotatePhotoBoothPairing,
+  startTunnel,
+  stopTunnel,
+  updateSettings
+} from "../../lib/api";
 import { photoBoothStatusQueryKey, usePhotoBoothStatusQuery } from "../../lib/query";
 import { fireAndForget } from "../../lib/ui-actions";
 
@@ -22,6 +28,26 @@ function parseTickerMessages(value: string): string[] {
     .slice(0, 20);
 }
 
+function tunnelModeLabel(mode: AppSnapshot["tunnel"]["mode"]): string {
+  return mode === "token" ? "Stable URL" : "Quick URL";
+}
+
+function cloudflaredSourceLabel(source: AppSnapshot["tunnel"]["binarySource"]): string {
+  const resolvedSource = source ?? "missing";
+  switch (resolvedSource) {
+    case "env":
+      return "Configured path";
+    case "managed":
+      return "App-managed";
+    case "path":
+      return "System PATH";
+    case "missing":
+      return "Missing";
+    default:
+      return "Unknown";
+  }
+}
+
 export function SettingsTab({
   snapshot,
   meta
@@ -34,6 +60,20 @@ export function SettingsTab({
   const photoBoothAdminStatus = photoBoothStatusQuery.data;
   const photoBoothStatus = photoBoothAdminStatus?.status ?? snapshot.photoBooth;
   const tickerMessageInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const [cloudflaredInstalling, setCloudflaredInstalling] = useState(false);
+  const tunnelUrl =
+    snapshot.tunnel.publicUrl ?? (meta ? `${meta.localBaseUrl}/racer` : "Tunnel inactive");
+  const canInstallCloudflared =
+    snapshot.tunnel.binarySource === "missing" && snapshot.tunnel.status !== "active";
+
+  async function installCloudflaredFromAdmin(): Promise<void> {
+    setCloudflaredInstalling(true);
+    try {
+      await installCloudflared();
+    } finally {
+      setCloudflaredInstalling(false);
+    }
+  }
 
   return (
     <div className="page-grid">
@@ -158,30 +198,60 @@ export function SettingsTab({
       <Panel
         title="Tunnel"
         actions={
-          snapshot.tunnel.status === "active" ? (
-            <Button
-              variant="ghost"
-              onClick={() => {
-                fireAndForget(stopTunnel());
-              }}
-            >
-              Stop Tunnel
-            </Button>
-          ) : (
-            <Button
-              onClick={() => {
-                fireAndForget(startTunnel());
-              }}
-            >
-              Start Tunnel
-            </Button>
-          )
+          <div className="panel-action-row">
+            {canInstallCloudflared ? (
+              <Button
+                variant="ghost"
+                disabled={cloudflaredInstalling}
+                onClick={() => {
+                  fireAndForget(installCloudflaredFromAdmin(), "install cloudflared");
+                }}
+              >
+                {cloudflaredInstalling ? "Installing..." : "Install cloudflared"}
+              </Button>
+            ) : null}
+            {snapshot.tunnel.status === "active" ? (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  fireAndForget(stopTunnel());
+                }}
+              >
+                Stop Tunnel
+              </Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  fireAndForget(startTunnel());
+                }}
+              >
+                Start Tunnel
+              </Button>
+            )}
+          </div>
         }
       >
         <div className="stack-sm">
-          <strong>Status: {snapshot.tunnel.status}</strong>
-          <span>{snapshot.tunnel.publicUrl ?? meta?.localBaseUrl ?? "Tunnel inactive"}</span>
+          <div className="stat-grid">
+            <StatPill label="Status" value={snapshot.tunnel.status} />
+            <StatPill label="Mode" value={tunnelModeLabel(snapshot.tunnel.mode)} />
+            <StatPill
+              label="cloudflared"
+              value={cloudflaredSourceLabel(snapshot.tunnel.binarySource)}
+            />
+            <StatPill
+              label="Tunnel"
+              value={
+                snapshot.tunnel.tunnelName ?? (snapshot.tunnel.mode === "token" ? "Unset" : "Quick")
+              }
+            />
+          </div>
+          <span>{tunnelUrl}</span>
+          {snapshot.tunnel.cloudflaredVersion ? (
+            <span>{snapshot.tunnel.cloudflaredVersion}</span>
+          ) : null}
           {snapshot.tunnel.message ? <span>{snapshot.tunnel.message}</span> : null}
+          {snapshot.tunnel.lastError ? <span>{snapshot.tunnel.lastError}</span> : null}
           {meta?.qrCodeDataUrl ? (
             <img className="qr-code" src={meta.qrCodeDataUrl} alt="QR code for racer page" />
           ) : null}

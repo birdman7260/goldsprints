@@ -5,7 +5,8 @@ import type {
   CreateRacerInput,
   QueueSignupInput,
   Racer,
-  StartTournamentInput
+  StartTournamentInput,
+  TunnelDiagnostics
 } from "@goldsprints/shared/types";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -14,9 +15,34 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 const configuredBase =
   typeof import.meta.env.VITE_API_BASE === "string" ? import.meta.env.VITE_API_BASE : undefined;
-export const apiBase =
-  configuredBase ??
-  (window.location.port === "5173" ? "http://127.0.0.1:3187" : window.location.origin);
+
+interface BrowserLocation {
+  hostname: string;
+  origin: string;
+  port: string;
+}
+
+function isLoopbackHost(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+
+export function resolveApiBase(
+  location: BrowserLocation,
+  configuredApiBase: string | undefined = configuredBase
+): string {
+  if (configuredApiBase && isLoopbackHost(location.hostname)) {
+    return configuredApiBase;
+  }
+
+  // Public tunnel visitors must use their current origin, not the laptop-local dev override.
+  if (location.port === "5173" && isLoopbackHost(location.hostname)) {
+    return "http://127.0.0.1:3187";
+  }
+
+  return location.origin;
+}
+
+export const apiBase = resolveApiBase(window.location);
 
 function buildUrl(path: string): string {
   return path.startsWith("http") ? path : `${apiBase}${path}`;
@@ -200,6 +226,14 @@ export async function stopTunnel(): Promise<AppSnapshot> {
   return parseJson(await fetch(buildUrl("/api/tunnel/stop"), { method: "POST" }));
 }
 
+export async function fetchTunnelDiagnostics(): Promise<TunnelDiagnostics> {
+  return parseJson(await fetch(buildUrl("/api/tunnel/diagnostics")));
+}
+
+export async function installCloudflared(): Promise<TunnelDiagnostics> {
+  return parseJson(await fetch(buildUrl("/api/tunnel/install-cloudflared"), { method: "POST" }));
+}
+
 export async function removeRacerFromUpcoming(racerId: string): Promise<AppSnapshot> {
   return parseJson(await fetch(buildUrl(`/api/queue/racer/${racerId}`), { method: "DELETE" }));
 }
@@ -226,7 +260,11 @@ export async function uploadAvatar(racerId: string, file: File): Promise<AppSnap
 }
 
 export function createWebSocketUrl(): string {
-  const url = new URL(apiBase);
+  return createWebSocketUrlFromApiBase(apiBase);
+}
+
+export function createWebSocketUrlFromApiBase(baseUrl: string): string {
+  const url = new URL(baseUrl);
   url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
   url.pathname = "/ws";
   url.search = "";

@@ -473,10 +473,12 @@ Requirements:
   `Implemented`
 - The app must be able to resume from prior state after restart. `Implemented`
 - The racer page must be available from the host app itself. `Implemented`
-- `cloudflared` support must exist so the racer page can be exposed to external devices.
-  `Partial`
+- `cloudflared` support must exist so the racer page can be exposed to external devices, including
+  quick temporary URLs and stable token-backed Cloudflare Tunnel URLs. `Implemented`
 - The admin must be able to start/stop the tunnel and see the resulting URL and QR code.
   `Implemented`
+- The app must be able to install and use an app-managed `cloudflared` binary on macOS and Windows
+  without requiring Homebrew, winget, or a globally installed binary. `Implemented`
 
 ## Kaleidoscope Photo Booth
 
@@ -566,8 +568,27 @@ Current delivery notes:
 
 Current delivery notes:
 
-- Tunnel lifecycle support exists, but depends on `cloudflared` being installed on the machine.
-  `Partial`
+- Stable tunnel mode is configured with backend-only dotenv variables such as
+  `GOLDSPRINTS_TUNNEL_MODE=token`, `GOLDSPRINTS_TUNNEL_NAME=GoldSprints`,
+  `GOLDSPRINTS_PUBLIC_RACER_URL=https://goldsprints.birdsnest.family/racer`, and
+  `GOLDSPRINTS_TUNNEL_TOKEN`. Tokens must stay in ignored local env files. `Implemented`
+- Cloudflared lookup prefers `GOLDSPRINTS_CLOUDFLARED_PATH`, then the app-managed runtime install,
+  then a system `PATH` binary. Admin diagnostics and scripts expose the active source/version.
+  `Implemented`
+- Vite dev mode must allow the stable racer-page hostname through host protection so tunneled dev
+  testing works at `goldsprints.birdsnest.family`; additional hosts can be configured with
+  `GOLDSPRINTS_VITE_ALLOWED_HOSTS`. `Implemented`
+- Stable Cloudflare Public Hostnames must route the hostname root to the embedded backend port
+  (`http://127.0.0.1:3187` by default), with no `/racer` path restriction, so assets, APIs, uploads,
+  and WebSocket traffic are all reachable. `Implemented`
+- Tunnel diagnostics must check the backend health endpoint, racer page HTML, and `/ws` WebSocket
+  upgrade separately so partial Cloudflare path routing is obvious during setup. `Implemented`
+- Browser API/WebSocket routing must ignore localhost `VITE_API_BASE` overrides when loaded from a
+  public tunnel hostname, so racer phones connect to the Cloudflare origin rather than
+  `127.0.0.1` on their own device. `Implemented`
+- In dev mode, the embedded backend must proxy Vite hot-reload websocket upgrades while still owning
+  the app snapshot websocket at `/ws`, so public tunnel testing does not show misleading websocket
+  failures. `Implemented`
 
 ## Technical Requirements
 
@@ -609,6 +630,12 @@ Current tooling requirements now include:
   including booth-specific `.env.photo-booth` overrides while keeping shell variables highest
   priority
 - a root `pnpm db:studio` launcher that bootstraps the isolated Studio package on demand
+- root `pnpm cloudflared:install`, `pnpm cloudflared:doctor`, and `pnpm cloudflared:version`
+  scripts for app-managed tunnel binary setup and diagnostics
+- the Electron production build must bundle workspace shared TypeScript packages into the main
+  process output so the built app can run with `pnpm start` without a TypeScript loader
+- root packaging scripts must exist for unpacked smoke builds and platform packages:
+  `pnpm package:dir`, `pnpm package:app`, `pnpm package:mac`, and `pnpm package:win`
 - strict ESLint + Prettier
 - `pnpm dev:reset-data`
 - `pnpm dev:debug`
@@ -624,6 +651,6 @@ These are still part of the broader product direction, but are not complete in t
 - real USB bike sensor implementation
 - field-validated OS2L / VirtualDJ start integration
 - full tournament racer-replacement workflow
-- fully polished production tunnel / network discovery experience across all environments
+- field validation of the stable Cloudflare Tunnel at an event venue network
 - field-validated DSLR camera model and WLED serial setup for the kaleidoscope booth
 - true avatar crop/resize derivative generation from booth DSLR originals

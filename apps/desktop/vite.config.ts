@@ -3,6 +3,16 @@ import react from "@vitejs/plugin-react";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import { fileURLToPath, URL } from "node:url";
 
+function configuredAllowedHosts(): string[] {
+  return [
+    "goldsprints.birdsnest.family",
+    ...(process.env.GOLDSPRINTS_VITE_ALLOWED_HOSTS ?? "")
+      .split(",")
+      .map((host) => host.trim())
+      .filter(Boolean)
+  ];
+}
+
 export default defineConfig({
   plugins: [
     tanstackRouter({
@@ -20,7 +30,8 @@ export default defineConfig({
   },
   server: {
     host: "127.0.0.1",
-    port: 5173
+    port: 5173,
+    allowedHosts: configuredAllowedHosts()
   },
   preview: {
     host: "127.0.0.1",

@@ -29,6 +29,7 @@ import type {
   TournamentBracketLayoutMode,
   TournamentBracketSize,
   TournamentPreset,
+  TunnelDiagnostics,
   TunnelState
 } from "@goldsprints/shared/types";
 import { nowIso } from "@goldsprints/shared/utils";
@@ -166,7 +167,7 @@ export class GoldsprintsApp extends EventEmitter {
   private readonly os2lTrigger = new Os2lRaceTriggerAdapter(
     Number(process.env.GOLDSPRINTS_OS2L_PORT ?? DEFAULT_OS2L_PORT)
   );
-  private readonly tunnelManager = new CloudflaredTunnelManager();
+  private readonly tunnelManager: CloudflaredTunnelManager;
   private readonly tournaments = new TournamentService();
   private countdownTicker: NodeJS.Timeout | null = null;
   private currentRuntime: CurrentRaceRuntime | null = null;
@@ -180,6 +181,7 @@ export class GoldsprintsApp extends EventEmitter {
     this.uploadsDir = path.join(options.dataDir, "uploads");
     this.serverPort = options.serverPort ?? DEFAULT_SERVER_PORT;
     this.db = new AppDatabase(options.dataDir);
+    this.tunnelManager = new CloudflaredTunnelManager({ dataDir: options.dataDir });
   }
 
   async init(): Promise<void> {
@@ -1592,6 +1594,20 @@ export class GoldsprintsApp extends EventEmitter {
 
   getTunnelState(): TunnelState {
     return this.tunnelManager.getState();
+  }
+
+  getTunnelDiagnostics(): TunnelDiagnostics {
+    const diagnostics = this.tunnelManager.getDiagnostics();
+    this.emitSnapshot();
+    return diagnostics;
+  }
+
+  async installCloudflared(): Promise<TunnelDiagnostics> {
+    try {
+      return await this.tunnelManager.installCloudflared();
+    } finally {
+      this.emitSnapshot();
+    }
   }
 
   setServerPort(port: number): void {

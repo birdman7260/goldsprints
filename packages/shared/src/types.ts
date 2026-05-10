@@ -385,8 +385,28 @@ export interface RaceResultPresentation {
 
 export interface TunnelState {
   status: "idle" | "starting" | "active" | "error";
+  mode?: "quick" | "token";
   publicUrl?: string | null;
+  tunnelName?: string | null;
+  binarySource?: "env" | "managed" | "path" | "missing" | null;
+  cloudflaredVersion?: string | null;
   message?: string | null;
+  lastError?: string | null;
+}
+
+export interface TunnelDiagnostics {
+  mode: "quick" | "token";
+  publicUrl: string | null;
+  tunnelName: string | null;
+  hasToken: boolean;
+  binaryPath: string | null;
+  binarySource: "env" | "managed" | "path" | "missing";
+  cloudflaredVersion: string | null;
+  installPath: string | null;
+  downloadUrl: string | null;
+  supportedPlatform: boolean;
+  message: string | null;
+  lastError: string | null;
 }
 
 export interface AdminSettings {

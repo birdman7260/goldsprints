@@ -7,5 +7,5 @@
       "@backend/*": ["src/backend/*"]
     }
   },
-  "include": ["src/backend", "src/electron", "drizzle.config.ts"]
+  "include": ["src/backend", "src/electron", "drizzle.config.ts", "tsup.electron.config.ts"]
 }

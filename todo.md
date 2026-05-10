@@ -14,3 +14,5 @@ hidden QR code ideas:
 ability to change any racer's sprite sheet via AI prompt
 for the beat match game, ability to change the BPM at any point
 distance/time extension that can be applied at any point (with loud sound played at the same time)
+
+eyJhIjoiNTAzMzFhZjY3MjQ5M2M3MmYyZTk3NzIxNWMxY2VlNjUiLCJ0IjoiZDZiODk2OTYtNGNiOC00NDZiLWEzMTMtNWQ5ZTM4MmM2NWYzIiwicyI6IlpqWXdaRGMxTUdRdFl6SmtOaTAwT1RJMkxUZ3lOMlV0TURVd04yWTBZMk16TVRJMyJ9

@@ -551,6 +551,13 @@ p {
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
 }
 
+.panel-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
 .list {
   margin-top: 0.75rem;
 }

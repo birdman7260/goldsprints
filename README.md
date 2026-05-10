@@ -190,7 +190,8 @@ Important files:
 
 - Node.js 22 or newer is recommended
 - macOS or Windows for the intended desktop runtime
-- `cloudflared` installed and on `PATH` if you want public racer-page tunnels
+- `cloudflared` is optional at first run: GoldSprints can use an existing binary, or install an
+  app-managed macOS/Windows binary into its runtime tools folder.
 
 ## Getting Started
 
@@ -249,6 +250,38 @@ without the root launcher.
 
 Only variables prefixed with `VITE_` are exposed to browser renderer code by Vite. Keep secrets such
 as `GOLDSPRINTS_BOOTH_SECRET` in backend/agent dotenv files, not in `VITE_*` variables.
+`VITE_API_BASE` is only honored for loopback pages such as the local Vite dev server; public tunnel
+visitors use the current `https://...` origin so REST and WebSocket requests route through
+Cloudflare instead of trying to connect to `127.0.0.1` on the visitor's device.
+
+Stable Cloudflare tunnels are configured through backend-only variables. For the Birdsnest event
+domain, keep the token in `.env.local` and never commit it:
+
+```bash
+GOLDSPRINTS_TUNNEL_MODE=token
+GOLDSPRINTS_TUNNEL_NAME=GoldSprints
+GOLDSPRINTS_PUBLIC_RACER_URL=https://goldsprints.birdsnest.family/racer
+GOLDSPRINTS_TUNNEL_TOKEN=<token from Cloudflare>
+```
+
+Quick tunnel mode remains available with `GOLDSPRINTS_TUNNEL_MODE=quick`. Binary lookup prefers
+`GOLDSPRINTS_CLOUDFLARED_PATH`, then the app-managed install, then a `cloudflared` found on `PATH`.
+Dev mode allows `goldsprints.birdsnest.family` through Vite's host protection; add more
+comma-separated hosts with `GOLDSPRINTS_VITE_ALLOWED_HOSTS` if a future event uses another public
+domain while pointed at the Vite dev server.
+
+In Cloudflare Zero Trust, the `GoldSprints` Public Hostname should be configured with:
+
+- Hostname: `goldsprints.birdsnest.family`
+- Path: empty
+- Service type: `HTTP`
+- Service URL: `127.0.0.1:3187`
+
+Do not point the public hostname at Vite's `5173` dev server and do not set the Public Hostname path
+to `/racer`. The racer page itself lives at `/racer`, but the tunnel must expose the app root so
+assets, `/api/*`, `/uploads/*`, and WebSocket traffic can all load.
+In dev mode, the embedded backend also proxies Vite's hot-reload websocket so tunneled browser
+testing does not produce unrelated Vite websocket failures.
 
 ## Scripts
 
@@ -264,8 +297,25 @@ as `GOLDSPRINTS_BOOTH_SECRET` in backend/agent dotenv files, not in `VITE_*` var
   - Same as `dev:debug`, but pauses Electron on startup so you can attach a debugger before app bootstrap runs.
 - `pnpm build`
   - Builds the renderer with Vite and bundles the Electron entry with `tsup`.
+  - The Electron bundle inlines workspace shared TypeScript packages so `pnpm start` does not try
+    to load raw `.ts` files from `packages/shared`.
   - Copies runtime assets such as SQLite migration files into `apps/desktop/dist/electron`.
   - This creates distributable app assets in `apps/desktop/dist/`, but it does not create an installer.
+- `pnpm cloudflared:install`
+  - Downloads the official `cloudflared` release for macOS arm64, macOS x64, or Windows x64 into
+    the GoldSprints runtime tools folder.
+  - Verifies the binary with `cloudflared --version`.
+  - Does not use Homebrew, winget, or admin-level system installs.
+- `pnpm cloudflared:doctor`
+  - Prints tunnel mode, public URL, tunnel name, binary source, version, install path, and any
+    current setup error.
+  - When a public URL is configured, checks `<public-origin>/api/health`, `/racer`, and the `/ws`
+    WebSocket upgrade to catch Cloudflare routes that only match part of the app.
+  - If `/api/health` works but `/racer` or `/ws` fails, the Public Hostname is probably path-scoped
+    instead of routing the empty root path to `http://127.0.0.1:3187`.
+  - Exits non-zero when no usable `cloudflared` binary is available.
+- `pnpm cloudflared:version`
+  - Prints the resolved `cloudflared --version` output using the same lookup order as the app.
 - `pnpm dev:reset-data`
   - Deletes the repo-local dev runtime directory at `.goldsprints-dev/runtime`.
   - Use this when you want a fresh SQLite database, cleared uploads, and no leftover dev event data.
@@ -279,6 +329,18 @@ as `GOLDSPRINTS_BOOTH_SECRET` in backend/agent dotenv files, not in `VITE_*` var
 - `pnpm start`
   - Launches Electron against the built app.
   - Use this after `pnpm build`.
+- `pnpm package:dir`
+  - Builds the app and creates an unpacked Electron app in `apps/desktop/release`.
+  - This is the fastest packaging smoke test because it skips installer creation.
+- `pnpm package:app`
+  - Builds the app and runs Electron Builder for the current platform.
+  - Installer/package output is written to `apps/desktop/release`.
+- `pnpm package:mac`
+  - Builds a macOS package from macOS.
+  - Current builds are unsigned unless signing/notarization credentials are configured.
+- `pnpm package:win`
+  - Builds a Windows package from Windows for the most reliable result.
+  - Current builds are unsigned unless code-signing credentials are configured.
 - `pnpm preview`
   - Serves the built Vite renderer for inspection outside Electron.
   - Useful when checking static renderer output only.
@@ -572,7 +634,6 @@ selected.
 
 - The real USB bike sensor adapter is still a placeholder seam.
 - OS2L wiring is scaffolded, but real VirtualDJ cue integration is not validated end-to-end yet.
-- `cloudflared` integration depends on the binary being installed locally.
 - Tournament replacement / bye-management workflows for removing racers mid-tournament are still
   partial in the admin UI.
 
