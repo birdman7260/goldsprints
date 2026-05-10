@@ -1,4 +1,4 @@
-import type { PhotoBoothSession } from "../../../src/shared/types";
+import type { PhotoBoothSession } from "@goldsprints/shared/types";
 
 export const FAKE_QR_PREFIX = "fake";
 

@@ -1,8 +1,31 @@
+@font-face {
+  /* Match the main app's bundled DOS-era font when the pixel theme is active. */
+  font-family: "WebPlus IBM VGA 8x16";
+  src: url("../../../../apps/desktop/src/renderer/assets/fonts/oldschool-pc-fonts/WebPlus_IBM_VGA_8x16.woff")
+    format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
 :root {
+  --theme-font-family: "Space Grotesk", "Avenir Next", sans-serif;
+  --theme-surface: #08111d;
+  --theme-surface-alt: #112338;
+  --theme-accent: #3cf2d2;
+  --theme-accent-soft: rgba(60, 242, 210, 0.16);
+  --theme-text: #f7fbff;
+  --theme-text-muted: #b8d6e8;
+  --theme-success: #47ff98;
+  --theme-warning: #ffca57;
+  --theme-danger: #ff6f91;
+  --theme-lane-a: #38bdf8;
+  --theme-lane-b: #fb7185;
+  --ui-panel-gap: 18px;
+  --ui-panel-padding: 24px;
   color-scheme: dark;
-  font-family: "Avenir Next", "Trebuchet MS", ui-rounded, system-ui, sans-serif;
-  background: #050608;
-  color: #f8fafc;
+  font-family: var(--theme-font-family);
+  background: var(--theme-surface);
+  color: var(--theme-text);
 }
 
 * {
@@ -13,9 +36,37 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 20% 12%, rgba(255, 196, 86, 0.28), transparent 28%),
-    radial-gradient(circle at 80% 10%, rgba(60, 242, 210, 0.2), transparent 32%),
-    linear-gradient(145deg, #050608, #08111d 48%, #171018);
+    radial-gradient(circle at 20% 12%, var(--theme-accent-soft), transparent 28%),
+    radial-gradient(
+      circle at 80% 10%,
+      color-mix(in srgb, var(--theme-lane-b) 24%, transparent),
+      transparent 32%
+    ),
+    linear-gradient(
+      145deg,
+      var(--theme-surface),
+      var(--theme-surface-alt) 48%,
+      var(--theme-surface)
+    );
+}
+
+:root[data-theme-surface="black"] body {
+  background: #000;
+}
+
+:root[data-theme-surface="frontier"] body {
+  background:
+    radial-gradient(
+      circle at 18% 14%,
+      color-mix(in srgb, var(--theme-warning) 20%, transparent),
+      transparent 26%
+    ),
+    radial-gradient(
+      circle at 85% 18%,
+      color-mix(in srgb, var(--theme-lane-a) 18%, transparent),
+      transparent 30%
+    ),
+    linear-gradient(145deg, var(--theme-surface), var(--theme-surface-alt));
 }
 
 button,
@@ -50,28 +101,13 @@ button {
   gap: 18px;
 }
 
-.hero-card,
-.scan-card,
-.control-card,
-.capture-card,
-.review-card,
-.capture-countdown,
-.diagnostics {
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 32px;
-  background: rgba(8, 17, 29, 0.86);
-  box-shadow: 0 28px 88px rgba(0, 0, 0, 0.38);
-}
-
 .hero-card {
   padding: 28px;
-  display: grid;
-  gap: 18px;
 }
 
 .eyebrow {
   margin: 0 0 8px;
-  color: #3cf2d2;
+  color: var(--theme-accent);
   font-weight: 900;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -95,7 +131,7 @@ h2 {
 }
 
 p {
-  color: #b8d6e8;
+  color: var(--theme-text-muted);
   font-size: clamp(18px, 2.4vw, 28px);
 }
 
@@ -107,31 +143,30 @@ p {
 }
 
 .hardware-badge {
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--theme-accent-soft);
   border-radius: 999px;
   padding: 9px 13px;
-  background:
-    radial-gradient(circle at 50% 12%, rgba(255, 255, 255, 0.42), transparent 24%),
-    linear-gradient(
-      180deg,
-      hsl(var(--panel-hue) 94% 66% / 0.96),
-      hsl(calc(var(--panel-hue) + 34deg) 88% 44% / 0.94)
-    );
-  color: #cfe7f5;
+  background: var(--theme-accent-soft);
+  color: var(--theme-text-muted);
   font-size: 14px;
   font-weight: 800;
   text-transform: uppercase;
 }
 
+.hardware-badge .stat-pill__label,
+.hardware-badge .stat-pill__value {
+  font-size: inherit;
+}
+
 .hardware-badge--online,
 .hardware-badge--simulated {
-  border-color: rgba(60, 242, 210, 0.55);
-  color: #3cf2d2;
+  border-color: color-mix(in srgb, var(--theme-success) 64%, transparent);
+  color: var(--theme-success);
 }
 
 .hardware-badge--error {
-  border-color: rgba(255, 92, 92, 0.58);
-  color: #ff7b7b;
+  border-color: color-mix(in srgb, var(--theme-danger) 64%, transparent);
+  color: var(--theme-danger);
 }
 
 .scan-card {
@@ -141,23 +176,11 @@ p {
   gap: 14px;
 }
 
-input,
-select {
-  width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  padding: 18px 20px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #f8fafc;
-}
-
-.button,
-.capture-button,
-.panel-button {
+.capture-button {
   border: 0;
   border-radius: 999px;
-  color: #061018;
-  background: #3cf2d2;
+  color: var(--theme-surface);
+  background: var(--theme-accent);
   cursor: pointer;
   font-weight: 950;
   text-transform: uppercase;
@@ -168,35 +191,19 @@ select {
     background 160ms ease;
 }
 
-.button {
-  padding: 17px 24px;
-}
-
-.button:hover,
-.capture-button:hover,
-.panel-button:hover {
+.capture-button:hover:not(:disabled) {
   filter: brightness(1.13);
   transform: translateY(-1px);
 }
 
-.button:active,
-.capture-button:active,
-.panel-button:active {
+.capture-button:active:not(:disabled) {
   transform: translateY(2px) scale(0.98);
 }
 
-.button:disabled,
-.capture-button:disabled,
-.panel-button:disabled {
+.capture-button:disabled {
   cursor: not-allowed;
   filter: grayscale(0.8);
   opacity: 0.5;
-}
-
-.button--ghost {
-  border: 1px solid rgba(60, 242, 210, 0.42);
-  background: rgba(60, 242, 210, 0.1);
-  color: #f8fafc;
 }
 
 .photo-layout {
@@ -205,23 +212,10 @@ select {
   gap: 18px;
 }
 
-.control-card,
-.capture-card,
-.capture-countdown,
-.review-card,
-.diagnostics {
-  padding: 24px;
-}
-
-.control-card {
-  display: grid;
-  gap: 18px;
-}
-
-.control-card label {
+.panel label {
   display: grid;
   gap: 8px;
-  color: #e9f7ff;
+  color: var(--theme-text);
   font-weight: 850;
 }
 
@@ -239,16 +233,16 @@ select {
   height: 296px;
   overflow: hidden;
   border-radius: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--theme-accent-soft);
   background:
     linear-gradient(
       180deg,
-      rgba(5, 6, 8, 0.9),
+      color-mix(in srgb, var(--theme-surface) 90%, transparent),
       transparent 30%,
       transparent 70%,
-      rgba(5, 6, 8, 0.9)
+      color-mix(in srgb, var(--theme-surface) 90%, transparent)
     ),
-    rgba(255, 255, 255, 0.05);
+    color-mix(in srgb, var(--theme-surface-alt) 58%, transparent);
 }
 
 .light-look-wheel {
@@ -284,11 +278,11 @@ select {
   right: 12px;
   top: 50%;
   height: 84px;
-  border: 2px solid rgba(255, 255, 255, 0.24);
+  border: 2px solid color-mix(in srgb, var(--theme-accent) 36%, transparent);
   border-radius: 28px;
   box-shadow:
-    inset 0 0 0 1px rgba(60, 242, 210, 0.3),
-    0 0 40px rgba(60, 242, 210, 0.16);
+    inset 0 0 0 1px color-mix(in srgb, var(--theme-accent) 30%, transparent),
+    0 0 40px var(--theme-accent-soft);
   transform: translateY(-50%);
 }
 
@@ -301,9 +295,9 @@ select {
   height: 74px;
   margin: 0;
   padding: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--theme-accent-soft);
   border-radius: 26px;
-  background: rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, var(--theme-surface-alt) 52%, transparent);
   cursor: pointer;
   opacity: var(--look-opacity, 0.58);
   transform: translateY(calc(-50% + var(--look-y, 0px))) scale(var(--look-scale, 1));
@@ -328,8 +322,8 @@ select {
 }
 
 .light-look-item--active {
-  border-color: rgba(60, 242, 210, 0.72);
-  box-shadow: 0 0 26px rgba(60, 242, 210, 0.2);
+  border-color: color-mix(in srgb, var(--theme-accent) 72%, transparent);
+  box-shadow: 0 0 26px var(--theme-accent-soft);
 }
 
 .light-look-preview {
@@ -427,8 +421,12 @@ select {
   font-size: clamp(34px, 6vw, 78px);
   line-height: 0.95;
   background:
-    radial-gradient(circle at 30% 20%, #fff6b8, transparent 36%),
-    linear-gradient(145deg, #ffcf4f, #ff5ca8 55%, #3cf2d2);
+    radial-gradient(
+      circle at 30% 20%,
+      color-mix(in srgb, var(--theme-text) 72%, transparent),
+      transparent 36%
+    ),
+    linear-gradient(145deg, var(--theme-warning), var(--theme-lane-b) 55%, var(--theme-accent));
 }
 
 .umbrella-picker-card {
@@ -448,12 +446,16 @@ select {
   position: relative;
   min-height: min(68vh, 660px);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--theme-accent-soft);
   border-right: 0;
   border-radius: 32px 0 0 32px;
   background:
-    radial-gradient(circle at 100% 50%, rgba(255, 207, 79, 0.24), transparent 48%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    radial-gradient(circle at 100% 50%, var(--theme-accent-soft), transparent 48%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--theme-surface-alt) 50%, transparent),
+      color-mix(in srgb, var(--theme-surface) 44%, transparent)
+    );
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -474,11 +476,16 @@ select {
   background:
     radial-gradient(
       circle,
-      rgba(5, 6, 8, 0.96) 0 8%,
-      rgba(255, 255, 255, 0.16) 8.5% 9.5%,
+      color-mix(in srgb, var(--theme-surface) 96%, transparent) 0 8%,
+      var(--theme-accent-soft) 8.5% 9.5%,
       transparent 10%
     ),
-    radial-gradient(circle, transparent 67%, rgba(255, 255, 255, 0.24) 68%, transparent 69%);
+    radial-gradient(
+      circle,
+      transparent 67%,
+      color-mix(in srgb, var(--theme-accent) 30%, transparent) 68%,
+      transparent 69%
+    );
   filter: drop-shadow(-28px 0 52px rgba(0, 0, 0, 0.38));
   transform: translateY(-50%) rotate(var(--wheel-rotation));
   transition: transform 190ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -495,7 +502,7 @@ select {
   width: var(--panel-chord-ratio, 42%);
   height: 50%;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid color-mix(in srgb, var(--theme-text) 24%, transparent);
   border-top: 0;
   background: rgba(255, 255, 255, 0.08);
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
@@ -526,9 +533,9 @@ select {
 }
 
 .umbrella-panel-slice--active {
-  border-color: rgba(255, 255, 255, 0.74);
+  border-color: color-mix(in srgb, var(--theme-text) 74%, transparent);
   filter: brightness(1.18) drop-shadow(0 0 18px hsl(var(--panel-hue) 94% 64% / 0.72))
-    drop-shadow(0 0 34px rgba(255, 255, 255, 0.28));
+    drop-shadow(0 0 34px var(--theme-accent-soft));
   z-index: 20;
 }
 
@@ -562,8 +569,37 @@ select {
   max-width: min(820px, 100%);
   max-height: 58vh;
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--theme-accent-soft);
   object-fit: contain;
+}
+
+:root[data-theme-ui="pixel"] .hero-card,
+:root[data-theme-ui="pixel"] .scan-card,
+:root[data-theme-ui="pixel"] .capture-card,
+:root[data-theme-ui="pixel"] .review-card,
+:root[data-theme-ui="pixel"] .capture-countdown,
+:root[data-theme-ui="pixel"] .diagnostics,
+:root[data-theme-ui="pixel"] .light-wheel-shell,
+:root[data-theme-ui="pixel"] .light-look-item,
+:root[data-theme-ui="pixel"] .light-look-preview,
+:root[data-theme-ui="pixel"] .umbrella-panel-picker,
+:root[data-theme-ui="pixel"] .capture-button,
+:root[data-theme-ui="pixel"] .hardware-badge {
+  border-radius: 0;
+}
+
+:root[data-theme-ui="pixel"] .hero-card,
+:root[data-theme-ui="pixel"] .scan-card,
+:root[data-theme-ui="pixel"] .capture-card,
+:root[data-theme-ui="pixel"] .review-card,
+:root[data-theme-ui="pixel"] .capture-countdown,
+:root[data-theme-ui="pixel"] .diagnostics {
+  box-shadow: none;
+}
+
+:root[data-theme-ui="pixel"] .capture-button {
+  border: 2px solid var(--theme-accent);
+  box-shadow: none;
 }
 
 .review-actions,

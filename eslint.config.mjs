@@ -8,13 +8,15 @@ import unusedImports from "eslint-plugin-unused-imports";
 import tseslint from "typescript-eslint";
 
 const typedFiles = [
-  "src/**/*.{ts,tsx}",
+  "apps/desktop/src/**/*.{ts,tsx}",
+  "apps/desktop/vite.config.ts",
+  "apps/desktop/vitest.config.ts",
+  "apps/desktop/drizzle.config.ts",
+  "packages/shared/src/**/*.{ts,tsx}",
+  "packages/shared-ui/src/**/*.{ts,tsx}",
   "tools/photo-booth-agent/src/**/*.{ts,tsx}",
   "tools/photo-booth-agent/vite.config.ts",
-  "tools/photo-booth-agent/vitest.config.ts",
-  "vite.config.ts",
-  "vitest.config.ts",
-  "drizzle.config.ts"
+  "tools/photo-booth-agent/vitest.config.ts"
 ];
 const scopeToFiles = (configs, files) =>
   configs.map((config) => ({
@@ -30,7 +32,7 @@ export default tseslint.config(
       "node_modules/**",
       "coverage/**",
       ".vite/**",
-      "src/renderer/routeTree.gen.ts"
+      "apps/desktop/src/renderer/routeTree.gen.ts"
     ]
   },
   js.configs.recommended,
@@ -49,8 +51,10 @@ export default tseslint.config(
       sourceType: "module",
       parserOptions: {
         project: [
-          "./tsconfig.json",
-          "./tsconfig.node.json",
+          "./apps/desktop/tsconfig.json",
+          "./apps/desktop/tsconfig.node.json",
+          "./packages/shared/tsconfig.json",
+          "./packages/shared-ui/tsconfig.json",
           "./tools/photo-booth-agent/tsconfig.json"
         ],
         tsconfigRootDir: import.meta.dirname
@@ -121,10 +125,9 @@ export default tseslint.config(
   },
   {
     files: [
-      "src/renderer/**/*.{ts,tsx}",
-      "src/shared/**/*.{ts,tsx}",
-      "vite.config.ts",
-      "vitest.config.ts"
+      "apps/desktop/src/renderer/**/*.{ts,tsx}",
+      "packages/shared-ui/src/**/*.{ts,tsx}",
+      "tools/photo-booth-agent/src/kiosk/**/*.tsx"
     ],
     languageOptions: {
       globals: {
@@ -134,13 +137,15 @@ export default tseslint.config(
   },
   {
     files: [
-      "src/backend/**/*.ts",
-      "src/electron/**/*.ts",
+      "apps/desktop/src/backend/**/*.ts",
+      "apps/desktop/src/electron/**/*.ts",
+      "apps/desktop/vitest.config.ts",
+      "apps/desktop/vite.config.ts",
+      "apps/desktop/drizzle.config.ts",
       "tools/photo-booth-agent/src/**/*.ts",
       "tools/photo-booth-agent/vitest.config.ts",
       "tools/photo-booth-agent/vite.config.ts",
-      "scripts/**/*.mjs",
-      "drizzle.config.ts"
+      "scripts/**/*.mjs"
     ],
     languageOptions: {
       globals: {
@@ -163,19 +168,19 @@ export default tseslint.config(
     }
   },
   {
-    files: ["src/renderer/router.tsx"],
+    files: ["apps/desktop/src/renderer/router.tsx"],
     rules: {
       "react-refresh/only-export-components": "off"
     }
   },
   {
-    files: ["src/renderer/routes/**/*.tsx"],
+    files: ["apps/desktop/src/renderer/routes/**/*.tsx"],
     rules: {
       "react-refresh/only-export-components": "off"
     }
   },
   {
-    files: ["**/*.test.ts", "src/renderer/test/**/*.ts"],
+    files: ["**/*.test.ts", "apps/desktop/src/renderer/test/**/*.ts"],
     languageOptions: {
       globals: {
         ...globals.node,

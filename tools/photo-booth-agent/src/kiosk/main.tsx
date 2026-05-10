@@ -1,5 +1,10 @@
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { Button, Panel, StatPill, TextInput } from "@goldsprints/shared-ui";
+import "@goldsprints/shared-ui/styles.css";
+import { applyThemeToDocument } from "@goldsprints/shared-ui/theme";
+import { themes } from "@goldsprints/shared/themes";
+import type { ThemeDefinition } from "@goldsprints/shared/types";
 import { DEFAULT_LIGHT_LOOK } from "../light-looks";
 import type {
   DiagnosticsResult,
@@ -21,6 +26,7 @@ interface BoothState {
   captureCountdownEndsAt: string | null;
   pendingUploadCount: number;
   hardware: Record<string, HardwareComponentHealth>;
+  theme: ThemeDefinition;
 }
 
 const defaultState: BoothState = {
@@ -36,7 +42,8 @@ const defaultState: BoothState = {
   },
   captureCountdownEndsAt: null,
   pendingUploadCount: 0,
-  hardware: {}
+  hardware: {},
+  theme: themes[0]
 };
 
 async function post<T>(path: string, body: unknown = {}): Promise<T> {
@@ -58,9 +65,11 @@ async function post<T>(path: string, body: unknown = {}): Promise<T> {
 
 function HardwareBadge({ label, health }: { label: string; health?: HardwareComponentHealth }) {
   return (
-    <span className={`hardware-badge hardware-badge--${health?.status ?? "unknown"}`}>
-      {label}: {health?.status ?? "unknown"}
-    </span>
+    <StatPill
+      className={`hardware-badge hardware-badge--${health?.status ?? "unknown"}`}
+      label={label}
+      value={health?.status ?? "unknown"}
+    />
   );
 }
 
@@ -75,12 +84,11 @@ function DiagnosticsPanel({
 }) {
   const components = diagnostics ?? hardware;
   return (
-    <section className="diagnostics">
+    <Panel title="Diagnostics" className="diagnostics">
       <div className="diagnostics__header">
-        <h2>Diagnostics</h2>
-        <button className="button button--ghost" onClick={onRun}>
+        <Button variant="ghost" onClick={onRun}>
           Run Checks
-        </button>
+        </Button>
       </div>
       <div className="hardware-grid">
         {["scanner", "camera", "lights", "umbrella", "hallSensor"].map((key) => {
@@ -90,7 +98,7 @@ function DiagnosticsPanel({
           return <HardwareBadge key={key} label={key} health={health} />;
         })}
       </div>
-    </section>
+    </Panel>
   );
 }
 
@@ -136,9 +144,13 @@ function App() {
   const canCapture = state.flow === "photo-mode";
   const canReview = state.flow === "reviewing";
 
+  useEffect(() => {
+    applyThemeToDocument(state.theme);
+  }, [state.theme]);
+
   return (
     <main className={`kiosk kiosk--${state.flow}`}>
-      <section className="hero-card">
+      <Panel className="hero-card">
         <div>
           <p className="eyebrow">GoldSprints Kaleidoscope</p>
           <h1>{state.racerName ?? "Scan Your Racer QR"}</h1>
@@ -149,13 +161,17 @@ function App() {
           <HardwareBadge label="camera" health={state.hardware.camera} />
           <HardwareBadge label="lights" health={state.hardware.lights} />
           <HardwareBadge label="umbrella" health={state.hardware.umbrella} />
-          <span className="hardware-badge">pending sync: {state.pendingUploadCount}</span>
+          <StatPill
+            className="hardware-badge"
+            label="pending sync"
+            value={state.pendingUploadCount}
+          />
         </div>
-      </section>
+      </Panel>
 
       {state.flow === "idle" || state.flow === "error" ? (
-        <section className="scan-card">
-          <input
+        <Panel className="scan-card">
+          <TextInput
             value={manualScan}
             placeholder="Manual QR token, or fake:Test Rider when fake QR testing is enabled"
             onChange={(event) => setManualScan(event.target.value)}
@@ -166,16 +182,15 @@ function App() {
               }
             }}
           />
-          <button
-            className="button"
+          <Button
             onClick={() => {
               runAction(post("/api/scan", { payload: manualScan }));
               setManualScan("");
             }}
           >
             Start Photo Mode
-          </button>
-        </section>
+          </Button>
+        </Panel>
       ) : null}
 
       {state.flow === "photo-mode" ? (
@@ -185,7 +200,7 @@ function App() {
             disabled={disabled}
             onChange={(lookId) => runAction(post("/api/lights/selection", { lookId }))}
           />
-          <div className="capture-card">
+          <Panel className="capture-card">
             <button
               className="capture-button"
               disabled={!canCapture}
@@ -193,10 +208,10 @@ function App() {
             >
               Take Photo
             </button>
-            <button className="button button--ghost" onClick={() => runAction(post("/api/cancel"))}>
+            <Button variant="ghost" onClick={() => runAction(post("/api/cancel"))}>
               Cancel
-            </button>
-          </div>
+            </Button>
+          </Panel>
           <UmbrellaPanelPicker
             umbrella={state.umbrella}
             disabled={disabled}
@@ -207,40 +222,35 @@ function App() {
       ) : null}
 
       {state.flow === "capturing" ? (
-        <section className="capture-countdown">
+        <Panel className="capture-countdown">
           <h2>Hold still</h2>
           <p>The umbrella is freezing and the Sony is firing.</p>
-        </section>
+        </Panel>
       ) : null}
 
       {canReview ? (
-        <section className="review-card">
+        <Panel className="review-card">
           {state.previewUrl ? <img src={state.previewUrl} alt="Captured avatar preview" /> : null}
           <div className="review-actions">
-            <button className="button" onClick={() => runAction(post("/api/accept"))}>
-              Keep
-            </button>
-            <button className="button button--ghost" onClick={() => runAction(post("/api/retake"))}>
+            <Button onClick={() => runAction(post("/api/accept"))}>Keep</Button>
+            <Button variant="ghost" onClick={() => runAction(post("/api/retake"))}>
               Retry
-            </button>
+            </Button>
           </div>
-        </section>
+        </Panel>
       ) : null}
 
       {state.flow === "syncing" ? (
-        <section className="capture-countdown">
+        <Panel className="capture-countdown">
           <h2>Saving</h2>
           <p>Your avatar is being saved to the race system.</p>
-        </section>
+        </Panel>
       ) : null}
 
       <footer>
-        <button
-          className="button button--ghost"
-          onClick={() => setShowDiagnostics((current) => !current)}
-        >
+        <Button variant="ghost" onClick={() => setShowDiagnostics((current) => !current)}>
           {showDiagnostics ? "Hide Diagnostics" : "Diagnostics"}
-        </button>
+        </Button>
       </footer>
 
       {showDiagnostics ? (

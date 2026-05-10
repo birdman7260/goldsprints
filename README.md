@@ -128,36 +128,46 @@ The current sensor path is a simulator. A real USB adapter seam exists, but the 
 
 ## Project Layout
 
-- `src/electron`
+- `apps/desktop`
+  - workspace package `@goldsprints/desktop`
+  - owns the Electron shell, embedded backend, Vite renderer, Drizzle config, and desktop build
+- `apps/desktop/src/electron`
   - Electron main-process entrypoint
-- `src/backend`
+- `apps/desktop/src/backend`
   - embedded server, adapters, persistence, and race/tournament services
-  - SQLite schema migrations live in `src/backend/db/migrations/*.sql`
-  - the typed Drizzle schema mirror lives in `src/backend/db/schema.ts`
-- `src/renderer`
+  - SQLite schema migrations live in `apps/desktop/src/backend/db/migrations/*.sql`
+  - the typed Drizzle schema mirror lives in `apps/desktop/src/backend/db/schema.ts`
+- `apps/desktop/src/renderer`
   - React UI, file-based routes, API client, and theme-aware components
-  - bundled webfont assets for period-specific themes live in `src/renderer/assets/fonts`
-  - bundled race-avatar sprite sheets live in `src/renderer/assets/sprites`
-  - generated TanStack route tree lives in `src/renderer/routeTree.gen.ts`
-- `src/shared`
-  - shared constants, types, validation, presets, and themes
+  - bundled webfont assets for period-specific themes live in `apps/desktop/src/renderer/assets/fonts`
+  - bundled race-avatar sprite sheets live in `apps/desktop/src/renderer/assets/sprites`
+  - generated TanStack route tree lives in `apps/desktop/src/renderer/routeTree.gen.ts`
+- `packages/shared/src`
+  - workspace package `@goldsprints/shared`
+  - shared constants, types, validation, presets, and themes imported through package subpaths
+- `packages/shared-ui/src`
+  - workspace package `@goldsprints/shared-ui`
+  - React UI primitives, shared component CSS, and theme DOM helpers used by the desktop renderer
+    and Raspberry Pi booth kiosk
 - `tools/photo-booth-agent`
   - isolated Raspberry Pi kiosk agent package with its own Node-built native dependencies
   - camera/light adapters, local SQLite upload queue, and booth state machine
+- `tools/db-studio`
+  - isolated Drizzle Studio package with its own Node-built SQLite dependency
 
 Important files:
 
-- [src/electron/main.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/electron/main.ts)
-- [src/backend/server.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/backend/server.ts)
-- [src/backend/db/migrations/0001_initial-schema.sql](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/backend/db/migrations/0001_initial-schema.sql)
-- [src/backend/db/schema.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/backend/db/schema.ts)
-- [drizzle.config.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/drizzle.config.ts)
-- [src/backend/services/app.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/backend/services/app.ts)
-- [src/backend/services/competition.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/backend/services/competition.ts)
-- [src/renderer/router.tsx](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/renderer/router.tsx)
-- [src/renderer/components/elimination-bracket-view.tsx](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/renderer/components/elimination-bracket-view.tsx)
-- [src/renderer/components/tournament-flow-layout.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/renderer/components/tournament-flow-layout.ts)
-- [src/shared/themes.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/shared/themes.ts)
+- [apps/desktop/src/electron/main.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/electron/main.ts)
+- [apps/desktop/src/backend/server.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/server.ts)
+- [apps/desktop/src/backend/db/migrations/0001_initial-schema.sql](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/db/migrations/0001_initial-schema.sql)
+- [apps/desktop/src/backend/db/schema.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/db/schema.ts)
+- [apps/desktop/drizzle.config.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/drizzle.config.ts)
+- [apps/desktop/src/backend/services/app.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/services/app.ts)
+- [apps/desktop/src/backend/services/competition.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/services/competition.ts)
+- [apps/desktop/src/renderer/router.tsx](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/renderer/router.tsx)
+- [apps/desktop/src/renderer/components/elimination-bracket-view.tsx](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/renderer/components/elimination-bracket-view.tsx)
+- [apps/desktop/src/renderer/components/tournament-flow-layout.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/renderer/components/tournament-flow-layout.ts)
+- [packages/shared/src/themes.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/packages/shared/src/themes.ts)
 - [tools/photo-booth-agent/src/agent.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/tools/photo-booth-agent/src/agent.ts)
 
 ## Stack
@@ -254,16 +264,16 @@ as `GOLDSPRINTS_BOOTH_SECRET` in backend/agent dotenv files, not in `VITE_*` var
   - Same as `dev:debug`, but pauses Electron on startup so you can attach a debugger before app bootstrap runs.
 - `pnpm build`
   - Builds the renderer with Vite and bundles the Electron entry with `tsup`.
-  - Copies runtime assets such as SQLite migration files into `dist/electron`.
-  - This creates distributable app assets in `dist/`, but it does not create an installer.
+  - Copies runtime assets such as SQLite migration files into `apps/desktop/dist/electron`.
+  - This creates distributable app assets in `apps/desktop/dist/`, but it does not create an installer.
 - `pnpm dev:reset-data`
   - Deletes the repo-local dev runtime directory at `.goldsprints-dev/runtime`.
   - Use this when you want a fresh SQLite database, cleared uploads, and no leftover dev event data.
   - Stop the running dev app first so SQLite files are not in use.
 - `pnpm db:studio`
-  - Opens Drizzle Studio against the current SQLite database path from `drizzle.config.ts`.
+  - Opens Drizzle Studio against the current SQLite database path from `apps/desktop/drizzle.config.ts`.
   - Useful for inspecting the live dev database with the same typed schema the app code uses.
-  - This helps with exploration only; runtime migrations still come from `src/backend/db/migrations/*.sql`.
+  - This helps with exploration only; runtime migrations still come from `apps/desktop/src/backend/db/migrations/*.sql`.
   - Runs from the isolated `tools/db-studio` pnpm package, so its Node-built `better-sqlite3` never overwrites the Electron build used by the app itself.
   - The first run bootstraps that isolated tooling package automatically if it has not been installed yet.
 - `pnpm start`
@@ -292,7 +302,7 @@ as `GOLDSPRINTS_BOOTH_SECRET` in backend/agent dotenv files, not in `VITE_*` var
   - Defaults to simulator camera, scanner, lights, and umbrella hardware so the flow can be tested
     without the Raspberry Pi.
   - Runs from the isolated `tools/photo-booth-agent` pnpm package, so its Node-built
-    `better-sqlite3` never collides with the Electron-built root app dependency.
+    `better-sqlite3` never collides with the Electron-built desktop app dependency.
   - Loads `.env`, `.env.local`, `.env.photo-booth`, and `.env.photo-booth.local` before launching
     the isolated package.
   - Stores accepted photos waiting to sync in `GOLDSPRINTS_BOOTH_DATA_DIR/photo-booth.sqlite`.
@@ -326,8 +336,8 @@ as `GOLDSPRINTS_BOOTH_SECRET` in backend/agent dotenv files, not in `VITE_*` var
 - `pnpm quality`
   - Runs the formatting and lint gate used before handoff: `format:check` then `lint`.
 - `pnpm typecheck`
-  - Runs TypeScript in no-emit mode for the renderer config, backend/node config, and isolated
-    photo booth agent package.
+  - Runs TypeScript in no-emit mode for shared packages, the desktop renderer/node configs, and
+    the isolated photo booth agent package.
 - `pnpm test`
   - Runs the Vitest suite once.
   - Current coverage focuses on race metrics, queue behavior, theme validation, tournament logic,
@@ -337,9 +347,8 @@ as `GOLDSPRINTS_BOOTH_SECRET` in backend/agent dotenv files, not in `VITE_*` var
 - `pnpm rebuild:native`
   - Rebuilds Electron-native dependencies such as `better-sqlite3` against the Electron runtime.
   - Use this if native module ABI issues appear after dependency or Electron version changes.
-- `pnpm postinstall`
-  - Automatically calls `rebuild:native` after dependency installation so the app is ready for Electron immediately.
-  - Drizzle Studio no longer needs a matching rebuild because it runs from its own isolated pnpm package.
+  - Drizzle Studio and the photo booth agent do not use this rebuild because they run from isolated
+    pnpm packages with Node-built native dependencies.
 
 ## Data And Persistence
 
@@ -396,6 +405,13 @@ messages, and tests. Use
 Built-in look ids are `solid-white`, `solid-red`, `solid-blue`, `kaleidoscope-rainbow`,
 `chasing-rainbow`, `sparkle`, and `pride`.
 
+The booth kiosk follows the same selected app theme as the admin, racer, and race displays. The
+booth agent polls the main app snapshot, publishes the active `ThemeDefinition` through its local
+state/SSE feed, and the kiosk uses the same shared theme helper as the desktop renderer to apply
+`--theme-*` CSS variables plus semantic theme data attributes. Shared UI primitives and their CSS
+contract live in `packages/shared-ui/src` and are imported by both the Electron renderer and the
+booth kiosk so panels, buttons, text inputs, selects, and stat pills stay visually aligned.
+
 Umbrella panel selection uses a custom right-edge wheel picker. The picker renders a full circular
 umbrella wheel, clips it so only the left half is visible, and rotates the full wheel with
 touch/mouse drag plus mousewheel or trackpad input. Each panel is a pie-shaped slice whose point
@@ -420,11 +436,13 @@ the booth package directory second.
 
 The booth agent intentionally lives in `tools/photo-booth-agent` instead of the root runtime. That
 gives the Pi process its own Node-flavored `better-sqlite3` build while Electron keeps using the
-root Electron-flavored native build.
+desktop app's Electron-flavored native build.
+The root launchers pass `--ignore-workspace` for isolated tool installs/runs; if you manually
+bootstrap a tool package, use `corepack pnpm --ignore-workspace --dir tools/photo-booth-agent install`.
 
 ## Database Schema
 
-SQLite schema changes are managed as ordered SQL migrations in `src/backend/db/migrations`.
+SQLite schema changes are managed as ordered SQL migrations in `apps/desktop/src/backend/db/migrations`.
 
 - This keeps the schema editable as real SQL instead of a TypeScript string.
 - VS Code SQLite and SQL-formatting extensions can work directly with the migration files.
@@ -471,8 +489,8 @@ That gives you three places to look:
 - VS Code debugger
   - A ready-made attach config lives in `.vscode/launch.json`.
   - Start `pnpm dev:debug`, then run the `Attach Electron + Renderer` compound launch config.
-  - `Attach Electron Main` lets you step through `src/electron` and the embedded backend in `src/backend`.
-  - `Attach Electron Renderer` lets you step through React code in `src/renderer`.
+  - `Attach Electron Main` lets you step through `apps/desktop/src/electron` and the embedded backend in `apps/desktop/src/backend`.
+  - `Attach Electron Renderer` lets you step through React code in `apps/desktop/src/renderer`.
 
 Useful notes:
 
@@ -480,7 +498,7 @@ Useful notes:
 - Keyboard shortcuts still work if you want DevTools manually:
   - macOS: `Cmd+Opt+I`
   - Windows/Linux: `Ctrl+Shift+I`
-- The main process and backend share the Electron process in development, so breakpoints in both `src/electron/main.ts` and backend service files will hit in the same Node debugger session.
+- The main process and backend share the Electron process in development, so breakpoints in both `apps/desktop/src/electron/main.ts` and backend service files will hit in the same Node debugger session.
 - If a button appears to do nothing, check the terminal first. In debug mode, failed API calls and unhandled renderer action errors should show up there.
 
 ## Themes
@@ -498,8 +516,16 @@ The selected theme is applied globally through CSS variables and semantic DOM at
 components and CSS should branch on manifest attributes such as `orientation`, `uiStyle`,
 `surfaceStyle`, `connectorStyle`, and `raceGraphic.variant`, not on concrete theme IDs.
 
+The shared UI package owns the base component style contract and DOM theme helper. Import
+`@goldsprints/shared-ui/styles.css` before surface-specific CSS, use
+`@goldsprints/shared-ui/theme` to apply a selected `ThemeDefinition`, then keep each surface
+stylesheet focused on layout, page choreography, and screen-specific controls. If a shared
+primitive needs a new visual variation, add a shared modifier or CSS variable in
+`@goldsprints/shared-ui` instead of redefining `.button`, `.panel`, `.search-select`, `.stat-pill`,
+or `.empty-state` locally.
+
 Moving race avatars are resolved in the renderer from the theme's sprite-sheet id. To replace a
-theme sprite, keep the declared frame grid in [src/shared/themes.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/shared/themes.ts) aligned with the asset in [src/renderer/assets/sprites](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/src/renderer/assets/sprites): row `0` is the slower animation and row `1` is the faster animation by default.
+theme sprite, keep the declared frame grid in [packages/shared/src/themes.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/packages/shared/src/themes.ts) aligned with the asset in [apps/desktop/src/renderer/assets/sprites](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/renderer/assets/sprites): row `0` is the slower animation and row `1` is the faster animation by default.
 
 The DOS-inspired `Oregon Trail '90` theme also bundles an IBM VGA bitmap recreation so the intended projector typography does not depend on fonts installed on the host machine.
 
@@ -534,11 +560,11 @@ selected.
 
 ## Third-Party Assets
 
-- `src/renderer/assets/fonts/oldschool-pc-fonts/WebPlus_IBM_VGA_8x16.woff`
+- `apps/desktop/src/renderer/assets/fonts/oldschool-pc-fonts/WebPlus_IBM_VGA_8x16.woff`
   - from The Ultimate Oldschool PC Font Pack by VileR
   - source: [int10h.org/oldschool-pc-fonts](https://int10h.org/oldschool-pc-fonts/)
   - license: CC BY-SA 4.0
-  - bundled attribution and license text live alongside the font asset in `src/renderer/assets/fonts/oldschool-pc-fonts`
+  - bundled attribution and license text live alongside the font asset in `apps/desktop/src/renderer/assets/fonts/oldschool-pc-fonts`
 
 ## Current Limitations
 

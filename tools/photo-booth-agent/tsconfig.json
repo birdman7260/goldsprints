@@ -1,24 +1,7 @@
 {
+  "extends": "../../tsconfig.react.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "jsx": "react-jsx",
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "declaration": false,
-    "sourceMap": true,
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vite/client", "vitest/globals"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "vite.config.ts",
-    "vitest.config.ts",
-    "../../src/shared/**/*.ts"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "vitest.config.ts"]
 }

@@ -1,5 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
+import { Button, Panel } from "@goldsprints/shared-ui";
 import type { UmbrellaState } from "../../types";
 import { UMBRELLA_PANELS } from "../../umbrella-panels";
 import { normalizeWheelDeltaY, WHEEL_ITEM_PITCH } from "./wheel-input";
@@ -193,8 +194,7 @@ export function UmbrellaPanelPicker({
   });
 
   return (
-    <section className="control-card umbrella-picker-card">
-      <h2>Umbrella Panels</h2>
+    <Panel title="Umbrella Panels" className="umbrella-picker-card">
       <div
         ref={wheelElementRef}
         className={
@@ -295,10 +295,10 @@ export function UmbrellaPanelPicker({
           ))}
         </div>
       </div>
-      <button className="button button--ghost" disabled={disabled} onClick={onSpin}>
+      <Button variant="ghost" disabled={disabled} onClick={onSpin}>
         Slow Spin
-      </button>
+      </Button>
       <p>{umbrella.message ?? `Mode: ${umbrella.mode}`}</p>
-    </section>
+    </Panel>
   );
 }

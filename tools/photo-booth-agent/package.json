@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@goldsprints/shared": "file:../../packages/shared",
+    "@goldsprints/shared-ui": "file:../../packages/shared-ui",
     "better-sqlite3": "^11.10.0",
     "dotenv": "^17.4.2",
     "express": "^4.21.2",

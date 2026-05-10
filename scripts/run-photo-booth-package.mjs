@@ -39,12 +39,16 @@ export function runPhotoBoothPackageScript(scriptName, forwardedArgs = []) {
   loadDotenvFiles({ rootDir, profile: "photo-booth" });
   const env = createPhotoBoothEnv();
   if (!fs.existsSync(packageNodeModules)) {
-    const installArgs = ["pnpm", "--dir", packageDir, "install"];
+    const installArgs = ["pnpm", "--ignore-workspace", "--dir", packageDir, "install"];
     if (fs.existsSync(packageLockfile)) {
       installArgs.push("--frozen-lockfile");
     }
     run(corepackCommand, installArgs);
   }
 
-  run(corepackCommand, ["pnpm", "--dir", packageDir, "run", scriptName, ...forwardedArgs], { env });
+  run(
+    corepackCommand,
+    ["pnpm", "--ignore-workspace", "--dir", packageDir, "run", scriptName, ...forwardedArgs],
+    { env }
+  );
 }

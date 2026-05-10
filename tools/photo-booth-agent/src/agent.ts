@@ -4,7 +4,8 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import express from "express";
 import type { Response } from "express";
-import type { PhotoBoothSession } from "../../../src/shared/types";
+import { themes } from "@goldsprints/shared/themes";
+import type { AppSnapshot, PhotoBoothSession, ThemeDefinition } from "@goldsprints/shared/types";
 import {
   GPhotoCameraAdapter,
   ManualScannerAdapter,
@@ -116,6 +117,8 @@ class PhotoBoothAgent {
   private currentCapture: CapturedPhoto | null = null;
   private watchdog: NodeJS.Timeout | null = null;
   private preCaptureUmbrella: UmbrellaState | null = null;
+  private theme: ThemeDefinition = themes[0];
+  private themePoller: NodeJS.Timeout | null = null;
 
   constructor(private readonly config: BoothAgentConfig) {
     const captureDir = path.join(config.dataDir, "captures");
@@ -137,6 +140,10 @@ class PhotoBoothAgent {
       console.log(`Photo booth kiosk listening on http://127.0.0.1:${this.config.port}`);
     });
     void this.startHardware();
+    void this.syncTheme();
+    this.themePoller = setInterval(() => {
+      void this.syncTheme();
+    }, 5_000);
     void this.syncPending();
     setInterval(() => {
       void this.syncPending();
@@ -301,13 +308,15 @@ class PhotoBoothAgent {
     pendingUploadCount: number;
     hardware: BoothHardwareHealth;
     diagnosticsUrl: string;
+    theme: ThemeDefinition;
   } {
     return {
       ...this.state,
       previewUrl: this.state.previewPath,
       pendingUploadCount: this.queue.listPending().length,
       hardware: this.getHardwareHealth(),
-      diagnosticsUrl: "/api/diagnostics"
+      diagnosticsUrl: "/api/diagnostics",
+      theme: this.theme
     };
   }
 
@@ -506,6 +515,27 @@ class PhotoBoothAgent {
     await this.sendBoothStatus("online", this.queue.listPending().length);
   }
 
+  private async syncTheme(): Promise<void> {
+    let nextTheme: ThemeDefinition;
+    try {
+      const response = await fetch(`${this.config.mainServerUrl}/api/snapshot`);
+      if (!response.ok) {
+        return;
+      }
+
+      const snapshot = (await response.json()) as AppSnapshot;
+      nextTheme = snapshot.raceProjection.theme;
+    } catch {
+      return;
+    }
+
+    if (nextTheme.id === this.theme.id) {
+      return;
+    }
+    this.theme = nextTheme;
+    this.broadcastState();
+  }
+
   private async uploadCapture(capture: QueuedBoothCapture): Promise<void> {
     const bytes = await fs.readFile(capture.filePath);
     const form = new FormData();
@@ -619,6 +649,9 @@ class PhotoBoothAgent {
   private registerShutdownHandlers(): void {
     const shutdown = () => {
       void (async () => {
+        if (this.themePoller) {
+          clearInterval(this.themePoller);
+        }
         await this.scanner.stop().catch(() => undefined);
         await this.lights.enterIdle().catch(() => undefined);
         await this.umbrella.shutdown().catch(() => undefined);

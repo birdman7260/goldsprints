@@ -1,0 +1,84 @@
+{
+  "name": "@goldsprints/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron app for orchestrating GoldSprints races, queues, and tournaments.",
+  "main": "dist/electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"vite --strictPort\" \"wait-on tcp:5173 && cross-env NODE_OPTIONS=--import=tsx ELECTRON_RENDERER_URL=http://127.0.0.1:5173 electron src/electron/main.ts\"",
+    "dev:debug": "concurrently -k \"vite --strictPort\" \"wait-on tcp:5173 && cross-env GOLDSPRINTS_DEBUG=1 GOLDSPRINTS_OPEN_DEVTOOLS=1 NODE_OPTIONS=--import=tsx ELECTRON_RENDERER_URL=http://127.0.0.1:5173 electron --inspect=9229 --remote-debugging-port=9223 src/electron/main.ts\"",
+    "dev:debug:break": "concurrently -k \"vite --strictPort\" \"wait-on tcp:5173 && cross-env GOLDSPRINTS_DEBUG=1 GOLDSPRINTS_OPEN_DEVTOOLS=1 NODE_OPTIONS=--import=tsx ELECTRON_RENDERER_URL=http://127.0.0.1:5173 electron --inspect-brk=9229 --remote-debugging-port=9223 src/electron/main.ts\"",
+    "build": "vite build && tsup src/electron/main.ts --format esm --platform=node --target node22 --out-dir dist/electron --external electron && node ../../scripts/copy-runtime-assets.mjs",
+    "preview": "vite preview",
+    "rebuild:native": "electron-rebuild -f -w better-sqlite3",
+    "start": "electron .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.node.json --noEmit"
+  },
+  "build": {
+    "appId": "org.newyuinc.goldsprints",
+    "productName": "GoldSprints",
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "public"
+    },
+    "extraMetadata": {
+      "main": "dist/electron/main.js"
+    }
+  },
+  "dependencies": {
+    "@goldsprints/shared": "workspace:*",
+    "@goldsprints/shared-ui": "workspace:*",
+    "@tanstack/react-query": "^5.76.1",
+    "@tanstack/react-router": "^1.116.1",
+    "@xyflow/react": "^12.10.2",
+    "better-sqlite3": "^11.10.0",
+    "canvas-confetti": "^1.9.4",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
+    "express": "^4.21.2",
+    "framer-motion": "^12.38.0",
+    "multer": "^1.4.5-lts.2",
+    "nanoid": "^5.1.5",
+    "qrcode": "^1.5.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "ws": "^8.18.2",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@tanstack/router-plugin": "^1.167.30",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.15.3",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@types/ws": "^8.18.1",
+    "@electron/rebuild": "^3.6.1",
+    "@vitejs/plugin-react": "^4.4.1",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "drizzle-kit": "^0.31.10",
+    "electron": "^35.2.0",
+    "electron-builder": "^25.1.8",
+    "jsdom": "^26.1.0",
+    "tsup": "^8.5.1",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.1.3",
+    "wait-on": "^8.0.3"
+  }
+}

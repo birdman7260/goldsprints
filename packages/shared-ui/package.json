@@ -1,0 +1,28 @@
+{
+  "name": "@goldsprints/shared-ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/ui.tsx",
+      "import": "./src/ui.tsx"
+    },
+    "./theme": {
+      "types": "./src/theme.ts",
+      "import": "./src/theme.ts"
+    },
+    "./styles.css": "./src/styles.css"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.2",
+    "react": "^19.1.0",
+    "typescript": "^5.8.3"
+  }
+}

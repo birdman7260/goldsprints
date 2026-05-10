@@ -1,4 +1,5 @@
 import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
+import { Panel } from "@goldsprints/shared-ui";
 import { LIGHT_LOOKS, type LightLookDefinition, type LightLookPreview } from "../../light-looks";
 import type { LightSelection } from "../../types";
 import { normalizeWheelDeltaY, WHEEL_ITEM_PITCH } from "./wheel-input";
@@ -173,8 +174,7 @@ export function LightLookWheel({
   );
 
   return (
-    <section className="control-card light-wheel-card" aria-label="LED look selector">
-      <h2>Light Look</h2>
+    <Panel title="Light Look" className="light-wheel-card" aria-label="LED look selector">
       <div className="light-wheel-frame">
         <div className="light-wheel-shell">
           <div
@@ -263,6 +263,6 @@ export function LightLookWheel({
         </div>
       </div>
       <p>Spin the wheel to pick the booth lighting.</p>
-    </section>
+    </Panel>
   );
 }

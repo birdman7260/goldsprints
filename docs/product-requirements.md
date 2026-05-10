@@ -284,6 +284,14 @@ Requirements:
 - Renderer code and CSS must not branch on concrete theme IDs for visual behavior. They should use
   manifest-provided attributes such as orientation, surface style, UI style, connector style, and
   race graphic variant. `Implemented`
+- Shared UI primitives must have one shared CSS contract for panels, buttons, inputs, searchable
+  selects, stat pills, empty states, focus states, hover states, press states, disabled states, and
+  pixel-style variants. `Implemented`
+- Desktop and kiosk surfaces must import the shared UI stylesheet, then reserve their own CSS for
+  layout, page-specific visuals, and hardware/screen-specific controls. `Implemented`
+- Theme DOM application must be centralized so every renderer surface applies the same `--theme-*`
+  variables and semantic `data-theme-*` attributes from the selected `ThemeDefinition`.
+  `Implemented`
 - It must be straightforward to add theme-specific race graphics behind a shared component contract.
   `Implemented`
 - Each theme must be able to provide a bundled sprite sheet asset for the moving race avatars, and
@@ -463,6 +471,13 @@ Requirements:
   text inside the selection items. The picker must feel infinite, support direct touch/mouse drag
   scrolling and mousewheel/trackpad input, and snap to the centered look without separate arrow
   buttons or visible recentering. `Implemented`
+- The booth kiosk must follow the same selected app theme as the admin, racer, and race displays by
+  receiving the active `ThemeDefinition` from the main app through the booth agent and applying the
+  same shared theme helper, CSS variables, semantic theme data attributes, and shared UI component
+  stylesheet. `Implemented`
+- Shared React UI primitives must live outside any single screen package and be used by the admin,
+  racer, race, and booth kiosk surfaces for common panels, buttons, inputs, and stat/status pills.
+  `Implemented`
 - Umbrella control must happen behind an `UmbrellaAdapter`, with a Python GPIO helper process and
   simulator implementation. The helper owns STEP/DIR/ENABLE timing and hall-sensor homing.
   `Implemented`
@@ -514,6 +529,8 @@ Requirements:
 - Desktop runtime must be Electron. `Implemented`
 - Source must be TypeScript. `Implemented`
 - The repo's package manager and lockfile must use pnpm. `Implemented`
+- The repo must use a hybrid pnpm workspace with `apps/*` and `packages/*` managed by the
+  workspace, while native-runtime tools under `tools/*` remain isolated when needed. `Implemented`
 - Renderer routing must use TanStack Router. `Implemented`
 - Renderer data fetching must use TanStack Query. `Implemented`
 - Dev/build toolchain must use Vite. `Implemented`
@@ -528,12 +545,19 @@ Requirements:
 
 Current tooling requirements now include:
 
-- SQL migration files in `src/backend/db/migrations`
-- a typed Drizzle schema mirror in `src/backend/db/schema.ts`
+- SQL migration files in `apps/desktop/src/backend/db/migrations`
+- a typed Drizzle schema mirror in `apps/desktop/src/backend/db/schema.ts`
+- `@goldsprints/desktop` as the workspace package that owns Electron, the embedded backend, and the
+  renderer app
+- `@goldsprints/shared` for shared constants, types, validation, presets, themes, and utility code
+- `@goldsprints/shared-ui` for React UI primitives shared by the desktop renderer and the booth
+  kiosk
+- shared base TypeScript configs that package/app tsconfigs extend instead of duplicating common
+  compiler settings
 - an isolated pnpm package for Node-based Drizzle Studio tooling so it does not share a native
   `better-sqlite3` build with the Electron app
 - an isolated pnpm package for the Raspberry Pi photo booth agent so its local SQLite queue uses a
-  Node-built `better-sqlite3` instead of the Electron-built root dependency
+  Node-built `better-sqlite3` instead of the Electron-built desktop dependency
 - dotenv-based configuration for the Electron/backend runtime and the isolated photo booth agent,
   including booth-specific `.env.photo-booth` overrides while keeping shell variables highest
   priority
