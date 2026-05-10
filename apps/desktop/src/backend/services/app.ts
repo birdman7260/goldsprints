@@ -6,7 +6,6 @@ import { nanoid } from "nanoid";
 import {
   COUNTDOWN_SECONDS,
   DEFAULT_OS2L_PORT,
-  DEFAULT_PUBLIC_HOST,
   DEFAULT_SERVER_PORT
 } from "@goldsprints/shared/constants";
 import { themes, getTheme } from "@goldsprints/shared/themes";
@@ -63,6 +62,7 @@ import {
   verifySignedPhotoBoothToken,
   type PhotoBoothTokenPayload
 } from "./photo-booth";
+import { getLocalNetworkBaseUrl } from "./network";
 
 const RESULT_MODAL_DURATION_MS = 15000;
 
@@ -527,7 +527,7 @@ export class GoldsprintsApp extends EventEmitter {
   }
 
   getLocalBaseUrl(): string {
-    return `http://${DEFAULT_PUBLIC_HOST}:${this.serverPort}`;
+    return getLocalNetworkBaseUrl(this.serverPort);
   }
 
   async getQrCodeDataUrl(): Promise<string> {

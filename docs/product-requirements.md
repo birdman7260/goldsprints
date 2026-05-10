@@ -488,6 +488,9 @@ Requirements:
   for race operations. `Implemented`
 - The Raspberry Pi booth agent must pair with the main GoldSprints backend using a booth id and
   shared secret from admin settings. `Implemented`
+- Photo booth pairing must advertise a LAN-reachable desktop backend URL, not `localhost` or
+  `127.0.0.1`, so the Raspberry Pi can connect over the event network. The LAN host should
+  auto-detect Wi-Fi/Ethernet with an environment override for multi-adapter laptops. `Implemented`
 - The booth should use a mounted USB 2D scanner to read racer photo booth QR codes. `Implemented`
 - Racer photo booth QR codes must be signed and short-lived, containing racer/event/session data
   without exposing the booth pairing secret. `Implemented`

@@ -223,7 +223,11 @@ Development mode starts:
 - an Electron race display window
 - dev runtime data inside `.goldsprints-dev/runtime`
 
-The racer page is available through the backend route at `/racer`.
+The racer page is available through the backend route at `/racer`. Admin QR codes and photo booth
+pairing use the machine's LAN address when one can be detected, for example
+`http://192.168.1.42:3187/racer`, so phones and the Raspberry Pi can reach the host app over the
+event network. If the laptop has multiple adapters and the auto-detected address is wrong, set
+`GOLDSPRINTS_LOCAL_SERVER_HOST=<laptop LAN IP>` in `.env.local`.
 
 ## Environment Configuration
 
@@ -247,6 +251,10 @@ Use `.env.example` for shared app defaults and `.env.photo-booth.example` for Pi
 setup. The booth agent also loads those files directly when started from
 `tools/photo-booth-agent`, so Raspberry Pi deployments still work if you run the package script
 without the root launcher.
+
+`GOLDSPRINTS_LOCAL_SERVER_HOST` optionally overrides the LAN host advertised by the desktop app in
+local QR codes and Raspberry Pi photo booth pairing. Leave it unset for Wi-Fi/Ethernet auto-detect;
+set it when macOS/Windows chooses a VPN, virtual adapter, or other address the Pi cannot reach.
 
 Only variables prefixed with `VITE_` are exposed to browser renderer code by Vite. Keep secrets such
 as `GOLDSPRINTS_BOOTH_SECRET` in backend/agent dotenv files, not in `VITE_*` variables.
@@ -450,9 +458,11 @@ Flow:
 8. The main backend stores the DSLR original separately from the app avatar URL and updates the
    racer avatar across admin, racer, and race displays.
 
-Admin pairing/status lives in `Settings -> Kaleidoscope Photo Booth`. The pairing secret is shown
-only on the admin settings API, not in the general live snapshot sent to racer phones. The same card
-also shows hardware health for scanner, camera, lights, umbrella, hall sensor, and pending uploads.
+Admin pairing/status lives in `Settings -> Kaleidoscope Photo Booth`. The pairing server URL uses
+the laptop's LAN address, not `localhost`, because the Raspberry Pi must connect from another
+device. The pairing secret is shown only on the admin settings API, not in the general live snapshot
+sent to racer phones. The same card also shows hardware health for scanner, camera, lights,
+umbrella, hall sensor, and pending uploads.
 
 The TMC2209 driver needs separate motor power and current limiting; the Raspberry Pi GPIO pins only
 send STEP/DIR/ENABLE logic. Run `pnpm photo-booth:doctor` before events to verify `gphoto2
