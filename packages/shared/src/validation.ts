@@ -73,6 +73,7 @@ export const settingUpdateSchema = z.object({
   includeAllRaceData: z.boolean().optional(),
   raceDisplayShowEventName: z.boolean().optional(),
   raceDisplayTickerMessages: z.array(z.string().trim().min(1).max(120)).max(20).optional(),
+  raceDisplayTickerSpeed: z.number().finite().min(24).max(180).optional(),
   targetDistanceMeters: z.number().finite().positive().max(100000).optional()
 });
 

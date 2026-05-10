@@ -8,6 +8,7 @@ import {
   DEFAULT_EVENT_NAME,
   DEFAULT_SERVER_PORT,
   DEFAULT_TARGET_DISTANCE_METERS,
+  DEFAULT_TICKER_SPEED_PIXELS_PER_SECOND,
   DEFAULT_THEME_ID
 } from "@goldsprints/shared/constants";
 import type {
@@ -85,6 +86,7 @@ function getDefaultAdminSettings(): AdminSettings {
     includeAllRaceData: false,
     raceDisplayShowEventName: true,
     raceDisplayTickerMessages: ["Fiercely local racing all night"],
+    raceDisplayTickerSpeed: DEFAULT_TICKER_SPEED_PIXELS_PER_SECOND,
     targetDistanceMeters: DEFAULT_TARGET_DISTANCE_METERS,
     serverPort: DEFAULT_SERVER_PORT
   };

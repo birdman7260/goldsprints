@@ -251,7 +251,10 @@ Requirements:
   snapping. It should show only the next three upcoming races, labeled `Up next`, `After that`, and
   `Later`, and may mix admin-configured announcement messages between those races. If there are no
   upcoming races, it must show `Sign up to race!` while still rotating through admin-configured
-  announcement messages. `Implemented`
+  announcement messages. The ticker should behave like a measured endless loop and must not reset
+  to a visible starting position during normal operation. `Implemented`
+- Admin must be able to control projector ticker scroll speed with a slider in projector display
+  settings. `Implemented`
 - When no race is staged, no tournament bracket is being shown, and there are no upcoming races
   available to stage, the projector display should show a large racer-page QR code with audience
   messaging that encourages people to scan, register, and sign up. This prompt should be centered

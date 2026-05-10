@@ -175,21 +175,95 @@ function LocalMark({ variant }: { variant: "footer" | "corner" }) {
   );
 }
 
-function RaceTicker({ items }: { items: string[] }) {
+function RaceTicker({
+  items,
+  speedPixelsPerSecond
+}: {
+  items: string[];
+  speedPixelsPerSecond: number;
+}) {
   const safeItems = items.length > 0 ? items : ["Sign up to race!"];
   const repeatedGroup = Array.from(
     { length: Math.max(4, Math.ceil(10 / safeItems.length)) },
     () => safeItems
   ).flat();
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const segmentRef = useRef<HTMLDivElement | null>(null);
+  const offsetRef = useRef(0);
+  const frameRef = useRef<number | null>(null);
+  const lastTimestampRef = useRef<number | null>(null);
+  const itemSignature = safeItems.join("\u001f");
+
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    const segment = segmentRef.current;
+    if (!track || !segment) {
+      return;
+    }
+
+    const trackElement = track;
+    const segmentElement = segment;
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const pixelsPerSecond = Math.max(24, Math.min(180, speedPixelsPerSecond));
+    let segmentWidth = segmentElement.getBoundingClientRect().width;
+
+    function measureSegment(): void {
+      segmentWidth = segmentElement.getBoundingClientRect().width;
+      if (segmentWidth <= 0) {
+        return;
+      }
+
+      offsetRef.current %= segmentWidth;
+      trackElement.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`;
+    }
+
+    function animate(timestamp: number): void {
+      if (reducedMotionQuery.matches) {
+        trackElement.style.transform = "translate3d(0, 0, 0)";
+        lastTimestampRef.current = timestamp;
+        frameRef.current = window.requestAnimationFrame(animate);
+        return;
+      }
+
+      const lastTimestamp = lastTimestampRef.current ?? timestamp;
+      lastTimestampRef.current = timestamp;
+      const elapsedSeconds = (timestamp - lastTimestamp) / 1000;
+
+      if (segmentWidth > 0) {
+        // Wrap by subtracting one measured segment width instead of resetting a CSS animation. The
+        // duplicate segment is already in the same visual position, so the loop stays invisible.
+        offsetRef.current = (offsetRef.current + elapsedSeconds * pixelsPerSecond) % segmentWidth;
+        trackElement.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`;
+      }
+
+      frameRef.current = window.requestAnimationFrame(animate);
+    }
+
+    const resizeObserver = new ResizeObserver(measureSegment);
+    resizeObserver.observe(segmentElement);
+    measureSegment();
+    lastTimestampRef.current = null;
+    frameRef.current = window.requestAnimationFrame(animate);
+
+    return () => {
+      if (frameRef.current != null) {
+        window.cancelAnimationFrame(frameRef.current);
+      }
+      resizeObserver.disconnect();
+      frameRef.current = null;
+      lastTimestampRef.current = null;
+    };
+  }, [itemSignature, speedPixelsPerSecond]);
 
   return (
     <div className="race-page__ticker" aria-label="Upcoming races and announcements">
-      <div className="race-page__ticker-track">
-        {[0, 1].map((groupIndex) => (
+      <div ref={trackRef} className="race-page__ticker-track">
+        {[0, 1, 2].map((groupIndex) => (
           <div
             key={`ticker-group:${groupIndex}`}
+            ref={groupIndex === 0 ? segmentRef : undefined}
             className="race-page__ticker-group"
-            aria-hidden={groupIndex === 1}
+            aria-hidden={groupIndex > 0}
           >
             {repeatedGroup.map((item, index) => (
               <span key={`${groupIndex}:${item}:${index}`} className="race-page__ticker-item">
@@ -695,7 +769,10 @@ export function RacePage() {
         {displayWinner ? <WinnerBanner winnerName={displayWinner.racer.displayName} /> : null}
       </AnimatePresence>
 
-      <RaceTicker items={tickerItems} />
+      <RaceTicker
+        items={tickerItems}
+        speedPixelsPerSecond={snapshot.settings.raceDisplayTickerSpeed}
+      />
     </div>
   );
 }

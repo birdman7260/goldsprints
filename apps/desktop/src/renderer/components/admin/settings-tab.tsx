@@ -100,6 +100,23 @@ export function SettingsTab({
             Show event name under the Gold Sprints title
           </label>
           <label>
+            Ticker speed
+            <div className="range-control">
+              <input
+                type="range"
+                min={24}
+                max={180}
+                step={4}
+                value={snapshot.settings.raceDisplayTickerSpeed}
+                onChange={(event) => {
+                  const nextSpeed = Number(event.target.value);
+                  fireAndForget(updateSettings({ raceDisplayTickerSpeed: nextSpeed }));
+                }}
+              />
+              <span>{snapshot.settings.raceDisplayTickerSpeed} px/s</span>
+            </div>
+          </label>
+          <label>
             Ticker messages
             <textarea
               ref={tickerMessageInputRef}

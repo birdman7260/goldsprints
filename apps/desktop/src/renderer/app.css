@@ -428,6 +428,26 @@ p {
   color: var(--theme-text-muted);
 }
 
+.range-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.range-control input[type="range"] {
+  width: 100%;
+  accent-color: var(--theme-accent);
+  cursor: pointer;
+}
+
+.range-control span {
+  min-width: 4.8rem;
+  color: var(--theme-text);
+  font-weight: 800;
+  text-align: right;
+}
+
 .racer-section-heading,
 .racer-picker-label {
   display: grid;
@@ -1162,7 +1182,8 @@ p {
 .race-page__ticker-track {
   display: flex;
   width: max-content;
-  animation: race-ticker-scroll 42s linear infinite;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
 }
 
 .race-page__ticker-group {
@@ -1192,22 +1213,6 @@ p {
   border-radius: 999px;
   background: var(--theme-accent);
   box-shadow: 0 0 1rem var(--theme-accent);
-}
-
-@keyframes race-ticker-scroll {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .race-page__ticker-track {
-    animation: none;
-  }
 }
 
 .bracket-lab {

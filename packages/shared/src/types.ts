@@ -386,6 +386,7 @@ export interface AdminSettings {
   includeAllRaceData: boolean;
   raceDisplayShowEventName: boolean;
   raceDisplayTickerMessages: string[];
+  raceDisplayTickerSpeed: number;
   targetDistanceMeters: number;
   serverPort: number;
 }

@@ -2,6 +2,7 @@ export const APP_NAME = "GoldSprints";
 export const API_PREFIX = "/api";
 export const WS_PATH = "/ws";
 export const DEFAULT_TARGET_DISTANCE_METERS = 250;
+export const DEFAULT_TICKER_SPEED_PIXELS_PER_SECOND = 72;
 export const COUNTDOWN_SECONDS = 3;
 export const DEFAULT_WHEEL_CIRCUMFERENCE_METERS = 2.1;
 export const DEFAULT_OS2L_PORT = 9996;
