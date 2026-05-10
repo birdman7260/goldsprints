@@ -115,6 +115,10 @@ Requirements:
   - `Tournaments`
   - `Settings`
     `Implemented`
+- Standard admin content cards should size to their own content and align toward the top of their
+  grid area instead of stretching inner spacing to match taller neighboring cards. Views that
+  intentionally need full-height cards, such as expanded bracket boards, may opt back into stretch
+  behavior. `Implemented`
 
 ### Event Tab
 

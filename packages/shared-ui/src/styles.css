@@ -23,6 +23,7 @@ textarea {
 
 .panel {
   display: grid;
+  align-content: start;
   gap: var(--ui-panel-gap);
   border: 1px solid var(--theme-accent-soft);
   border-radius: var(--ui-radius-panel);
