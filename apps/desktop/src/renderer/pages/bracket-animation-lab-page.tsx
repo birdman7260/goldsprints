@@ -332,6 +332,8 @@ function buildLabSnapshot(theme: ThemeDefinition, bundle: TournamentBundle): App
     includeAllRaceData: false,
     mode: "single-elimination",
     os2lEnabled: false,
+    raceDisplayShowEventName: true,
+    raceDisplayTickerMessages: [],
     serverPort: 3187,
     targetDistanceMeters: 250,
     themeId: theme.id

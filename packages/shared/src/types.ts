@@ -384,6 +384,8 @@ export interface AdminSettings {
   os2lEnabled: boolean;
   autoStageNextRace: boolean;
   includeAllRaceData: boolean;
+  raceDisplayShowEventName: boolean;
+  raceDisplayTickerMessages: string[];
   targetDistanceMeters: number;
   serverPort: number;
 }

@@ -83,6 +83,8 @@ function getDefaultAdminSettings(): AdminSettings {
     os2lEnabled: false,
     autoStageNextRace: false,
     includeAllRaceData: false,
+    raceDisplayShowEventName: true,
+    raceDisplayTickerMessages: ["Fiercely local racing all night"],
     targetDistanceMeters: DEFAULT_TARGET_DISTANCE_METERS,
     serverPort: DEFAULT_SERVER_PORT
   };

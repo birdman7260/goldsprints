@@ -228,19 +228,33 @@ Requirements:
 - The display must show solo and two-rider races. `Implemented`
 - The race visualization must support horizontal or vertical layouts depending on theme.
   `Implemented`
+- Projector layout must be optimized for a likely `1080p` display with large audience-readable
+  text and minimal non-race chrome. `Implemented`
+- Horizontal race themes must show `Gold Sprints` centered at the top, optionally show the active
+  event name underneath, reserve the main middle area for the race/bracket visualizer, show one or
+  two full-width racer cards above the footer, and show a centered `Fiercely Local` footer with a
+  logo placeholder between the words. `Implemented`
+- Vertical race themes must show `Gold Sprints` and the optional event name in the top-left,
+  `Fiercely Local` with the logo placeholder in the top-right, keep the race indicator centered
+  from top to bottom, and place racer cards at the bottom on either side of the race indicator.
+  `Implemented`
+- Admin must be able to toggle whether the event name appears on the projector race display.
+  `Implemented`
+- A bottom-edge ticker must run continuously across the full projector display without visible
+  snapping. It should show only the next three upcoming races, labeled `Up next`, `After that`, and
+  `Later`, and may mix admin-configured announcement messages between those races. If there are no
+  upcoming races, it must show `Sign up to race!` while still rotating through admin-configured
+  announcement messages. `Implemented`
 - The race visualizer components must animate live racer progress with Framer Motion rather than
   only snapping through layout/CSS updates. `Implemented`
 - The display must show:
   - racer avatars when present
   - current speed
   - top speed
-  - average speed
-  - distance traveled
-  - target race distance
+  - distance traveled and target race distance in the race graphic
   - winner state
-  - next-up teaser
+  - upcoming races in the bottom ticker
   - countdown
-  - estimated wattage
   - theme-specific animated race avatars moving along the track
     `Implemented`
 - Winner confetti must cover the full screen. `Implemented`

@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 import type { AppSnapshot } from "@goldsprints/shared/types";
 import { Button, Panel, StatPill } from "@goldsprints/shared-ui";
 import { rotatePhotoBoothPairing, startTunnel, stopTunnel, updateSettings } from "../../lib/api";
@@ -13,6 +14,14 @@ const boothHardwareLabels = {
   hallSensor: "Hall Sensor"
 } as const;
 
+function parseTickerMessages(value: string): string[] {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 20);
+}
+
 export function SettingsTab({
   snapshot,
   meta
@@ -24,6 +33,7 @@ export function SettingsTab({
   const queryClient = useQueryClient();
   const photoBoothAdminStatus = photoBoothStatusQuery.data;
   const photoBoothStatus = photoBoothAdminStatus?.status ?? snapshot.photoBooth;
+  const tickerMessageInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   return (
     <div className="page-grid">
@@ -74,6 +84,57 @@ export function SettingsTab({
             />
             Seed from all-time race data
           </label>
+        </div>
+      </Panel>
+
+      <Panel title="Projector Display">
+        <div className="form-grid">
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={snapshot.settings.raceDisplayShowEventName}
+              onChange={(event) => {
+                fireAndForget(updateSettings({ raceDisplayShowEventName: event.target.checked }));
+              }}
+            />
+            Show event name under the Gold Sprints title
+          </label>
+          <label>
+            Ticker messages
+            <textarea
+              ref={tickerMessageInputRef}
+              key={snapshot.settings.raceDisplayTickerMessages.join("\n")}
+              rows={5}
+              defaultValue={snapshot.settings.raceDisplayTickerMessages.join("\n")}
+              placeholder="One projector ticker message per line"
+            />
+          </label>
+          <div className="button-row">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (tickerMessageInputRef.current) {
+                  tickerMessageInputRef.current.value = "";
+                }
+                fireAndForget(updateSettings({ raceDisplayTickerMessages: [] }));
+              }}
+            >
+              Clear Messages
+            </Button>
+            <Button
+              onClick={() => {
+                fireAndForget(
+                  updateSettings({
+                    raceDisplayTickerMessages: parseTickerMessages(
+                      tickerMessageInputRef.current?.value ?? ""
+                    )
+                  })
+                );
+              }}
+            >
+              Save Ticker Messages
+            </Button>
+          </div>
         </div>
       </Panel>
 

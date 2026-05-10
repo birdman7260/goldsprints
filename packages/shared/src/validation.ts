@@ -71,6 +71,8 @@ export const settingUpdateSchema = z.object({
   os2lEnabled: z.boolean().optional(),
   autoStageNextRace: z.boolean().optional(),
   includeAllRaceData: z.boolean().optional(),
+  raceDisplayShowEventName: z.boolean().optional(),
+  raceDisplayTickerMessages: z.array(z.string().trim().min(1).max(120)).max(20).optional(),
   targetDistanceMeters: z.number().finite().positive().max(100000).optional()
 });
 

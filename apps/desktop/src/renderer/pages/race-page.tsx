@@ -1,4 +1,11 @@
-import type { AppSnapshot, RaceRecord, TournamentBundle } from "@goldsprints/shared/types";
+import type {
+  AppSnapshot,
+  QueueEntry,
+  RaceMetricsSnapshot,
+  RaceRecord,
+  RacerSummary,
+  TournamentBundle
+} from "@goldsprints/shared/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
@@ -7,10 +14,10 @@ import {
   EliminationBracketView
 } from "../components/elimination-bracket-view";
 import { RaceGraphic } from "../components/race-graphics";
-import { EmptyState, Panel, StatPill } from "@goldsprints/shared-ui";
+import { EmptyState, Panel } from "@goldsprints/shared-ui";
 import { WinnerConfetti } from "../components/winner-confetti";
 import { findBracketNodeByParticipantIds } from "../components/tournament-flow-layout";
-import { getActiveTournament, getPresetLabel } from "../lib/admin-competition";
+import { getActiveTournament } from "../lib/admin-competition";
 import { getConfettiEffectDurationMs } from "../lib/confetti-effects";
 import { useSnapshotQuery } from "../lib/query";
 import { buildParticipantEntries, resolveRacerName } from "../lib/snapshot-display";
@@ -90,39 +97,185 @@ function getTournamentRaceBundle(
   return snapshot.tournaments.find((bundle) => bundle.tournament.id === race.tournamentId) ?? null;
 }
 
-function getRaceDisplayHeaderTitle(input: {
-  bracketBundle: TournamentBundle | null;
-  displayRace: RaceRecord | null;
-  winnerName: string | null;
-}): string {
-  if (input.winnerName) {
-    return `${input.winnerName} wins!`;
-  }
-
-  if (input.displayRace) {
-    return "Race in Progress";
-  }
-
-  if (input.bracketBundle) {
-    return input.bracketBundle.tournament.name;
-  }
-
-  return "Stand By";
+function formatSpeed(value: number | undefined): string {
+  return `${(value ?? 0).toFixed(1)} km/h`;
 }
 
-function getRaceDisplayEyebrow(input: {
-  bracketBundle: TournamentBundle | null;
-  displayRace: RaceRecord | null;
-}): string {
-  if (input.displayRace?.tournamentId && input.bracketBundle) {
-    return `${getPresetLabel(input.bracketBundle.tournament.preset)} Bracket`;
+function getMetricForRacer(
+  metrics: RaceMetricsSnapshot[],
+  racerId: string
+): RaceMetricsSnapshot | undefined {
+  return metrics.find((metric) => metric.racerId === racerId);
+}
+
+function getQueueEntryLabel(snapshot: AppSnapshot, entry: QueueEntry, index: number): string {
+  const racers = entry.racerIds.map((racerId) => resolveRacerName(snapshot, racerId)).join(" vs ");
+  const prefix = ["Up next", "After that", "Later"][index] ?? "Later";
+  return `${prefix}: ${racers}`;
+}
+
+function buildTickerItems(snapshot: AppSnapshot): string[] {
+  const upcomingRaces = snapshot.queue
+    .filter((entry) => entry.status === "queued" || entry.status === "staging")
+    .slice(0, 3)
+    .map((entry, index) => getQueueEntryLabel(snapshot, entry, index));
+  const messages = snapshot.settings.raceDisplayTickerMessages;
+
+  if (upcomingRaces.length === 0) {
+    return ["Sign up to race!", ...messages];
   }
 
-  if (input.bracketBundle) {
-    return "Tournament Bracket";
+  const items: string[] = [];
+  const itemCount = Math.max(upcomingRaces.length, messages.length);
+
+  for (let index = 0; index < itemCount; index += 1) {
+    if (upcomingRaces[index]) {
+      items.push(upcomingRaces[index]);
+    }
+
+    if (messages[index]) {
+      items.push(messages[index]);
+    }
   }
 
-  return "Live Race";
+  return items;
+}
+
+function ProjectorBrand({
+  eventName,
+  showEventName
+}: {
+  eventName: string;
+  showEventName: boolean;
+}) {
+  return (
+    <header className="race-page__brand">
+      <h1>Gold Sprints</h1>
+      {showEventName ? <p>{eventName}</p> : null}
+    </header>
+  );
+}
+
+function LocalMark({ variant }: { variant: "footer" | "corner" }) {
+  return (
+    <div className={`race-page__local-mark race-page__local-mark--${variant}`}>
+      {variant === "footer" ? (
+        <>
+          <span>Fiercely</span>
+          <span className="race-page__logo-placeholder" aria-label="Sponsor logo placeholder" />
+          <span>Local</span>
+        </>
+      ) : (
+        <>
+          <span>Fiercely Local</span>
+          <span className="race-page__logo-placeholder" aria-label="Sponsor logo placeholder" />
+        </>
+      )}
+    </div>
+  );
+}
+
+function RaceTicker({ items }: { items: string[] }) {
+  const safeItems = items.length > 0 ? items : ["Sign up to race!"];
+  const repeatedGroup = Array.from(
+    { length: Math.max(4, Math.ceil(10 / safeItems.length)) },
+    () => safeItems
+  ).flat();
+
+  return (
+    <div className="race-page__ticker" aria-label="Upcoming races and announcements">
+      <div className="race-page__ticker-track">
+        {[0, 1].map((groupIndex) => (
+          <div
+            key={`ticker-group:${groupIndex}`}
+            className="race-page__ticker-group"
+            aria-hidden={groupIndex === 1}
+          >
+            {repeatedGroup.map((item, index) => (
+              <span key={`${groupIndex}:${item}:${index}`} className="race-page__ticker-item">
+                {item}
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProjectorRacerCards({
+  displayRace,
+  metrics,
+  orientation,
+  racers
+}: {
+  displayRace: RaceRecord;
+  metrics: RaceMetricsSnapshot[];
+  orientation: "horizontal" | "vertical";
+  racers: RacerSummary[];
+}) {
+  return (
+    <AnimatePresence initial={false}>
+      <motion.div
+        key={`metrics:${displayRace.id}`}
+        className={`race-page__racer-cards race-page__racer-cards--${orientation} ${
+          racers.length === 1 ? "race-page__racer-cards--solo" : "race-page__racer-cards--dual"
+        }`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 14 }}
+        transition={{ duration: 0.28, ease: "easeOut" }}
+      >
+        {racers.map((entry, index) => {
+          const metric = getMetricForRacer(metrics, entry.racer.id);
+          return (
+            <Panel
+              key={entry.racer.id}
+              className={`panel--glass race-page__racer-card race-page__racer-card--lane-${index}`}
+            >
+              <div className="race-page__racer-identity">
+                {entry.racer.avatarUrl ? (
+                  <img
+                    className="race-page__racer-avatar"
+                    src={entry.racer.avatarUrl}
+                    alt={entry.racer.displayName}
+                  />
+                ) : (
+                  <span className="race-page__racer-avatar">{entry.racer.displayName[0]}</span>
+                )}
+                <strong>{entry.racer.displayName}</strong>
+              </div>
+              <div className="race-page__racer-stats">
+                <div>
+                  <span>Speed</span>
+                  <strong>{formatSpeed(metric?.currentSpeedKph)}</strong>
+                </div>
+                <div>
+                  <span>Top Speed</span>
+                  <strong>{formatSpeed(metric?.topSpeedKph)}</strong>
+                </div>
+              </div>
+            </Panel>
+          );
+        })}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function WinnerBanner({ winnerName }: { winnerName: string }) {
+  return (
+    <motion.div
+      className="race-page__winner-banner"
+      initial={{ opacity: 0, scale: 0.94, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.98, y: -12 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+    >
+      <span>Winner</span>
+      <strong>{winnerName}</strong>
+    </motion.div>
+  );
 }
 
 export function RacePage() {
@@ -397,23 +550,11 @@ export function RacePage() {
     (postRaceSequence?.phase === "confetti" && displayRace != null);
   const racers = buildParticipantEntries(snapshot, displayRace);
   const metrics = displayRace?.metrics ?? [];
-  const nextUp = projection.nextQueueEntry
-    ? projection.nextQueueEntry.racerIds
-        .map((racerId) => resolveRacerName(snapshot, racerId))
-        .join(" vs ")
-    : "Queue clear";
-  const headerTitle = getRaceDisplayHeaderTitle({
-    bracketBundle,
-    displayRace,
-    winnerName: displayWinner?.racer.displayName ?? null
-  });
-  const eyebrow = getRaceDisplayEyebrow({
-    bracketBundle,
-    displayRace
-  });
+  const orientation = projection.theme.orientation;
+  const tickerItems = buildTickerItems(snapshot);
 
   return (
-    <div className="race-page">
+    <div className={`race-page race-page--${orientation}`}>
       <WinnerConfetti
         winnerKey={winnerKey}
         effectId={projection.theme.confettiEffectId}
@@ -425,34 +566,11 @@ export function RacePage() {
           projection.theme.tokens.laneB
         ]}
       />
-      <div className="race-page__header">
-        <div>
-          <p className="eyebrow">{eyebrow}</p>
-          <h1>{headerTitle}</h1>
-        </div>
-        <div className="stack-sm align-end">
-          <span>Next up</span>
-          <strong>{nextUp}</strong>
-        </div>
-      </div>
-
-      {displayRace ? (
-        <div className="race-page__summary stat-grid">
-          <StatPill
-            label="Race Distance"
-            value={`${displayRace.targetDistanceMeters.toFixed(0)} m`}
-          />
-          <StatPill
-            label="Lead Distance"
-            value={`${Math.max(...metrics.map((metric) => metric.distanceMeters), 0).toFixed(0)} m`}
-          />
-        </div>
-      ) : bracketBundle ? (
-        <div className="race-page__summary stat-grid">
-          <StatPill label="Tournament" value={bracketBundle.tournament.name} />
-          <StatPill label="Format" value={getPresetLabel(bracketBundle.tournament.preset)} />
-        </div>
-      ) : null}
+      <ProjectorBrand
+        eventName={snapshot.activeEvent.name}
+        showEventName={snapshot.settings.raceDisplayShowEventName}
+      />
+      <LocalMark variant={orientation === "horizontal" ? "footer" : "corner"} />
 
       {projection.countdownSecondsRemaining ? (
         <div className="countdown-overlay">
@@ -512,7 +630,7 @@ export function RacePage() {
           ) : !bracketBundle ? (
             <Panel className="panel--glass">
               <EmptyState
-                title="Projector ready"
+                title="Projector Ready"
                 body="Stage the next race from the admin screen or arm VirtualDJ to kick off the countdown."
               />
             </Panel>
@@ -521,61 +639,19 @@ export function RacePage() {
       </div>
 
       {showRacePanel && displayRace ? (
-        <AnimatePresence initial={false}>
-          <motion.div
-            key={`metrics:${displayRace.id}`}
-            className="race-metrics-grid"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 14 }}
-            transition={{ duration: 0.28, ease: "easeOut" }}
-          >
-            {racers.map((entry) => {
-              const metric = metrics.find((candidate) => candidate.racerId === entry.racer.id);
-              return (
-                <Panel key={entry.racer.id} className="panel--glass">
-                  <div className="race-metric-card">
-                    <div className="race-metric-card__header">
-                      {entry.racer.avatarUrl ? (
-                        <img
-                          className="racer-avatar"
-                          src={entry.racer.avatarUrl}
-                          alt={entry.racer.displayName}
-                        />
-                      ) : (
-                        <span className="racer-avatar">{entry.racer.displayName[0]}</span>
-                      )}
-                      <div>
-                        <strong>{entry.racer.displayName}</strong>
-                        <p>{metric?.distanceMeters.toFixed(0) ?? 0}m traveled</p>
-                      </div>
-                    </div>
-                    <div className="stat-grid">
-                      <StatPill
-                        label="Speed"
-                        value={`${metric?.currentSpeedKph.toFixed(1) ?? "0.0"} km/h`}
-                      />
-                      <StatPill
-                        label="Top"
-                        value={`${metric?.topSpeedKph.toFixed(1) ?? "0.0"} km/h`}
-                      />
-                      <StatPill
-                        label="Average"
-                        value={`${metric?.averageSpeedKph.toFixed(1) ?? "0.0"} km/h`}
-                      />
-                      <StatPill
-                        label="Distance"
-                        value={`${metric?.distanceMeters.toFixed(0) ?? "0"} / ${displayRace.targetDistanceMeters.toFixed(0)} m`}
-                      />
-                      <StatPill label="Watts" value={`${metric?.maxWattage.toFixed(0) ?? "0"} W`} />
-                    </div>
-                  </div>
-                </Panel>
-              );
-            })}
-          </motion.div>
-        </AnimatePresence>
+        <ProjectorRacerCards
+          displayRace={displayRace}
+          metrics={metrics}
+          orientation={orientation}
+          racers={racers}
+        />
       ) : null}
+
+      <AnimatePresence>
+        {displayWinner ? <WinnerBanner winnerName={displayWinner.racer.displayName} /> : null}
+      </AnimatePresence>
+
+      <RaceTicker items={tickerItems} />
     </div>
   );
 }

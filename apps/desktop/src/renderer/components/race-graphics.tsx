@@ -23,6 +23,8 @@ function resolveMetric(
 export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: RaceGraphicProps) {
   const prefersReducedMotion = useReducedMotion();
   const { raceGraphic } = theme;
+  const spriteDisplayHeightRem = theme.orientation === "vertical" ? 4.5 : 5.4;
+  const spriteOffsetRem = spriteDisplayHeightRem / 2;
   // Keep one shared motion profile across themes so each graphic can style itself
   // differently without feeling like a completely different timing system.
   const progressTransition = prefersReducedMotion
@@ -55,11 +57,16 @@ export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: Ra
                   className="climb-lane__rider"
                   data-race-motion="true"
                   initial={false}
-                  animate={{ bottom: `calc(${percentageValue} - 1.625rem)` }}
+                  animate={{ bottom: `calc(${percentageValue} - ${spriteOffsetRem}rem)` }}
                   transition={progressTransition}
-                  style={{ bottom: `calc(${percentageValue} - 1.625rem)` }}
+                  style={{ bottom: `calc(${percentageValue} - ${spriteOffsetRem}rem)` }}
                 >
-                  <RaceSpriteAvatar label={entry.racer.displayName} metric={metric} theme={theme} />
+                  <RaceSpriteAvatar
+                    displayHeightRem={spriteDisplayHeightRem}
+                    label={entry.racer.displayName}
+                    metric={metric}
+                    theme={theme}
+                  />
                 </motion.div>
               </div>
               <span className="climb-lane__name">{entry.racer.displayName}</span>
@@ -125,11 +132,16 @@ export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: Ra
                   className="ledger-lane__marker"
                   data-race-motion="true"
                   initial={false}
-                  animate={{ left: `calc(${percentageValue} - 1.65rem)` }}
+                  animate={{ left: `calc(${percentageValue} - ${spriteOffsetRem}rem)` }}
                   transition={progressTransition}
-                  style={{ left: `calc(${percentageValue} - 1.65rem)` }}
+                  style={{ left: `calc(${percentageValue} - ${spriteOffsetRem}rem)` }}
                 >
-                  <RaceSpriteAvatar label={entry.racer.displayName} metric={metric} theme={theme} />
+                  <RaceSpriteAvatar
+                    displayHeightRem={spriteDisplayHeightRem}
+                    label={entry.racer.displayName}
+                    metric={metric}
+                    theme={theme}
+                  />
                 </motion.div>
               </div>
             </div>
@@ -183,11 +195,16 @@ export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: Ra
                   className="wagon-lane__marker"
                   data-race-motion="true"
                   initial={false}
-                  animate={{ left: `calc(${percentageValue} - 1.625rem)` }}
+                  animate={{ left: `calc(${percentageValue} - ${spriteOffsetRem}rem)` }}
                   transition={progressTransition}
-                  style={{ left: `calc(${percentageValue} - 1.625rem)` }}
+                  style={{ left: `calc(${percentageValue} - ${spriteOffsetRem}rem)` }}
                 >
-                  <RaceSpriteAvatar label={entry.racer.displayName} metric={metric} theme={theme} />
+                  <RaceSpriteAvatar
+                    displayHeightRem={spriteDisplayHeightRem}
+                    label={entry.racer.displayName}
+                    metric={metric}
+                    theme={theme}
+                  />
                 </motion.div>
               </div>
             </div>
@@ -223,11 +240,16 @@ export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: Ra
                 className="track-lane__marker"
                 data-race-motion="true"
                 initial={false}
-                animate={{ left: `calc(${percentageValue} - 1.625rem)` }}
+                animate={{ left: `calc(${percentageValue} - ${spriteOffsetRem}rem)` }}
                 transition={progressTransition}
-                style={{ left: `calc(${percentageValue} - 1.625rem)` }}
+                style={{ left: `calc(${percentageValue} - ${spriteOffsetRem}rem)` }}
               >
-                <RaceSpriteAvatar label={entry.racer.displayName} metric={metric} theme={theme} />
+                <RaceSpriteAvatar
+                  displayHeightRem={spriteDisplayHeightRem}
+                  label={entry.racer.displayName}
+                  metric={metric}
+                  theme={theme}
+                />
               </motion.div>
             </div>
           </div>

@@ -620,10 +620,13 @@ p {
 }
 
 .race-page {
+  --race-ticker-height: clamp(2.8rem, 5vh, 3.6rem);
   min-height: 100vh;
-  padding: 2rem;
+  height: 100vh;
+  padding: clamp(1.1rem, 2.2vh, 2rem) clamp(1.4rem, 2.8vw, 3rem)
+    calc(var(--race-ticker-height) + clamp(0.7rem, 1.6vh, 1.25rem));
   display: grid;
-  gap: 1.5rem;
+  gap: clamp(0.85rem, 1.8vh, 1.4rem);
   background:
     radial-gradient(circle at 15% 20%, var(--theme-accent-soft), transparent 22%),
     radial-gradient(circle at 80% 10%, var(--theme-lane-b), transparent 18%),
@@ -631,6 +634,18 @@ p {
   color: var(--theme-text);
   position: relative;
   overflow: hidden;
+}
+
+.race-page--horizontal {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+
+.race-page--vertical {
+  grid-template-columns: minmax(15rem, 0.95fr) minmax(19rem, 1.12fr) minmax(15rem, 0.95fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  column-gap: clamp(1.5rem, 3vw, 3rem);
+  align-items: start;
 }
 
 :root[data-theme-surface="frontier"] .race-page {
@@ -710,15 +725,110 @@ p {
     0.1rem 0.1rem 0 #15110d;
 }
 
-.race-page__summary {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+.race-page__brand {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.race-page--horizontal .race-page__brand {
+  justify-items: center;
+  text-align: center;
+}
+
+.race-page--vertical .race-page__brand {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+}
+
+.race-page__brand h1 {
+  font-size: clamp(4.8rem, 8vw, 8.5rem);
+  line-height: 0.82;
+  letter-spacing: -0.09em;
+  text-transform: uppercase;
+}
+
+.race-page--vertical .race-page__brand h1 {
+  font-size: clamp(3.4rem, 5.4vw, 5.9rem);
+}
+
+.race-page__brand p {
+  color: var(--theme-text-muted);
+  font-size: clamp(1.35rem, 2.2vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.race-page__local-mark {
+  position: relative;
+  z-index: 4;
+  color: var(--theme-text);
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.race-page__local-mark--footer {
+  grid-row: 4;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.8rem, 1.8vw, 1.4rem);
+  font-size: clamp(1.65rem, 3vw, 3.1rem);
+}
+
+.race-page__local-mark--footer span:first-child {
+  justify-self: end;
+}
+
+.race-page__local-mark--footer span:last-child {
+  justify-self: start;
+}
+
+.race-page__local-mark--corner {
+  grid-column: 3;
+  grid-row: 1;
+  display: grid;
+  justify-items: center;
+  justify-self: end;
+  gap: 0.55rem;
+  font-size: clamp(1.5rem, 2.8vw, 3rem);
+  text-align: center;
+}
+
+.race-page__logo-placeholder {
+  display: inline-grid;
+  width: clamp(3.2rem, 5vw, 5.4rem);
+  aspect-ratio: 1;
+  place-items: center;
+  border: 0.18rem solid color-mix(in srgb, var(--theme-accent) 72%, transparent);
+  border-radius: 999px;
+  background:
+    radial-gradient(
+      circle,
+      color-mix(in srgb, var(--theme-accent) 32%, transparent),
+      transparent 58%
+    ),
+    color-mix(in srgb, var(--theme-surface-alt) 70%, transparent);
+  box-shadow: 0 0 2rem color-mix(in srgb, var(--theme-accent) 24%, transparent);
 }
 
 .race-page__stage {
+  grid-row: 2;
   position: relative;
-  min-height: 42rem;
+  min-width: 0;
+  min-height: 0;
   border-radius: 1.5rem;
   overflow: hidden;
+}
+
+.race-page--vertical .race-page__stage {
+  grid-column: 2;
+  grid-row: 1 / 4;
+  height: 100%;
 }
 
 .race-page__bracket-layer,
@@ -781,10 +891,233 @@ p {
   display: grid;
   place-items: center;
   background: rgba(0, 0, 0, 0.25);
-  font-size: clamp(5rem, 12vw, 10rem);
+  font-size: clamp(7rem, 16vw, 16rem);
   font-weight: 900;
   letter-spacing: 0.06em;
-  z-index: 3;
+  z-index: 12;
+}
+
+.race-page__racer-cards {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  gap: clamp(1rem, 1.8vw, 1.6rem);
+}
+
+.race-page__racer-cards--horizontal {
+  grid-row: 3;
+}
+
+.race-page__racer-cards--horizontal.race-page__racer-cards--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.race-page__racer-cards--horizontal.race-page__racer-cards--dual {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.race-page__racer-cards--vertical {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  grid-template-columns: minmax(0, 1fr) minmax(19rem, 1.12fr) minmax(0, 1fr);
+  align-items: end;
+}
+
+.race-page__racer-cards--vertical .race-page__racer-card--lane-0 {
+  grid-column: 1;
+}
+
+.race-page__racer-cards--vertical .race-page__racer-card--lane-1 {
+  grid-column: 3;
+}
+
+.race-page__racer-cards--vertical.race-page__racer-cards--solo .race-page__racer-card--lane-0 {
+  grid-column: 1;
+}
+
+.race-page__racer-card {
+  --ui-panel-padding: clamp(1rem, 1.6vw, 1.55rem);
+  min-width: 0;
+  border-width: 0.12rem;
+}
+
+.race-page__racer-identity {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.9rem, 1.6vw, 1.4rem);
+  min-width: 0;
+}
+
+.race-page__racer-identity strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: clamp(2rem, 3.6vw, 4rem);
+  line-height: 0.92;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.race-page--vertical .race-page__racer-identity strong {
+  font-size: clamp(1.55rem, 2.5vw, 2.75rem);
+}
+
+.race-page__racer-avatar {
+  width: clamp(5rem, 8vw, 8rem);
+  height: clamp(5rem, 8vw, 8rem);
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 0.18rem solid color-mix(in srgb, var(--theme-accent) 48%, transparent);
+  border-radius: 999px;
+  background: var(--theme-accent-soft);
+  object-fit: cover;
+  font-size: clamp(2rem, 3.4vw, 3.7rem);
+  font-weight: 950;
+  box-shadow: 0 0.9rem 2rem rgba(0, 0, 0, 0.28);
+}
+
+.race-page--vertical .race-page__racer-avatar {
+  width: clamp(4.3rem, 6.4vw, 6.4rem);
+  height: clamp(4.3rem, 6.4vw, 6.4rem);
+}
+
+.race-page__racer-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.75rem, 1.4vw, 1.2rem);
+}
+
+.race-page__racer-stats div {
+  display: grid;
+  gap: 0.2rem;
+  padding-top: clamp(0.75rem, 1.4vh, 1.1rem);
+  border-top: 1px solid var(--theme-accent-soft);
+}
+
+.race-page__racer-stats span {
+  color: var(--theme-text-muted);
+  font-size: clamp(0.9rem, 1.35vw, 1.35rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.race-page__racer-stats strong {
+  font-size: clamp(2rem, 4vw, 4.4rem);
+  line-height: 0.9;
+}
+
+.race-page--vertical .race-page__racer-stats strong {
+  font-size: clamp(1.5rem, 2.6vw, 2.9rem);
+}
+
+.race-page__winner-banner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 14;
+  display: grid;
+  min-width: min(56rem, calc(100vw - 4rem));
+  gap: 0.3rem;
+  padding: clamp(1.2rem, 2.4vw, 2rem) clamp(1.6rem, 3vw, 3rem);
+  translate: -50% -50%;
+  border: 0.16rem solid color-mix(in srgb, var(--theme-success) 62%, transparent);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(
+      circle at top,
+      color-mix(in srgb, var(--theme-success) 28%, transparent),
+      transparent 70%
+    ),
+    color-mix(in srgb, var(--theme-surface) 88%, transparent);
+  text-align: center;
+  box-shadow: 0 1.8rem 4rem rgba(0, 0, 0, 0.38);
+  pointer-events: none;
+}
+
+.race-page__winner-banner span {
+  color: var(--theme-success);
+  font-size: clamp(1.1rem, 2vw, 2.1rem);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.race-page__winner-banner strong {
+  font-size: clamp(4rem, 9vw, 9rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.race-page__ticker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  height: var(--race-ticker-height);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-top: 1px solid color-mix(in srgb, var(--theme-accent) 42%, transparent);
+  background:
+    linear-gradient(
+      90deg,
+      var(--theme-surface),
+      color-mix(in srgb, var(--theme-surface-alt) 86%, var(--theme-surface))
+    ),
+    var(--theme-surface);
+}
+
+.race-page__ticker-track {
+  display: flex;
+  width: max-content;
+  animation: race-ticker-scroll 42s linear infinite;
+}
+
+.race-page__ticker-group {
+  flex: 0 0 auto;
+  display: flex;
+}
+
+.race-page__ticker-item {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  padding-right: clamp(1.5rem, 3vw, 3rem);
+  color: var(--theme-text);
+  font-size: clamp(1.05rem, 2vw, 2rem);
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.race-page__ticker-item::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--theme-accent);
+  box-shadow: 0 0 1rem var(--theme-accent);
+}
+
+@keyframes race-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .race-page__ticker-track {
+    animation: none;
+  }
 }
 
 .bracket-lab {
@@ -922,6 +1255,81 @@ p {
   display: grid;
   gap: 1rem;
   background: #000;
+}
+
+.race-page .race-graphic {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.race-page--horizontal .race-graphic--horizontal,
+.race-page--horizontal .race-graphic--wagon,
+.race-page--horizontal .race-graphic--ledger {
+  align-content: center;
+  gap: clamp(1.8rem, 4.8vh, 4rem);
+}
+
+.race-page--horizontal .race-graphic--horizontal {
+  padding: clamp(2rem, 4vw, 4rem);
+}
+
+.race-page--horizontal .track-lane,
+.race-page--horizontal .wagon-lane,
+.race-page--horizontal .ledger-lane {
+  gap: clamp(0.85rem, 1.8vh, 1.4rem);
+}
+
+.race-page--horizontal .track-lane__header,
+.race-page--horizontal .wagon-lane__header,
+.race-page--horizontal .ledger-lane__header {
+  font-size: clamp(1.35rem, 2.4vw, 2.55rem);
+}
+
+.race-page--horizontal .track-lane__bar {
+  height: clamp(2.4rem, 5.5vh, 3.8rem);
+}
+
+.race-page--horizontal .track-lane__marker {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.race-page--horizontal .wagon-lane__track,
+.race-page--horizontal .ledger-lane__track {
+  min-height: clamp(8rem, 16vh, 12rem);
+}
+
+.race-page--horizontal .ledger-lane__marker {
+  top: calc(58% - 2.7rem);
+}
+
+.race-page--vertical .race-graphic--vertical {
+  height: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  align-items: stretch;
+  gap: clamp(1.5rem, 3vw, 2.6rem);
+  padding: clamp(1.3rem, 2.4vw, 2.2rem);
+}
+
+.race-page--vertical .climb-lane {
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  min-height: 0;
+}
+
+.race-page--vertical .climb-lane__track {
+  width: clamp(5.5rem, 7vw, 8rem);
+  height: 100%;
+  min-height: 0;
+  justify-self: center;
+}
+
+.race-page--vertical .climb-lane__name {
+  font-size: clamp(1.1rem, 1.8vw, 1.8rem);
+}
+
+.race-page--vertical .climb-lane__distance {
+  font-size: clamp(1rem, 1.6vw, 1.6rem);
 }
 
 .track-lane,

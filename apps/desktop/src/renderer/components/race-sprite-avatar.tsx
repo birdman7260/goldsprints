@@ -7,6 +7,7 @@ import type {
 import { resolveThemeSpriteSheet } from "../lib/theme-sprites";
 
 interface RaceSpriteAvatarProps {
+  displayHeightRem?: number;
   label: string;
   metric?: RaceMetricsSnapshot;
   theme: ThemeDefinition;
@@ -25,7 +26,12 @@ function pickAnimation(
   return { animation: slowAnimation, speedState: "slow" };
 }
 
-export function RaceSpriteAvatar({ label, metric, theme }: RaceSpriteAvatarProps) {
+export function RaceSpriteAvatar({
+  displayHeightRem = 3.25,
+  label,
+  metric,
+  theme
+}: RaceSpriteAvatarProps) {
   const spriteSheet = resolveThemeSpriteSheet(theme);
   const { animation, speedState } = pickAnimation(
     metric?.currentSpeedKph ?? 0,
@@ -33,7 +39,6 @@ export function RaceSpriteAvatar({ label, metric, theme }: RaceSpriteAvatarProps
     spriteSheet.slowAnimation,
     spriteSheet.fastAnimation
   );
-  const displayHeightRem = 3.25;
   const displayWidthRem = displayHeightRem * (animation.frameWidth / animation.frameHeight);
 
   // The sprite row changes with speed, while the keyframes only scrub across columns.

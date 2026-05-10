@@ -1,6 +1,7 @@
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -97,13 +98,15 @@ select {
 .text-input:focus-visible,
 .search-select__input:focus-visible,
 input:focus-visible,
-select:focus-visible {
+select:focus-visible,
+textarea:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--theme-accent) 74%, transparent);
   outline-offset: 3px;
 }
 
 input,
 select,
+textarea,
 .text-input,
 .search-select__input {
   width: 100%;
@@ -208,6 +211,7 @@ select,
 :root[data-theme-ui="pixel"] .button,
 :root[data-theme-ui="pixel"] input,
 :root[data-theme-ui="pixel"] select,
+:root[data-theme-ui="pixel"] textarea,
 :root[data-theme-ui="pixel"] .stat-pill {
   border-radius: 0.35rem;
 }
@@ -215,6 +219,7 @@ select,
 :root[data-theme-ui="pixel"] .panel,
 :root[data-theme-ui="pixel"] input,
 :root[data-theme-ui="pixel"] select,
+:root[data-theme-ui="pixel"] textarea,
 :root[data-theme-ui="pixel"] .stat-pill {
   border-color: rgba(111, 165, 179, 0.5);
   box-shadow:
