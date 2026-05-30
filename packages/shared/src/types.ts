@@ -456,6 +456,7 @@ export interface AdminSettings {
   autoStageNextRace: boolean;
   includeAllRaceData: boolean;
   allowAccountlessRacerSignup: boolean;
+  raceDisplayLaneColorsFlipped: boolean;
   raceDisplayShowEventName: boolean;
   raceDisplayTickerMessages: string[];
   raceDisplayTickerSpeed: number;

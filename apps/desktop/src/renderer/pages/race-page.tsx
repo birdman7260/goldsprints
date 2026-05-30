@@ -1,9 +1,7 @@
 import type {
   AppSnapshot,
   QueueEntry,
-  RaceMetricsSnapshot,
   RaceRecord,
-  RacerSummary,
   TournamentBundle
 } from "@goldsprints/shared/types";
 import { AnimatePresence, motion } from "framer-motion";
@@ -102,17 +100,6 @@ function getTournamentRaceBundle(
   }
 
   return snapshot.tournaments.find((bundle) => bundle.tournament.id === race.tournamentId) ?? null;
-}
-
-function formatSpeed(value: number | undefined): string {
-  return `${(value ?? 0).toFixed(1)} km/h`;
-}
-
-function getMetricForRacer(
-  metrics: RaceMetricsSnapshot[],
-  racerId: string
-): RaceMetricsSnapshot | undefined {
-  return metrics.find((metric) => metric.racerId === racerId);
 }
 
 function getQueueEntryLabel(snapshot: AppSnapshot, entry: QueueEntry, index: number): string {
@@ -334,66 +321,6 @@ function RacerSignupPrompt({
       </div>
       <div className="race-page__signup-url">{racerPageUrl}</div>
     </Panel>
-  );
-}
-
-function ProjectorRacerCards({
-  displayRace,
-  metrics,
-  orientation,
-  racers
-}: {
-  displayRace: RaceRecord;
-  metrics: RaceMetricsSnapshot[];
-  orientation: "horizontal" | "vertical";
-  racers: RacerSummary[];
-}) {
-  return (
-    <AnimatePresence initial={false}>
-      <motion.div
-        key={`metrics:${displayRace.id}`}
-        className={`race-page__racer-cards race-page__racer-cards--${orientation} ${
-          racers.length === 1 ? "race-page__racer-cards--solo" : "race-page__racer-cards--dual"
-        }`}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 14 }}
-        transition={{ duration: 0.28, ease: "easeOut" }}
-      >
-        {racers.map((entry, index) => {
-          const metric = getMetricForRacer(metrics, entry.racer.id);
-          return (
-            <Panel
-              key={entry.racer.id}
-              className={`panel--glass race-page__racer-card race-page__racer-card--lane-${index}`}
-            >
-              <div className="race-page__racer-identity">
-                {entry.racer.avatarUrl ? (
-                  <img
-                    className="race-page__racer-avatar"
-                    src={entry.racer.avatarUrl}
-                    alt={entry.racer.displayName}
-                  />
-                ) : (
-                  <span className="race-page__racer-avatar">{entry.racer.displayName[0]}</span>
-                )}
-                <strong>{entry.racer.displayName}</strong>
-              </div>
-              <div className="race-page__racer-stats">
-                <div>
-                  <span>Speed</span>
-                  <strong>{formatSpeed(metric?.currentSpeedKph)}</strong>
-                </div>
-                <div>
-                  <span>Top Speed</span>
-                  <strong>{formatSpeed(metric?.topSpeedKph)}</strong>
-                </div>
-              </div>
-            </Panel>
-          );
-        })}
-      </motion.div>
-    </AnimatePresence>
   );
 }
 
@@ -761,6 +688,7 @@ export function RacePage() {
               racers={racers}
               metrics={metrics}
               targetDistanceMeters={displayRace.targetDistanceMeters}
+              laneColorsFlipped={snapshot.settings.raceDisplayLaneColorsFlipped}
             />
           ) : showSignupPrompt ? (
             <RacerSignupPrompt qrCodeDataUrl={meta?.qrCodeDataUrl} racerPageUrl={racerPageUrl} />
@@ -774,15 +702,6 @@ export function RacePage() {
           ) : null}
         </motion.div>
       </div>
-
-      {showRacePanel && displayRace ? (
-        <ProjectorRacerCards
-          displayRace={displayRace}
-          metrics={metrics}
-          orientation={orientation}
-          racers={racers}
-        />
-      ) : null}
 
       <AnimatePresence>
         {resultPresentation ? (

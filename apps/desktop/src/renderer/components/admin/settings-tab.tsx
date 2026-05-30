@@ -168,6 +168,18 @@ export function SettingsTab({
             />
             Show event name under the Gold Sprints title
           </label>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={snapshot.settings.raceDisplayLaneColorsFlipped}
+              onChange={(event) => {
+                fireAndForget(
+                  updateSettings({ raceDisplayLaneColorsFlipped: event.target.checked })
+                );
+              }}
+            />
+            Flip projector lane colors
+          </label>
           <label>
             Ticker speed
             <div className="range-control">

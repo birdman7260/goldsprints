@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
+import { useLayoutEffect, useRef, useState } from "react";
 import type { RaceMetricsSnapshot, RacerSummary, ThemeDefinition } from "@goldsprints/shared/types";
 import { RaceSpriteAvatar } from "./race-sprite-avatar";
 
@@ -7,7 +8,12 @@ interface RaceGraphicProps {
   racers: RacerSummary[];
   metrics: RaceMetricsSnapshot[];
   targetDistanceMeters: number;
+  laneColorsFlipped: boolean;
 }
+
+type RaceLaneColor = "orange" | "purple";
+
+const FALLBACK_MIN_NAME_FONT_SIZE_PX = 22;
 
 function progress(distanceMeters: number, targetDistanceMeters: number): number {
   return Math.max(0, Math.min(100, (distanceMeters / targetDistanceMeters) * 100));
@@ -20,7 +26,149 @@ function resolveMetric(
   return metrics.find((metric) => metric.racerId === racerId);
 }
 
-export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: RaceGraphicProps) {
+function formatSpeed(value: number | undefined): string {
+  return `${(value ?? 0).toFixed(1)} km/h`;
+}
+
+function getLaneColor(index: number, laneColorsFlipped: boolean): RaceLaneColor {
+  const topLaneColor: RaceLaneColor = laneColorsFlipped ? "purple" : "orange";
+  const secondaryLaneColor: RaceLaneColor = laneColorsFlipped ? "orange" : "purple";
+  return index === 0 ? topLaneColor : secondaryLaneColor;
+}
+
+function getLaneClassName(
+  baseClassName: string,
+  index: number,
+  laneColorsFlipped: boolean
+): string {
+  return `${baseClassName} race-lane race-lane--${getLaneColor(index, laneColorsFlipped)}`;
+}
+
+function AutoFitRacerName({ name }: { name: string }) {
+  const containerRef = useRef<HTMLSpanElement | null>(null);
+  const measuringRef = useRef<HTMLSpanElement | null>(null);
+  const [fontSizePx, setFontSizePx] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const measuringText = measuringRef.current;
+    if (!container || !measuringText) {
+      return;
+    }
+
+    const nameContainer = container;
+    const nameMeasuringText = measuringText;
+    let animationFrame = 0;
+    let disposed = false;
+
+    function fitName(): void {
+      const availableWidth = nameContainer.getBoundingClientRect().width;
+      const naturalWidth = nameMeasuringText.getBoundingClientRect().width;
+      if (availableWidth <= 0 || naturalWidth <= 0) {
+        return;
+      }
+
+      // Measure the name at its theme-defined max size, then shrink only as far
+      // as needed before the normal CSS ellipsis takes over.
+      const styles = window.getComputedStyle(nameMeasuringText);
+      const maxFontSize = Number.parseFloat(styles.fontSize);
+      const configuredMinimum = Number.parseFloat(
+        styles.getPropertyValue("--race-lane-name-min-size-px")
+      );
+      const minFontSize = Number.isFinite(configuredMinimum)
+        ? configuredMinimum
+        : FALLBACK_MIN_NAME_FONT_SIZE_PX;
+      const nextFontSize =
+        naturalWidth > availableWidth
+          ? Math.max(minFontSize, maxFontSize * (availableWidth / naturalWidth))
+          : maxFontSize;
+
+      setFontSizePx((current) =>
+        current != null && Math.abs(current - nextFontSize) < 0.5 ? current : nextFontSize
+      );
+    }
+
+    function queueFit(): void {
+      if (disposed) {
+        return;
+      }
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(fitName);
+    }
+
+    const resizeObserver = new ResizeObserver(queueFit);
+    resizeObserver.observe(nameContainer);
+    queueFit();
+    void document.fonts.ready.then(queueFit);
+
+    return () => {
+      disposed = true;
+      window.cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
+    };
+  }, [name]);
+
+  return (
+    <span ref={containerRef} className="race-lane__name-wrap">
+      <strong
+        className="race-lane__name"
+        style={fontSizePx == null ? undefined : { fontSize: `${fontSizePx}px` }}
+        title={name}
+      >
+        {name}
+      </strong>
+      <span ref={measuringRef} className="race-lane__name-measure" aria-hidden="true">
+        {name}
+      </span>
+    </span>
+  );
+}
+
+function LaneIdentity({ racer }: { racer: RacerSummary["racer"] }) {
+  return (
+    <div className="race-lane__identity">
+      {racer.avatarUrl ? (
+        <img className="race-lane__avatar" src={racer.avatarUrl} alt={racer.displayName} />
+      ) : null}
+      <AutoFitRacerName name={racer.displayName} />
+    </div>
+  );
+}
+
+function LaneReadout({
+  metric,
+  targetDistanceMeters
+}: {
+  metric?: RaceMetricsSnapshot;
+  targetDistanceMeters: number;
+}) {
+  return (
+    <div className="race-lane__readout">
+      <div className="race-lane__readout-item race-lane__readout-item--distance">
+        <span>Distance</span>
+        <strong>
+          {Math.round(metric?.distanceMeters ?? 0)} / {Math.round(targetDistanceMeters)}m
+        </strong>
+      </div>
+      <div className="race-lane__readout-item">
+        <span>Speed</span>
+        <strong>{formatSpeed(metric?.currentSpeedKph)}</strong>
+      </div>
+      <div className="race-lane__readout-item">
+        <span>Top</span>
+        <strong>{formatSpeed(metric?.topSpeedKph)}</strong>
+      </div>
+    </div>
+  );
+}
+
+export function RaceGraphic({
+  theme,
+  racers,
+  metrics,
+  targetDistanceMeters,
+  laneColorsFlipped
+}: RaceGraphicProps) {
   const prefersReducedMotion = useReducedMotion();
   const { raceGraphic } = theme;
   const spriteDisplayHeightRem = theme.orientation === "vertical" ? 4.5 : 5.4;
@@ -39,12 +187,15 @@ export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: Ra
   if (theme.orientation === "vertical") {
     return (
       <div className={`race-graphic race-graphic--vertical race-graphic--${raceGraphic.variant}`}>
-        {racers.map((entry) => {
+        {racers.map((entry, index) => {
           const metric = resolveMetric(metrics, entry.racer.id);
           const percentage = progress(metric?.distanceMeters ?? 0, targetDistanceMeters);
           const percentageValue = `${percentage.toFixed(2)}%`;
           return (
-            <div key={entry.racer.id} className="climb-lane">
+            <div
+              key={entry.racer.id}
+              className={getLaneClassName("climb-lane", index, laneColorsFlipped)}
+            >
               <div className="climb-lane__track">
                 <motion.div
                   className="climb-lane__fill"
@@ -69,10 +220,10 @@ export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: Ra
                   />
                 </motion.div>
               </div>
-              <span className="climb-lane__name">{entry.racer.displayName}</span>
-              <strong className="climb-lane__distance">
-                {Math.round(metric?.distanceMeters ?? 0)} / {Math.round(targetDistanceMeters)}m
-              </strong>
+              <div className="climb-lane__summary">
+                <LaneIdentity racer={entry.racer} />
+                <LaneReadout metric={metric} targetDistanceMeters={targetDistanceMeters} />
+              </div>
             </div>
           );
         })}
@@ -88,36 +239,15 @@ export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: Ra
           const metric = resolveMetric(metrics, entry.racer.id);
           const percentage = progress(metric?.distanceMeters ?? 0, targetDistanceMeters);
           const percentageValue = `${percentage.toFixed(2)}%`;
-          const trailRole =
-            racers.length === 1
-              ? (raceGraphic.laneLabels?.solo ?? "Lead")
-              : index === 0
-                ? (raceGraphic.laneLabels?.laneA ?? "Lane A")
-                : (raceGraphic.laneLabels?.laneB ?? "Lane B");
 
           return (
-            <div key={entry.racer.id} className="ledger-lane">
-              <div className="ledger-lane__header">
-                <div className="ledger-lane__identity">
-                  {entry.racer.avatarUrl ? (
-                    <img
-                      className="racer-avatar racer-avatar--small"
-                      src={entry.racer.avatarUrl}
-                      alt={entry.racer.displayName}
-                    />
-                  ) : (
-                    <span className="racer-avatar racer-avatar--small">
-                      {entry.racer.displayName[0]}
-                    </span>
-                  )}
-                  <div className="ledger-lane__copy">
-                    <strong>{entry.racer.displayName}</strong>
-                    <span>{trailRole}</span>
-                  </div>
-                </div>
-                <strong>
-                  {Math.round(metric?.distanceMeters ?? 0)} / {Math.round(targetDistanceMeters)}m
-                </strong>
+            <div
+              key={entry.racer.id}
+              className={getLaneClassName("ledger-lane", index, laneColorsFlipped)}
+            >
+              <div className="ledger-lane__header race-lane__header">
+                <LaneIdentity racer={entry.racer} />
+                <LaneReadout metric={metric} targetDistanceMeters={targetDistanceMeters} />
               </div>
               <div className="ledger-lane__track">
                 <div className="ledger-lane__sky" aria-hidden="true" />
@@ -154,33 +284,18 @@ export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: Ra
   if (raceGraphic.variant === "trail") {
     return (
       <div className="race-graphic race-graphic--wagon">
-        {racers.map((entry) => {
+        {racers.map((entry, index) => {
           const metric = resolveMetric(metrics, entry.racer.id);
           const percentage = progress(metric?.distanceMeters ?? 0, targetDistanceMeters);
           const percentageValue = `${percentage.toFixed(2)}%`;
           return (
-            <div key={entry.racer.id} className="wagon-lane">
-              <div className="wagon-lane__header">
-                <div className="wagon-lane__identity">
-                  {entry.racer.avatarUrl ? (
-                    <img
-                      className="racer-avatar racer-avatar--small"
-                      src={entry.racer.avatarUrl}
-                      alt={entry.racer.displayName}
-                    />
-                  ) : (
-                    <span className="racer-avatar racer-avatar--small">
-                      {entry.racer.displayName[0]}
-                    </span>
-                  )}
-                  <div className="wagon-lane__copy">
-                    <strong>{entry.racer.displayName}</strong>
-                    <span>{raceGraphic.laneLabels?.default ?? "Racing"}</span>
-                  </div>
-                </div>
-                <strong>
-                  {Math.round(metric?.distanceMeters ?? 0)} / {Math.round(targetDistanceMeters)}m
-                </strong>
+            <div
+              key={entry.racer.id}
+              className={getLaneClassName("wagon-lane", index, laneColorsFlipped)}
+            >
+              <div className="wagon-lane__header race-lane__header">
+                <LaneIdentity racer={entry.racer} />
+                <LaneReadout metric={metric} targetDistanceMeters={targetDistanceMeters} />
               </div>
               <div className="wagon-lane__track">
                 <div className="wagon-lane__route" />
@@ -216,17 +331,18 @@ export function RaceGraphic({ theme, racers, metrics, targetDistanceMeters }: Ra
 
   return (
     <div className="race-graphic race-graphic--horizontal">
-      {racers.map((entry) => {
+      {racers.map((entry, index) => {
         const metric = resolveMetric(metrics, entry.racer.id);
         const percentage = progress(metric?.distanceMeters ?? 0, targetDistanceMeters);
         const percentageValue = `${percentage.toFixed(2)}%`;
         return (
-          <div key={entry.racer.id} className="track-lane">
-            <div className="track-lane__header">
-              <span>{entry.racer.displayName}</span>
-              <strong>
-                {Math.round(metric?.distanceMeters ?? 0)} / {Math.round(targetDistanceMeters)}m
-              </strong>
+          <div
+            key={entry.racer.id}
+            className={getLaneClassName("track-lane", index, laneColorsFlipped)}
+          >
+            <div className="track-lane__header race-lane__header">
+              <LaneIdentity racer={entry.racer} />
+              <LaneReadout metric={metric} targetDistanceMeters={targetDistanceMeters} />
             </div>
             <div className="track-lane__bar">
               <motion.div

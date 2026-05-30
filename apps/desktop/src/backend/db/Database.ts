@@ -130,6 +130,7 @@ function getDefaultAdminSettings(): AdminSettings {
     autoStageNextRace: false,
     includeAllRaceData: false,
     allowAccountlessRacerSignup: false,
+    raceDisplayLaneColorsFlipped: false,
     raceDisplayShowEventName: true,
     raceDisplayTickerMessages: ["Fiercely local racing all night"],
     raceDisplayTickerSpeed: DEFAULT_TICKER_SPEED_PIXELS_PER_SECOND,

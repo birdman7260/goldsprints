@@ -712,7 +712,7 @@ p {
 
 .race-page--horizontal {
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 .race-page--vertical {
@@ -846,7 +846,7 @@ p {
 }
 
 .race-page__local-mark--footer {
-  grid-row: 4;
+  grid-row: 3;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
@@ -1095,120 +1095,6 @@ p {
   font-weight: 900;
   letter-spacing: 0.06em;
   z-index: 12;
-}
-
-.race-page__racer-cards {
-  position: relative;
-  z-index: 5;
-  display: grid;
-  gap: clamp(1rem, 1.8vw, 1.6rem);
-}
-
-.race-page__racer-cards--horizontal {
-  grid-row: 3;
-}
-
-.race-page__racer-cards--horizontal.race-page__racer-cards--solo {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.race-page__racer-cards--horizontal.race-page__racer-cards--dual {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.race-page__racer-cards--vertical {
-  grid-column: 1 / 4;
-  grid-row: 3;
-  grid-template-columns: minmax(0, 1fr) minmax(19rem, 1.12fr) minmax(0, 1fr);
-  align-items: end;
-}
-
-.race-page__racer-cards--vertical .race-page__racer-card--lane-0 {
-  grid-column: 1;
-}
-
-.race-page__racer-cards--vertical .race-page__racer-card--lane-1 {
-  grid-column: 3;
-}
-
-.race-page__racer-cards--vertical.race-page__racer-cards--solo .race-page__racer-card--lane-0 {
-  grid-column: 1;
-}
-
-.race-page__racer-card {
-  --ui-panel-padding: clamp(1rem, 1.6vw, 1.55rem);
-  min-width: 0;
-  border-width: 0.12rem;
-}
-
-.race-page__racer-identity {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.9rem, 1.6vw, 1.4rem);
-  min-width: 0;
-}
-
-.race-page__racer-identity strong {
-  min-width: 0;
-  overflow: hidden;
-  font-size: clamp(2rem, 3.6vw, 4rem);
-  line-height: 0.92;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.race-page--vertical .race-page__racer-identity strong {
-  font-size: clamp(1.55rem, 2.5vw, 2.75rem);
-}
-
-.race-page__racer-avatar {
-  width: clamp(5rem, 8vw, 8rem);
-  height: clamp(5rem, 8vw, 8rem);
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  border: 0.18rem solid color-mix(in srgb, var(--theme-accent) 48%, transparent);
-  border-radius: 999px;
-  background: var(--theme-accent-soft);
-  object-fit: cover;
-  font-size: clamp(2rem, 3.4vw, 3.7rem);
-  font-weight: 950;
-  box-shadow: 0 0.9rem 2rem rgba(0, 0, 0, 0.28);
-}
-
-.race-page--vertical .race-page__racer-avatar {
-  width: clamp(4.3rem, 6.4vw, 6.4rem);
-  height: clamp(4.3rem, 6.4vw, 6.4rem);
-}
-
-.race-page__racer-stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(0.75rem, 1.4vw, 1.2rem);
-}
-
-.race-page__racer-stats div {
-  display: grid;
-  gap: 0.2rem;
-  padding-top: clamp(0.75rem, 1.4vh, 1.1rem);
-  border-top: 1px solid var(--theme-accent-soft);
-}
-
-.race-page__racer-stats span {
-  color: var(--theme-text-muted);
-  font-size: clamp(0.9rem, 1.35vw, 1.35rem);
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.race-page__racer-stats strong {
-  font-size: clamp(2rem, 4vw, 4.4rem);
-  line-height: 0.9;
-}
-
-.race-page--vertical .race-page__racer-stats strong {
-  font-size: clamp(1.5rem, 2.6vw, 2.9rem);
 }
 
 .race-page__results-overlay {
@@ -1787,11 +1673,143 @@ p {
   height: 100%;
 }
 
+.race-lane {
+  --race-lane-color: #f97316;
+  --race-lane-color-bright: #fb923c;
+  --race-lane-color-soft: rgba(249, 115, 22, 0.18);
+  --race-lane-color-shadow: rgba(249, 115, 22, 0.28);
+  --race-lane-avatar-size: clamp(6.8rem, 10.4vw, 11rem);
+  --race-lane-name-max-size: clamp(1.8rem, 3.8vw, 4.2rem);
+  --race-lane-name-min-size-px: 22;
+}
+
+.race-lane--orange {
+  --race-lane-color: #f97316;
+  --race-lane-color-bright: #fb923c;
+  --race-lane-color-soft: rgba(249, 115, 22, 0.18);
+  --race-lane-color-shadow: rgba(249, 115, 22, 0.28);
+}
+
+.race-lane--purple {
+  --race-lane-color: #8b5cf6;
+  --race-lane-color-bright: #a78bfa;
+  --race-lane-color-soft: rgba(139, 92, 246, 0.2);
+  --race-lane-color-shadow: rgba(139, 92, 246, 0.3);
+}
+
+.race-lane__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1rem, 2.2vw, 2rem);
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--race-lane-color) 54%, transparent);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--race-lane-color) 18%, transparent),
+      rgba(0, 0, 0, 0.1)
+    ),
+    color-mix(in srgb, var(--theme-surface-alt) 66%, transparent);
+  padding: clamp(0.75rem, 1.3vw, 1.25rem);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 0 2rem var(--race-lane-color-shadow);
+}
+
+.race-lane__identity {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  gap: clamp(0.9rem, 1.7vw, 1.45rem);
+  min-width: 0;
+  min-height: var(--race-lane-avatar-size);
+}
+
+.race-lane__avatar {
+  width: var(--race-lane-avatar-size);
+  height: var(--race-lane-avatar-size);
+  flex: 0 0 var(--race-lane-avatar-size);
+  border: 0.16rem solid color-mix(in srgb, var(--race-lane-color) 70%, white);
+  border-radius: 999px;
+  background: var(--theme-surface);
+  object-fit: cover;
+  box-shadow: 0 0.7rem 1.6rem rgba(0, 0, 0, 0.26);
+}
+
+.race-lane__name-wrap {
+  position: relative;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.race-lane__name,
+.race-lane__name-measure {
+  color: var(--theme-text);
+  font-size: var(--race-lane-name-max-size);
+  font-weight: 950;
+  line-height: 0.9;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.race-lane__name {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.race-lane__name-measure {
+  position: absolute;
+  visibility: hidden;
+  width: max-content;
+  pointer-events: none;
+}
+
+.race-lane__readout {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: clamp(0.65rem, 1.2vw, 1rem);
+  min-width: min(39rem, 56%);
+  text-align: right;
+}
+
+.race-lane__readout-item {
+  display: grid;
+  gap: 0.18rem;
+  min-width: clamp(7rem, 12vw, 11rem);
+  padding-left: clamp(0.65rem, 1.1vw, 1rem);
+  border-left: 1px solid color-mix(in srgb, var(--race-lane-color) 52%, transparent);
+}
+
+.race-lane__readout-item span {
+  color: var(--theme-text-muted);
+  font-size: clamp(0.72rem, 1.1vw, 1.1rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.race-lane__readout-item strong {
+  color: var(--theme-text);
+  font-size: clamp(1.55rem, 2.8vw, 3.2rem);
+  line-height: 0.95;
+  white-space: nowrap;
+}
+
+.race-lane__readout-item--distance {
+  min-width: clamp(9rem, 14vw, 13rem);
+}
+
 .race-page--horizontal .race-graphic--horizontal,
 .race-page--horizontal .race-graphic--wagon,
 .race-page--horizontal .race-graphic--ledger {
-  align-content: center;
+  align-content: stretch;
   gap: clamp(1.8rem, 4.8vh, 4rem);
+  grid-auto-rows: minmax(0, 1fr);
 }
 
 .race-page--horizontal .race-graphic--horizontal {
@@ -1802,6 +1820,7 @@ p {
 .race-page--horizontal .wagon-lane,
 .race-page--horizontal .ledger-lane {
   gap: clamp(0.85rem, 1.8vh, 1.4rem);
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .race-page--horizontal .track-lane__header,
@@ -1811,7 +1830,8 @@ p {
 }
 
 .race-page--horizontal .track-lane__bar {
-  height: clamp(2.4rem, 5.5vh, 3.8rem);
+  height: auto;
+  min-height: clamp(4rem, 13vh, 9rem);
 }
 
 .race-page--horizontal .track-lane__marker {
@@ -1821,7 +1841,8 @@ p {
 
 .race-page--horizontal .wagon-lane__track,
 .race-page--horizontal .ledger-lane__track {
-  min-height: clamp(8rem, 16vh, 12rem);
+  height: 100%;
+  min-height: 0;
 }
 
 .race-page--horizontal .ledger-lane__marker {
@@ -1837,7 +1858,7 @@ p {
 }
 
 .race-page--vertical .climb-lane {
-  grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-rows: minmax(0, 1fr) auto;
   min-height: 0;
 }
 
@@ -1848,40 +1869,37 @@ p {
   justify-self: center;
 }
 
-.race-page--vertical .climb-lane__name {
-  font-size: clamp(1.1rem, 1.8vw, 1.8rem);
-}
-
-.race-page--vertical .climb-lane__distance {
-  font-size: clamp(1rem, 1.6vw, 1.6rem);
-}
-
 .track-lane,
 .climb-lane,
 .wagon-lane {
   display: grid;
   gap: 0.6rem;
-}
-
-.track-lane__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  min-width: 0;
+  min-height: 0;
 }
 
 .track-lane__bar {
   position: relative;
   height: 1.25rem;
   border-radius: 999px;
-  background: var(--theme-surface);
+  border: 1px solid color-mix(in srgb, var(--race-lane-color) 50%, transparent);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--race-lane-color) 10%, transparent),
+      transparent
+    ),
+    var(--theme-surface);
   overflow: visible;
+  box-shadow:
+    inset 0 0 2rem rgba(0, 0, 0, 0.26),
+    0 0 2.4rem var(--race-lane-color-shadow);
 }
 
 .track-lane__fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--theme-lane-a), var(--theme-lane-b));
+  background: linear-gradient(90deg, var(--race-lane-color-soft), var(--race-lane-color-bright));
 }
 
 .track-lane__marker {
@@ -2429,8 +2447,18 @@ button.tournament-match-node:active {
   position: relative;
   height: 22rem;
   border-radius: 999px;
-  background: var(--theme-surface);
+  border: 1px solid color-mix(in srgb, var(--race-lane-color) 52%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in srgb, var(--race-lane-color) 10%, transparent)
+    ),
+    var(--theme-surface);
   overflow: visible;
+  box-shadow:
+    inset 0 0 1.4rem rgba(0, 0, 0, 0.28),
+    0 0 2rem var(--race-lane-color-shadow);
 }
 
 .climb-lane__fill {
@@ -2439,7 +2467,7 @@ button.tournament-match-node:active {
   right: 0;
   bottom: 0;
   border-radius: inherit;
-  background: linear-gradient(180deg, var(--theme-warning), var(--theme-lane-a));
+  background: linear-gradient(180deg, var(--race-lane-color-bright), var(--race-lane-color));
 }
 
 .climb-lane__rider {
@@ -2449,65 +2477,55 @@ button.tournament-match-node:active {
   transform: translateX(-50%);
 }
 
-.climb-lane__name,
-.climb-lane__distance {
+.climb-lane__summary {
+  --race-lane-avatar-size: clamp(6.4rem, 10vw, 10rem);
+  --race-lane-name-max-size: clamp(1.15rem, 1.9vw, 2rem);
+  --race-lane-name-min-size-px: 14;
+  display: grid;
+  gap: clamp(0.75rem, 1.2vw, 1.1rem);
+}
+
+.climb-lane .race-lane__identity {
+  justify-content: center;
   text-align: center;
 }
 
-.climb-lane__distance {
-  color: var(--theme-text-muted);
+.climb-lane .race-lane__name-wrap {
+  flex: 0 1 auto;
+}
+
+.climb-lane .race-lane__readout {
+  justify-content: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.climb-lane .race-lane__readout-item {
+  min-width: clamp(5.8rem, 8vw, 8rem);
+  padding: clamp(0.45rem, 0.7vw, 0.65rem) 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--race-lane-color) 52%, transparent);
+  border-left: 0;
+}
+
+.climb-lane .race-lane__readout-item strong {
+  font-size: clamp(1.05rem, 1.6vw, 1.75rem);
 }
 
 .wagon-lane__header,
-.wagon-lane__identity,
-.wagon-lane__copy {
+.ledger-lane__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-}
-
-.wagon-lane__copy {
-  display: grid;
-  justify-content: start;
-  gap: 0.15rem;
-}
-
-.wagon-lane__copy span {
-  color: var(--theme-text-muted);
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
 .ledger-lane {
   display: grid;
   gap: 0.75rem;
-}
-
-.ledger-lane__header,
-.ledger-lane__identity {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.ledger-lane__header {
-  justify-content: space-between;
-}
-
-.ledger-lane__identity {
-  justify-content: start;
   min-width: 0;
+  min-height: 0;
 }
 
-.ledger-lane__copy {
-  display: grid;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.ledger-lane__copy span,
 .ledger-lane__mileposts {
   color: var(--theme-text-muted);
   font-size: 0.82rem;
@@ -2518,8 +2536,9 @@ button.tournament-match-node:active {
   position: relative;
   min-height: 5.8rem;
   overflow: hidden;
-  border: 1px solid rgba(212, 176, 106, 0.72);
+  border: 1px solid color-mix(in srgb, var(--race-lane-color) 68%, transparent);
   background: #000;
+  box-shadow: 0 0 2rem var(--race-lane-color-shadow);
 }
 
 .ledger-lane__sky,
@@ -2551,13 +2570,13 @@ button.tournament-match-node:active {
   transform: translateY(-50%);
   background: repeating-linear-gradient(
     90deg,
-    rgba(212, 176, 106, 0.95) 0,
-    rgba(212, 176, 106, 0.95) 16px,
-    rgba(93, 151, 164, 0.82) 16px,
-    rgba(93, 151, 164, 0.82) 26px
+    var(--race-lane-color-bright) 0,
+    var(--race-lane-color-bright) 16px,
+    color-mix(in srgb, var(--race-lane-color) 50%, #000) 16px,
+    color-mix(in srgb, var(--race-lane-color) 50%, #000) 26px
   );
   box-shadow:
-    0 0 0 1px rgba(212, 176, 106, 0.8),
+    0 0 0 1px color-mix(in srgb, var(--race-lane-color) 70%, transparent),
     inset 0 0 0 1px rgba(243, 225, 183, 0.1);
 }
 
@@ -2578,12 +2597,18 @@ button.tournament-match-node:active {
 .wagon-lane__track {
   position: relative;
   min-height: 5rem;
+  border: 1px solid color-mix(in srgb, var(--race-lane-color) 45%, transparent);
   border-radius: 1.5rem;
   padding: 1.1rem 1.25rem;
   background:
-    linear-gradient(180deg, rgba(255, 226, 179, 0.08), rgba(72, 45, 26, 0.28)),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--race-lane-color) 10%, transparent),
+      rgba(72, 45, 26, 0.28)
+    ),
     linear-gradient(90deg, rgba(24, 15, 10, 0.8), rgba(54, 33, 20, 0.78));
   overflow: hidden;
+  box-shadow: 0 0 2rem var(--race-lane-color-shadow);
 }
 
 .wagon-lane__route {
@@ -2596,10 +2621,10 @@ button.tournament-match-node:active {
   transform: translateY(-50%);
   background: repeating-linear-gradient(
     90deg,
-    rgba(216, 161, 93, 0.5) 0,
-    rgba(216, 161, 93, 0.5) 10px,
-    rgba(143, 90, 50, 0.34) 10px,
-    rgba(143, 90, 50, 0.34) 20px
+    color-mix(in srgb, var(--race-lane-color) 58%, transparent) 0,
+    color-mix(in srgb, var(--race-lane-color) 58%, transparent) 10px,
+    color-mix(in srgb, var(--race-lane-color) 30%, transparent) 10px,
+    color-mix(in srgb, var(--race-lane-color) 30%, transparent) 20px
   );
   box-shadow:
     inset 0 0 0 1px rgba(255, 240, 214, 0.08),
