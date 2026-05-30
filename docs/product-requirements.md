@@ -283,10 +283,10 @@ Requirements:
   to a visible starting position during normal operation. `Implemented`
 - Admin must be able to control projector ticker scroll speed with a slider in projector display
   settings. `Implemented`
-- When no race is staged, no tournament bracket is being shown, and there are no upcoming races
-  available to stage, the projector display should show a large racer-page QR code with audience
-  messaging that encourages people to scan, register, and sign up. This prompt should be centered
-  in a wide full-stage layout even when the selected theme normally uses a vertical race
+- When no race is staged and no tournament bracket is being shown, the projector display should
+  show a large racer-page QR code with audience messaging that encourages people to scan, register,
+  and sign up, even if there are already upcoming queue entries. This prompt should be centered in
+  a wide full-stage layout even when the selected theme normally uses a vertical race
   visualization. `Implemented`
 - The race visualizer components must animate live racer progress with Framer Motion rather than
   only snapping through layout/CSS updates. `Implemented`

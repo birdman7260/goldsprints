@@ -675,12 +675,10 @@ export function RacePage() {
   const metrics = displayRace?.metrics ?? [];
   const orientation = projection.theme.orientation;
   const tickerItems = buildTickerItems(snapshot);
-  const hasRaceToStage = snapshot.queue.some(
-    (entry) => entry.status === "queued" || entry.status === "staging"
-  );
-  // The empty queue prompt is an audience call-to-action, so it should use a full-width projector
-  // layout instead of inheriting the current theme's horizontal/vertical race-track geometry.
-  const showSignupPrompt = !bracketBundle && !hasRaceToStage && displayRace == null;
+  // The no-staged-race prompt is an audience call-to-action, so it should use a full-width
+  // projector layout instead of inheriting the current theme's horizontal/vertical race-track
+  // geometry. The bottom ticker still communicates any queued upcoming races.
+  const showSignupPrompt = !bracketBundle && displayRace == null;
   const racerPageUrl =
     snapshot.tunnel.publicUrl ?? (meta ? `${meta.localBaseUrl}/racer` : "/racer");
 
