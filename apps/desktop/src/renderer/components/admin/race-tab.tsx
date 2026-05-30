@@ -41,6 +41,12 @@ export function RaceTab({
   setAdminQueueRequestedType: Dispatch<SetStateAction<"auto-match" | "solo">>;
   onAdminQueueSignup: () => void;
 }) {
+  // Queue entries do not know which race owns them; the current race keeps that link.
+  const stagedQueueEntryId =
+    currentRace && ["scheduled", "staging", "countdown", "active"].includes(currentRace.state)
+      ? currentRace.queueEntryId
+      : null;
+
   return (
     <div className="page-grid">
       <Panel title="Race Distance">
@@ -151,28 +157,37 @@ export function RaceTab({
           />
         ) : (
           <div className="list">
-            {snapshot.queue.map((entry) => (
-              <div key={entry.id} className="list-row">
-                <div>
-                  <strong>#{entry.position}</strong>
-                  <p>{formatRacerNames(snapshot, entry.racerIds)}</p>
-                  <p>{describeQueueEntry(entry)}</p>
+            {snapshot.queue.map((entry) => {
+              const isStagedMatch = entry.id === stagedQueueEntryId;
+
+              return (
+                <div
+                  key={entry.id}
+                  className={`list-row queue-list-row${isStagedMatch ? " queue-list-row--staged" : ""}`}
+                  aria-current={isStagedMatch ? "true" : undefined}
+                >
+                  <div>
+                    <strong>#{entry.position}</strong>
+                    {isStagedMatch ? <span className="queue-status-pill">Staged</span> : null}
+                    <p>{formatRacerNames(snapshot, entry.racerIds)}</p>
+                    <p>{describeQueueEntry(entry)}</p>
+                  </div>
+                  <div className="button-row">
+                    {entry.racerIds.map((racerId) => (
+                      <Button
+                        key={racerId}
+                        variant="ghost"
+                        onClick={() => {
+                          fireAndForget(removeRacerFromQueueEntry(entry.id, racerId));
+                        }}
+                      >
+                        Remove {resolveRacerName(snapshot, racerId)}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-                <div className="button-row">
-                  {entry.racerIds.map((racerId) => (
-                    <Button
-                      key={racerId}
-                      variant="ghost"
-                      onClick={() => {
-                        fireAndForget(removeRacerFromQueueEntry(entry.id, racerId));
-                      }}
-                    >
-                      Remove {resolveRacerName(snapshot, racerId)}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </Panel>

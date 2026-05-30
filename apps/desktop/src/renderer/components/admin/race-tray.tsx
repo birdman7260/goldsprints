@@ -4,11 +4,12 @@ import {
   dismissRaceResultPresentation,
   finalizeCurrentRace,
   finalizeInterruptedRace,
+  resetCurrentRaceToStaged,
   restartInterruptedRace,
   resumeInterruptedRace,
   stageNextRace,
   startCurrentRace,
-  unstageCurrentTournamentRace
+  unstageCurrentRace
 } from "../../lib/api";
 import { describeQueueEntry, resolveRacerName } from "../../lib/snapshot-display";
 import { fireAndForget } from "../../lib/ui-actions";
@@ -128,7 +129,16 @@ export function AdminRaceTray({
               );
             }}
             onUnstageCurrent={() => {
-              fireAndForget(unstageCurrentTournamentRace(), "unstage tournament race");
+              fireAndForget(
+                unstageCurrentRace(),
+                currentTournamentRace ? "unstage tournament race" : "unstage race"
+              );
+            }}
+            onResetCurrent={() => {
+              fireAndForget(
+                resetCurrentRaceToStaged(),
+                currentTournamentRace ? "reset tournament race" : "reset race"
+              );
             }}
             onFinalizeCurrent={() => {
               fireAndForget(

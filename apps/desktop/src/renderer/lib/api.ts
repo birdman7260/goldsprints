@@ -321,6 +321,14 @@ export async function startCurrentRace(): Promise<AppSnapshot> {
   return parseJson(await fetch(buildUrl("/api/races/current/start"), { method: "POST" }));
 }
 
+export async function unstageCurrentRace(): Promise<AppSnapshot> {
+  return parseJson(await fetch(buildUrl("/api/races/current/unstage"), { method: "POST" }));
+}
+
+export async function resetCurrentRaceToStaged(): Promise<AppSnapshot> {
+  return parseJson(await fetch(buildUrl("/api/races/current/reset-to-staged"), { method: "POST" }));
+}
+
 export async function unstageCurrentTournamentRace(): Promise<AppSnapshot> {
   return parseJson(
     await fetch(buildUrl("/api/races/current/unstage-tournament"), { method: "POST" })

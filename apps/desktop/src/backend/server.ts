@@ -493,6 +493,14 @@ export function createBackendServer(options: BackendServerOptions): BackendServe
     res.json(service.startManualCountdown());
   });
 
+  app.post(`${API_PREFIX}/races/current/unstage`, (_req, res) => {
+    res.json(service.unstageCurrentRace());
+  });
+
+  app.post(`${API_PREFIX}/races/current/reset-to-staged`, (_req, res) => {
+    res.json(service.resetCurrentRaceToStaged());
+  });
+
   app.post(`${API_PREFIX}/races/current/unstage-tournament`, (_req, res) => {
     res.json(service.unstageCurrentTournamentRace());
   });

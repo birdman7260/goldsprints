@@ -8,6 +8,7 @@ export function CurrentRaceActionRows({
   disableStageNextRaceButton,
   onStageNextRace,
   onUnstageCurrent,
+  onResetCurrent,
   onStartCountdown,
   onFinalizeCurrent,
   onResumeInterrupted,
@@ -19,6 +20,7 @@ export function CurrentRaceActionRows({
   disableStageNextRaceButton?: boolean;
   onStageNextRace?: () => void;
   onUnstageCurrent?: () => void;
+  onResetCurrent?: () => void;
   onStartCountdown: () => void;
   onFinalizeCurrent: () => void;
   onResumeInterrupted: () => void;
@@ -29,8 +31,10 @@ export function CurrentRaceActionRows({
   const showStageAction = showStageNextRaceButton && !currentRace;
   const showStartAction =
     currentRace != null && ["scheduled", "staging"].includes(currentRace.state);
-  const showUnstageTournamentAction =
-    currentRace?.tournamentId != null && ["scheduled", "staging"].includes(currentRace.state);
+  const showUnstageAction =
+    currentRace != null && ["scheduled", "staging"].includes(currentRace.state);
+  const showResetAction =
+    currentRace != null && ["countdown", "active"].includes(currentRace.state);
   const showFinalizeAction = currentRace?.state === "active";
 
   if (raceIsInterrupted) {
@@ -63,7 +67,13 @@ export function CurrentRaceActionRows({
     );
   }
 
-  if (!showStageAction && !showStartAction && !showUnstageTournamentAction && !showFinalizeAction) {
+  if (
+    !showStageAction &&
+    !showStartAction &&
+    !showUnstageAction &&
+    !showResetAction &&
+    !showFinalizeAction
+  ) {
     return null;
   }
 
@@ -80,6 +90,16 @@ export function CurrentRaceActionRows({
             Stage Next Race
           </Button>
         ) : null}
+        {showUnstageAction ? (
+          <Button
+            variant="ghost"
+            onClick={() => {
+              onUnstageCurrent?.();
+            }}
+          >
+            Unstage Race
+          </Button>
+        ) : null}
         {showStartAction ? (
           <Button
             variant="accent"
@@ -90,14 +110,14 @@ export function CurrentRaceActionRows({
             Start Countdown
           </Button>
         ) : null}
-        {showUnstageTournamentAction ? (
+        {showResetAction ? (
           <Button
             variant="ghost"
             onClick={() => {
-              onUnstageCurrent?.();
+              onResetCurrent?.();
             }}
           >
-            Unstage Match
+            Reset To Staged
           </Button>
         ) : null}
         {showFinalizeAction ? (

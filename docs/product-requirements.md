@@ -148,6 +148,12 @@ Requirements:
 
 - Stage the next open-time-trial race when no race is currently staged. `Implemented`
 - Start countdown only for an already staged race. `Implemented`
+- Unstage a scheduled/staged current race. If open-time-trial auto-stage is enabled, an explicit
+  unstage pauses auto-staging until the host presses `Stage Next Race` again. `Implemented`
+- In the staged-race action row, `Unstage Race` must sit to the left of `Start Countdown`, with
+  `Start Countdown` as the far-right primary action. `Implemented`
+- Reset a countdown/active race back to staged so it can be started again without completing the
+  race or its queue entry. `Implemented`
 - Finalize current race. `Implemented`
 - Resume, restart, or finalize interrupted races. `Implemented`
 - Open-time-trial race controls no longer need to live inside the `Race Desk` content panel; the
@@ -157,6 +163,8 @@ Requirements:
 - Add racers to the queue directly from admin controls. `Implemented`
 - Default admin queueing behavior must be head-to-head auto-match, with explicit solo as an option.
   `Implemented`
+- When a queued open-time-trial match is staged, the matching row in the admin queue list must be
+  visually highlighted. `Implemented`
 - Admin racer/opponent matchup pickers must support typing to filter the available racer list.
   `Implemented`
 - Show queue contents and allow racer removal from specific queue entries. `Implemented`

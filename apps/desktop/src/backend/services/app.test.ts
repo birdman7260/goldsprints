@@ -7,6 +7,8 @@ type AutoStageInvoker = (this: unknown) => boolean;
 type ClearResultPresentationInvoker = (this: unknown) => void;
 type ReconcileQueueRaceStatusesInvoker = (this: unknown, eventId: string) => void;
 type UnstageOpenRaceInvoker = (this: unknown, eventId: string) => void;
+type UnstageCurrentRaceInvoker = (this: unknown) => AppSnapshot;
+type ResetRaceToStagedInvoker = (this: unknown) => AppSnapshot;
 type UnstageTournamentRaceInvoker = (this: unknown) => AppSnapshot;
 
 function getCountdownInvoker(): CountdownInvoker {
@@ -57,6 +59,24 @@ function getUnstageOpenRaceInvoker(): UnstageOpenRaceInvoker {
   return candidate as UnstageOpenRaceInvoker;
 }
 
+function getUnstageCurrentRaceInvoker(): UnstageCurrentRaceInvoker {
+  const candidate: unknown = Reflect.get(GoldsprintsApp.prototype, "unstageCurrentRace");
+  if (typeof candidate !== "function") {
+    throw new Error("Missing current race unstaging implementation");
+  }
+
+  return candidate as UnstageCurrentRaceInvoker;
+}
+
+function getResetRaceToStagedInvoker(): ResetRaceToStagedInvoker {
+  const candidate: unknown = Reflect.get(GoldsprintsApp.prototype, "resetCurrentRaceToStaged");
+  if (typeof candidate !== "function") {
+    throw new Error("Missing current race reset implementation");
+  }
+
+  return candidate as ResetRaceToStagedInvoker;
+}
+
 function getUnstageTournamentRaceInvoker(): UnstageTournamentRaceInvoker {
   const candidate: unknown = Reflect.get(GoldsprintsApp.prototype, "unstageCurrentTournamentRace");
   if (typeof candidate !== "function") {
@@ -73,6 +93,37 @@ const invokeStartCountdown = (
   const invoker = getCountdownInvoker();
   return invoker.call(target, source);
 };
+
+function withAppPrototype<T extends object>(target: T): T {
+  Object.setPrototypeOf(target, GoldsprintsApp.prototype);
+  return target;
+}
+
+function buildRaceRecord(patch: Partial<RaceRecord> = {}): RaceRecord {
+  return {
+    createdAt: "now",
+    eventId: "event-1",
+    finishedAt: null,
+    format: "match",
+    id: "race-1",
+    metrics: [],
+    mode: "open-time-trial",
+    participants: [
+      { lane: "left", racerId: "racer-1" },
+      { lane: "right", racerId: "racer-2" }
+    ],
+    queueEntryId: "queue-1",
+    stageId: null,
+    startedAt: null,
+    state: "staging",
+    targetDistanceMeters: 250,
+    themeId: "neon-night",
+    tournamentId: null,
+    updatedAt: "now",
+    winnerRacerId: null,
+    ...patch
+  };
+}
 
 describe("app service countdown flow", () => {
   it("does not auto-stage an open time trial race when start is triggered without a staged race", () => {
@@ -198,6 +249,157 @@ describe("app service countdown flow", () => {
     );
 
     expect(markQueueEntryStatus).toHaveBeenCalledWith("queue-1", "completed");
+  });
+});
+
+describe("app service current race controls", () => {
+  it("unstages a staged open queue race and pauses auto-stage until manual staging", () => {
+    const snapshot = { generatedAt: "now" } as AppSnapshot;
+    const updateRace = vi.fn();
+    const markQueueEntryStatus = vi.fn();
+    const emitSnapshot = vi.fn();
+    const getSnapshot = vi.fn(() => snapshot);
+    const endRace = vi.fn();
+    const disarmRace = vi.fn();
+    const invoker = getUnstageCurrentRaceInvoker();
+    const target = withAppPrototype({
+      autoStagePausedUntilManualStage: false,
+      countdownStartTimer: null,
+      countdownTicker: null,
+      currentRuntime: null,
+      db: {
+        getActiveEvent: () => ({ id: "event-1" }),
+        getCurrentRace: () => buildRaceRecord(),
+        markQueueEntryStatus,
+        updateRace
+      },
+      emitSnapshot,
+      getSnapshot,
+      os2lTrigger: {
+        disarmRace
+      },
+      sensorAdapter: {
+        endRace
+      }
+    });
+
+    const result = invoker.call(target);
+
+    expect(updateRace).toHaveBeenCalledWith(
+      "race-1",
+      expect.objectContaining({
+        countdownStartedAt: null,
+        metrics: [],
+        state: "cancelled",
+        winnerRacerId: null
+      })
+    );
+    expect(markQueueEntryStatus).toHaveBeenCalledWith("queue-1", "queued");
+    expect(disarmRace).toHaveBeenCalledTimes(1);
+    expect(endRace).toHaveBeenCalledTimes(1);
+    expect(emitSnapshot).toHaveBeenCalledTimes(1);
+    expect(target.autoStagePausedUntilManualStage).toBe(true);
+    expect(result).toBe(snapshot);
+  });
+
+  it("does not unstage a race after countdown starts", () => {
+    const updateRace = vi.fn();
+    const markQueueEntryStatus = vi.fn();
+    const invoker = getUnstageCurrentRaceInvoker();
+    const target = withAppPrototype({
+      countdownStartTimer: null,
+      countdownTicker: null,
+      currentRuntime: null,
+      db: {
+        getActiveEvent: () => ({ id: "event-1" }),
+        getCurrentRace: () => buildRaceRecord({ state: "active" }),
+        markQueueEntryStatus,
+        updateRace
+      },
+      os2lTrigger: {
+        disarmRace: vi.fn()
+      },
+      sensorAdapter: {
+        endRace: vi.fn()
+      }
+    });
+
+    expect(() => invoker.call(target)).toThrow("before countdown starts");
+    expect(updateRace).not.toHaveBeenCalled();
+    expect(markQueueEntryStatus).not.toHaveBeenCalled();
+  });
+
+  it("resets an active race back to staged without completing its queue entry", () => {
+    const snapshot = { generatedAt: "now" } as AppSnapshot;
+    const updateRace = vi.fn();
+    const markQueueEntryStatus = vi.fn();
+    const emitSnapshot = vi.fn();
+    const getSnapshot = vi.fn(() => snapshot);
+    const armRace = vi.fn();
+    const disarmRace = vi.fn();
+    const endRace = vi.fn();
+    const invoker = getResetRaceToStagedInvoker();
+    const target = withAppPrototype({
+      countdownStartTimer: null,
+      countdownTicker: null,
+      currentRuntime: {
+        finalizeTimer: null
+      },
+      db: {
+        getActiveEvent: () => ({ id: "event-1" }),
+        getAdminSettings: () => ({ os2lEnabled: true }),
+        getCurrentRace: () =>
+          buildRaceRecord({
+            metrics: [
+              {
+                averageSpeedKph: 21,
+                currentSpeedKph: 20,
+                distanceMeters: 100,
+                elapsedMs: 12000,
+                lane: "left",
+                maxWattage: 310,
+                racerId: "racer-1",
+                rotationCount: 42,
+                topSpeedKph: 32,
+                wattage: 260
+              }
+            ],
+            startedAt: "started",
+            state: "active",
+            winnerRacerId: "racer-1"
+          }),
+        markQueueEntryStatus,
+        updateRace
+      },
+      emitSnapshot,
+      getSnapshot,
+      os2lTrigger: {
+        armRace,
+        disarmRace
+      },
+      sensorAdapter: {
+        endRace
+      }
+    });
+
+    const result = invoker.call(target);
+
+    expect(updateRace).toHaveBeenCalledWith(
+      "race-1",
+      expect.objectContaining({
+        countdownStartedAt: null,
+        metrics: [],
+        startedAt: null,
+        state: "staging",
+        winnerRacerId: null
+      })
+    );
+    expect(markQueueEntryStatus).toHaveBeenCalledWith("queue-1", "staging");
+    expect(disarmRace).toHaveBeenCalledTimes(1);
+    expect(endRace).toHaveBeenCalledTimes(1);
+    expect(armRace).toHaveBeenCalledWith("race-1");
+    expect(emitSnapshot).toHaveBeenCalledTimes(1);
+    expect(result).toBe(snapshot);
   });
 });
 

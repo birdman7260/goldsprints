@@ -262,9 +262,11 @@ export class GoldsprintsApp extends EventEmitter {
   private readonly tunnelManager: CloudflaredTunnelManager;
   private readonly tournaments = new TournamentService();
   private countdownTicker: NodeJS.Timeout | null = null;
+  private countdownStartTimer: NodeJS.Timeout | null = null;
   private currentRuntime: CurrentRaceRuntime | null = null;
   private resultPresentation: RaceResultPresentation | null = null;
   private resultPresentationTimer: NodeJS.Timeout | null = null;
+  private autoStagePausedUntilManualStage = false;
   private readonly passkeyChallenges = new Map<string, PasskeyChallenge>();
   private stripeClient: Stripe | null = null;
   private stripeSecretKey: string | null = null;
@@ -303,6 +305,7 @@ export class GoldsprintsApp extends EventEmitter {
       clearInterval(this.countdownTicker);
       this.countdownTicker = null;
     }
+    this.clearCountdownStartTimer();
     if (this.currentRuntime?.finalizeTimer) {
       clearTimeout(this.currentRuntime.finalizeTimer);
     }
@@ -320,6 +323,13 @@ export class GoldsprintsApp extends EventEmitter {
 
   private emitSnapshot(): void {
     this.emit("snapshot", this.getSnapshot());
+  }
+
+  private clearCountdownStartTimer(): void {
+    if (this.countdownStartTimer) {
+      clearTimeout(this.countdownStartTimer);
+      this.countdownStartTimer = null;
+    }
   }
 
   private getStripeConfig(): StripeRuntimeConfig {
@@ -1337,6 +1347,10 @@ export class GoldsprintsApp extends EventEmitter {
       return false;
     }
 
+    if (this.autoStagePausedUntilManualStage) {
+      return false;
+    }
+
     this.reconcileQueueRaceStatuses(activeEvent.id);
 
     const settings = this.db.getAdminSettings();
@@ -1797,6 +1811,7 @@ export class GoldsprintsApp extends EventEmitter {
       return this.getSnapshot();
     }
 
+    this.autoStagePausedUntilManualStage = false;
     this.db.markQueueEntryStatus(nextEntry.id, "staging");
     // Solo races use a dedicated "solo" lane so themes can render a centered single-rider layout.
     const participants =
@@ -1825,6 +1840,80 @@ export class GoldsprintsApp extends EventEmitter {
       this.os2lTrigger.armRace(race.id);
     }
 
+    this.emitSnapshot();
+    return this.getSnapshot();
+  }
+
+  private clearRaceStartState(): void {
+    if (this.countdownTicker) {
+      clearInterval(this.countdownTicker);
+      this.countdownTicker = null;
+    }
+    this.clearCountdownStartTimer();
+    if (this.currentRuntime?.finalizeTimer) {
+      clearTimeout(this.currentRuntime.finalizeTimer);
+    }
+    this.currentRuntime = null;
+    this.sensorAdapter.endRace();
+    this.os2lTrigger.disarmRace();
+  }
+
+  unstageCurrentRace(): AppSnapshot {
+    const activeEvent = this.db.getActiveEvent()!;
+    const currentRace = this.db.getCurrentRace(activeEvent.id);
+    if (!currentRace) {
+      return this.getSnapshot();
+    }
+
+    if (!["scheduled", "staging"].includes(currentRace.state)) {
+      throw new Error("Races can only be unstaged before countdown starts.");
+    }
+
+    this.clearRaceStartState();
+    this.db.updateRace(currentRace.id, {
+      countdownStartedAt: null,
+      finishedAt: null,
+      metrics: [],
+      startedAt: null,
+      state: "cancelled",
+      winnerRacerId: null
+    });
+    if (currentRace.queueEntryId) {
+      this.db.markQueueEntryStatus(currentRace.queueEntryId, "queued");
+      // Explicitly unstaging an open queue race is a host pause, not an invitation for auto-stage
+      // to immediately recreate the same staged race.
+      this.autoStagePausedUntilManualStage = true;
+    }
+    this.emitSnapshot();
+    return this.getSnapshot();
+  }
+
+  resetCurrentRaceToStaged(): AppSnapshot {
+    const activeEvent = this.db.getActiveEvent()!;
+    const currentRace = this.db.getCurrentRace(activeEvent.id);
+    if (!currentRace) {
+      return this.getSnapshot();
+    }
+
+    if (!["countdown", "active"].includes(currentRace.state)) {
+      return this.getSnapshot();
+    }
+
+    this.clearRaceStartState();
+    this.db.updateRace(currentRace.id, {
+      countdownStartedAt: null,
+      finishedAt: null,
+      metrics: [],
+      startedAt: null,
+      state: "staging",
+      winnerRacerId: null
+    });
+    if (currentRace.queueEntryId) {
+      this.db.markQueueEntryStatus(currentRace.queueEntryId, "staging");
+    }
+    if (this.db.getAdminSettings().os2lEnabled) {
+      this.os2lTrigger.armRace(currentRace.id);
+    }
     this.emitSnapshot();
     return this.getSnapshot();
   }
@@ -1866,7 +1955,9 @@ export class GoldsprintsApp extends EventEmitter {
       this.emitSnapshot();
     }, 250);
 
-    setTimeout(() => {
+    this.clearCountdownStartTimer();
+    this.countdownStartTimer = setTimeout(() => {
+      this.countdownStartTimer = null;
       if (this.countdownTicker) {
         clearInterval(this.countdownTicker);
         this.countdownTicker = null;
@@ -1880,7 +1971,7 @@ export class GoldsprintsApp extends EventEmitter {
 
   private activateRace(raceId: string): void {
     const race = this.db.getRace(raceId);
-    if (!race) {
+    if (race?.state !== "countdown") {
       return;
     }
 
