@@ -310,10 +310,13 @@ Requirements:
   effects. `Implemented`
 - When a race result is shown on the projector, the result overlay should be a full modal with a
   centered `WINNER!` title and lane-ordered vertical racer cards instead of a simple winner banner.
-  Each card should show the racer name, avatar when present, top speed, average speed, puke factor,
-  wattage, races today, wins today, and career race count when the racer has history in more than
-  one event. The winning card should be highlighted and slightly larger. The modal should remain up
-  for 15 seconds by default, and the admin should be able to choose `Move On` to dismiss it early.
+  Each card should show the racer name, avatar only when present, top speed, average speed, puke
+  factor, wattage, races today, wins today, and career race count when the racer has history in more
+  than one event. Missing avatars should not render placeholder imagery or reserve avatar space. The
+  cards should use the same orange/purple lane color roles as the race lanes, including the admin
+  flip-lane-colors setting. The winning card should be highlighted and slightly larger. The modal
+  should remain up for 15 seconds by default, and the admin should be able to choose `Move On` to
+  dismiss it early.
   While the modal is active, the completed race should remain frozen behind it and the app should
   not transition to the next race or tournament bracket handoff until the modal clears.
   If open-time-trial auto-stage is enabled, the next race should stage when this modal clears, not
@@ -337,7 +340,8 @@ Requirements:
   post-race bracket choreography. The bracket should stay hidden until the handoff sequence owns
   the display. `Implemented`
 - The bracket animation lab should include a dummy winner modal trigger so the result overlay,
-  typography wrapping, and post-race handoff timing can be tested without live race data.
+  fullscreen modal placement, typography wrapping, and post-race handoff timing can be tested
+  without live race data. Pressing `Esc` while the dummy winner modal is displayed should close it.
   `Implemented`
 - During the projector advancement handoff, only the advancement connector should draw/highlight
   along its length while the bracket camera pans toward the next matchup. The winner name/avatar
@@ -416,6 +420,9 @@ Requirements:
 - Accountless racers must be able to attach email plus a passkey later and keep the same racer
   profile. `Implemented`
 - Racers must be able to upload an avatar. `Implemented`
+- Uploaded avatar images must resolve through the backend asset origin so they display correctly
+  from local Vite dev, packaged desktop, local-network racer pages, and Cloudflare tunnel URLs.
+  `Implemented`
 - After registration, racers must see a short-lived photo booth QR that can be scanned by the
   kaleidoscope booth to capture or retake their avatar with the event DSLR. `Implemented`
 - Racers must be able to:

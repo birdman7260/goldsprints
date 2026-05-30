@@ -1107,6 +1107,12 @@ p {
   pointer-events: none;
 }
 
+.race-page__results-overlay--fullscreen {
+  position: fixed;
+  z-index: 100;
+  inset: clamp(1rem, 2vw, 2rem);
+}
+
 .race-page__results-modal {
   width: min(100rem, 100%);
   height: 100%;
@@ -1160,16 +1166,19 @@ p {
   min-width: 0;
   gap: clamp(1rem, 1.6vw, 1.5rem);
   align-self: stretch;
-  border-width: 0.13rem;
+  border-width: 0.14rem;
+  border-color: color-mix(in srgb, var(--race-lane-color) 46%, transparent);
   transform-origin: center;
   background:
     radial-gradient(
       circle at top,
-      color-mix(in srgb, var(--theme-accent) 15%, transparent),
+      color-mix(in srgb, var(--race-lane-color) 16%, transparent),
       transparent 62%
     ),
     color-mix(in srgb, var(--theme-surface) 90%, transparent);
-  box-shadow: 0 1.8rem 4rem rgba(0, 0, 0, 0.38);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--race-lane-color) 24%, transparent),
+    0 1.8rem 4rem rgba(0, 0, 0, 0.38);
 }
 
 .race-page__result-card--left {
@@ -1181,17 +1190,18 @@ p {
 }
 
 .race-page__result-card--winner {
-  border-color: color-mix(in srgb, var(--theme-success) 72%, transparent);
+  border-color: color-mix(in srgb, var(--race-lane-color-bright) 82%, transparent);
   transform: scale(1.055);
   background:
     radial-gradient(
       circle at top,
-      color-mix(in srgb, var(--theme-success) 24%, transparent),
+      color-mix(in srgb, var(--race-lane-color) 28%, transparent),
       transparent 66%
     ),
     color-mix(in srgb, var(--theme-surface) 93%, transparent);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--theme-success) 52%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--race-lane-color-bright) 58%, transparent),
+    0 0 3rem var(--race-lane-color-shadow),
     0 2.1rem 4.6rem rgba(0, 0, 0, 0.44);
 }
 
@@ -1202,14 +1212,18 @@ p {
   align-items: center;
 }
 
+.race-page__result-identity--no-avatar {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .race-page__result-avatar {
   width: clamp(5rem, 7vw, 7.2rem);
   height: clamp(5rem, 7vw, 7.2rem);
   display: grid;
   place-items: center;
-  border: 0.18rem solid color-mix(in srgb, var(--theme-accent) 48%, transparent);
+  border: 0.18rem solid color-mix(in srgb, var(--race-lane-color) 58%, transparent);
   border-radius: 1.4rem;
-  background: var(--theme-accent-soft);
+  background: var(--race-lane-color-soft);
   object-fit: cover;
   color: var(--theme-text);
   font-size: clamp(2rem, 3.4vw, 3.7rem);
@@ -1220,12 +1234,12 @@ p {
 .race-page__result-card--winner .race-page__result-avatar {
   width: clamp(5.6rem, 7.8vw, 8rem);
   height: clamp(5.6rem, 7.8vw, 8rem);
-  border-color: color-mix(in srgb, var(--theme-success) 68%, transparent);
+  border-color: color-mix(in srgb, var(--race-lane-color-bright) 78%, transparent);
 }
 
 .race-page__result-identity span {
   display: block;
-  color: var(--theme-success);
+  color: var(--race-lane-color-bright);
   font-size: clamp(0.8rem, 1.1vw, 1.25rem);
   font-weight: 950;
   letter-spacing: 0.18em;
@@ -1262,7 +1276,7 @@ p {
   gap: 1rem;
   align-items: baseline;
   padding-top: clamp(0.35rem, 0.7vh, 0.65rem);
-  border-top: 1px solid var(--theme-accent-soft);
+  border-top: 1px solid color-mix(in srgb, var(--race-lane-color) 30%, transparent);
 }
 
 .race-page__result-stats dt,
@@ -1286,10 +1300,12 @@ p {
 }
 
 .race-page__result-card--winner .race-page__result-stats dt {
+  color: color-mix(in srgb, var(--race-lane-color-bright) 72%, var(--theme-text-muted));
   font-size: clamp(0.88rem, 1.24vw, 1.34rem);
 }
 
 .race-page__result-card--winner .race-page__result-stats dd {
+  color: var(--race-lane-color-bright);
   font-size: clamp(1.62rem, 2.55vw, 3rem);
 }
 

@@ -1,5 +1,6 @@
 import { Handle, Position } from "@xyflow/react";
 import type { NodeProps } from "@xyflow/react";
+import { resolveBackendAssetUrl } from "../lib/assets";
 import type { BracketFlowNode } from "./tournament-flow-layout";
 
 export function TournamentMatchNode({ data, selected }: NodeProps<BracketFlowNode>) {
@@ -56,28 +57,33 @@ export function TournamentMatchNode({ data, selected }: NodeProps<BracketFlowNod
       </div>
 
       <div className="tournament-match-node__body">
-        {data.participants.map((participant, index) => (
-          <div
-            key={participant.id ?? `${data.appNodeId}:${index}`}
-            className={`tournament-match-node__participant${participant.isWinner ? " winner" : ""}`}
-          >
-            <div className="tournament-match-node__identity">
-              {participant.avatarUrl ? (
-                <img
-                  className="tournament-match-node__avatar"
-                  src={participant.avatarUrl}
-                  alt={participant.name}
-                />
-              ) : (
-                <span className="tournament-match-node__avatar tournament-match-node__avatar--placeholder">
-                  {participant.name.slice(0, 1).toUpperCase()}
-                </span>
-              )}
-              <span className="tournament-match-node__name">{participant.name}</span>
+        {data.participants.map((participant, index) => {
+          const avatarUrl = resolveBackendAssetUrl(participant.avatarUrl);
+          return (
+            <div
+              key={participant.id ?? `${data.appNodeId}:${index}`}
+              className={`tournament-match-node__participant${
+                participant.isWinner ? " winner" : ""
+              }`}
+            >
+              <div className="tournament-match-node__identity">
+                {avatarUrl ? (
+                  <img
+                    className="tournament-match-node__avatar"
+                    src={avatarUrl}
+                    alt={participant.name}
+                  />
+                ) : (
+                  <span className="tournament-match-node__avatar tournament-match-node__avatar--placeholder">
+                    {participant.name.slice(0, 1).toUpperCase()}
+                  </span>
+                )}
+                <span className="tournament-match-node__name">{participant.name}</span>
+              </div>
+              <span className="tournament-match-node__result">{participant.resultText ?? ""}</span>
             </div>
-            <span className="tournament-match-node__result">{participant.resultText ?? ""}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </Root>
   );

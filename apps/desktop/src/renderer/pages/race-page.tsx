@@ -706,6 +706,7 @@ export function RacePage() {
       <AnimatePresence>
         {resultPresentation ? (
           <RaceResultsOverlay
+            laneColorsFlipped={snapshot.settings.raceDisplayLaneColorsFlipped}
             race={resultPresentation.race}
             racers={snapshot.racers}
             winnerRacerId={resultPresentation.winnerRacerId}

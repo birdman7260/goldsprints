@@ -23,6 +23,7 @@ import {
   startPasskeySignIn,
   uploadAvatar
 } from "../lib/api";
+import { resolveBackendAssetUrl } from "../lib/assets";
 import { describeQueueEntry, resolveRacerName } from "../lib/snapshot-display";
 import { fireAndForget } from "../lib/ui-actions";
 import { snapshotQueryKey, useSnapshotQuery } from "../lib/query";
@@ -137,6 +138,8 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
   const [authBusy, setAuthBusy] = useState(false);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [queueMessage, setQueueMessage] = useState<string | null>(null);
+  const [avatarUploadMessage, setAvatarUploadMessage] = useState<string | null>(null);
+  const [avatarUploadBusy, setAvatarUploadBusy] = useState(false);
   const [upgradeEmail, setUpgradeEmail] = useState("");
   const [upgradeDisplayName, setUpgradeDisplayName] = useState("");
   const reduceMotion = useReducedMotion();
@@ -204,6 +207,7 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
     setSelectedRacerId(result.racer.id);
     setAuthMessage(null);
     setQueueMessage(null);
+    setAvatarUploadMessage(null);
   }
 
   async function handleEmailSignIn(): Promise<void> {
@@ -283,6 +287,7 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
     forgetRacerSessionToken();
     localStorage.removeItem("goldsprints.racerId");
     setSelectedRacerId("");
+    setAvatarUploadMessage(null);
   }
 
   async function handleQueueSignup(input: {
@@ -307,12 +312,24 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
   }
 
   async function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>): Promise<void> {
+    const input = event.currentTarget;
     const file = event.target.files?.[0];
     if (!file || !selectedRacerId) {
       return;
     }
 
-    await uploadAvatar(selectedRacerId, file);
+    setAvatarUploadBusy(true);
+    setAvatarUploadMessage(null);
+    try {
+      const nextSnapshot = await uploadAvatar(selectedRacerId, file);
+      queryClient.setQueryData(snapshotQueryKey, nextSnapshot);
+      input.value = "";
+      setAvatarUploadMessage("Avatar updated.");
+    } catch (error) {
+      setAvatarUploadMessage(error instanceof Error ? error.message : "Could not upload avatar.");
+    } finally {
+      setAvatarUploadBusy(false);
+    }
   }
 
   if (!snapshot) {
@@ -320,6 +337,7 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
   }
 
   const selectedRacer = snapshot.racers.find((entry) => entry.racer.id === selectedRacerId);
+  const selectedRacerAvatarUrl = resolveBackendAssetUrl(selectedRacer?.racer.avatarUrl);
   const selectedRacerHasEmail = Boolean(
     selectedRacer?.racer.identities.some((identity) => identity.type === "email")
   );
@@ -396,10 +414,10 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
                 {selectedRacer ? (
                   <div className="stack-md">
                     <div className="race-metric-card__header">
-                      {selectedRacer.racer.avatarUrl ? (
+                      {selectedRacerAvatarUrl ? (
                         <img
                           className="racer-avatar"
-                          src={selectedRacer.racer.avatarUrl}
+                          src={selectedRacerAvatarUrl}
                           alt={selectedRacer.racer.displayName}
                         />
                       ) : (
@@ -436,11 +454,13 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
                       <input
                         type="file"
                         accept="image/*"
+                        disabled={avatarUploadBusy}
                         onChange={(event) => {
                           fireAndForget(handleAvatarUpload(event));
                         }}
                       />
                     </label>
+                    {avatarUploadMessage ? <p>{avatarUploadMessage}</p> : null}
                     <PhotoBoothQr />
                     {!selectedRacerHasEmail ? (
                       <div className="stack-sm">

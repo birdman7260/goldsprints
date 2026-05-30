@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useLayoutEffect, useRef, useState } from "react";
 import type { RaceMetricsSnapshot, RacerSummary, ThemeDefinition } from "@goldsprints/shared/types";
+import { resolveBackendAssetUrl } from "../lib/assets";
 import { RaceSpriteAvatar } from "./race-sprite-avatar";
 
 interface RaceGraphicProps {
@@ -125,10 +126,12 @@ function AutoFitRacerName({ name }: { name: string }) {
 }
 
 function LaneIdentity({ racer }: { racer: RacerSummary["racer"] }) {
+  const avatarUrl = resolveBackendAssetUrl(racer.avatarUrl);
+
   return (
     <div className="race-lane__identity">
-      {racer.avatarUrl ? (
-        <img className="race-lane__avatar" src={racer.avatarUrl} alt={racer.displayName} />
+      {avatarUrl ? (
+        <img className="race-lane__avatar" src={avatarUrl} alt={racer.displayName} />
       ) : null}
       <AutoFitRacerName name={racer.displayName} />
     </div>

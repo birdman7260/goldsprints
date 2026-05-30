@@ -570,6 +570,23 @@ export function BracketAnimationLabPage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!showDummyWinnerModal) {
+      return;
+    }
+
+    function closeDummyWinnerModal(event: KeyboardEvent): void {
+      if (event.key === "Escape") {
+        setShowDummyWinnerModal(false);
+      }
+    }
+
+    window.addEventListener("keydown", closeDummyWinnerModal);
+    return () => {
+      window.removeEventListener("keydown", closeDummyWinnerModal);
+    };
+  }, [showDummyWinnerModal]);
+
   useEffect(
     () => () => {
       for (const timerId of timersRef.current) {
@@ -752,6 +769,7 @@ export function BracketAnimationLabPage() {
         <AnimatePresence>
           {showDummyWinnerModal ? (
             <RaceResultsOverlay
+              fullscreen
               race={dummyWinnerRace}
               racers={labModalRacers}
               winnerRacerId="lab-modal-left"

@@ -6,6 +6,9 @@ import type {
 } from "@goldsprints/shared/types";
 import { Panel } from "@goldsprints/shared-ui";
 import { motion } from "framer-motion";
+import { resolveBackendAssetUrl } from "../lib/assets";
+
+type RaceResultLaneColor = "orange" | "purple";
 
 function formatSpeed(value: number | undefined): string {
   return `${(value ?? 0).toFixed(1)} km/h`;
@@ -42,6 +45,15 @@ function getParticipantLaneClass(participant: RaceParticipant): string {
   return "race-page__result-card--left";
 }
 
+function getParticipantLaneColor(
+  participant: RaceParticipant,
+  laneColorsFlipped: boolean
+): RaceResultLaneColor {
+  const leadColor: RaceResultLaneColor = laneColorsFlipped ? "purple" : "orange";
+  const secondaryColor: RaceResultLaneColor = laneColorsFlipped ? "orange" : "purple";
+  return participant.lane === "right" ? secondaryColor : leadColor;
+}
+
 function getOrderedResultParticipants(race: RaceRecord): RaceParticipant[] {
   const laneOrder: Record<RaceParticipant["lane"], number> = {
     left: 0,
@@ -53,10 +65,14 @@ function getOrderedResultParticipants(race: RaceRecord): RaceParticipant[] {
 }
 
 export function RaceResultsOverlay({
+  fullscreen = false,
+  laneColorsFlipped = false,
   race,
   racers,
   winnerRacerId
 }: {
+  fullscreen?: boolean;
+  laneColorsFlipped?: boolean;
   race: RaceRecord;
   racers: RacerSummary[];
   winnerRacerId: string;
@@ -65,7 +81,9 @@ export function RaceResultsOverlay({
 
   return (
     <motion.div
-      className="race-page__results-overlay"
+      className={`race-page__results-overlay${
+        fullscreen ? " race-page__results-overlay--fullscreen" : ""
+      }`}
       initial={{ opacity: 0, scale: 0.94, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98, y: -12 }}
@@ -91,26 +109,27 @@ export function RaceResultsOverlay({
             const careerRaces =
               (stats?.careerRaces ?? stats?.races ?? 0) + (isRaceAlreadyCounted ? 0 : 1);
             const careerEventCount = stats?.careerEventCount ?? 1;
+            const avatarUrl = resolveBackendAssetUrl(racerSummary?.racer.avatarUrl);
+            const identityClassName = `race-page__result-identity${
+              avatarUrl ? "" : " race-page__result-identity--no-avatar"
+            }`;
+            const laneColor = getParticipantLaneColor(participant, laneColorsFlipped);
 
             return (
               <Panel
                 key={participant.racerId}
-                className={`panel--glass race-page__result-card ${getParticipantLaneClass(
+                className={`panel--glass race-lane race-lane--${laneColor} race-page__result-card ${getParticipantLaneClass(
                   participant
                 )} ${isWinner ? "race-page__result-card--winner" : ""}`}
               >
-                <div className="race-page__result-identity">
-                  {racerSummary?.racer.avatarUrl ? (
+                <div className={identityClassName}>
+                  {avatarUrl ? (
                     <img
                       className="race-page__result-avatar"
-                      src={racerSummary.racer.avatarUrl}
-                      alt={racerSummary.racer.displayName}
+                      src={avatarUrl}
+                      alt={racerSummary?.racer.displayName ?? "Racer avatar"}
                     />
-                  ) : (
-                    <span className="race-page__result-avatar">
-                      {racerSummary?.racer.displayName[0] ?? "?"}
-                    </span>
-                  )}
+                  ) : null}
                   <div>
                     <span>
                       {isWinner ? "Winner" : participant.lane === "solo" ? "Solo Run" : "Racer"}
