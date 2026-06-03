@@ -1,7 +1,7 @@
 dist
 node_modules
 coverage
-.goldsprints-dev
+.roller-rumble-dev
 package-lock.json
 pnpm-lock.yaml
 tools/db-studio/pnpm-lock.yaml

@@ -11,30 +11,30 @@ import {
   selectCloudflaredDownload
 } from "./cloudflared-tools";
 
-const dataDir = "/tmp/goldsprints-cloudflared-test";
+const dataDir = "/tmp/roller-rumble-cloudflared-test";
 
 describe("cloudflared tools", () => {
   it("normalizes bare public domains into racer page URLs", () => {
-    expect(normalizePublicRacerUrl("https://goldsprints.birdsnest.family")).toBe(
-      "https://goldsprints.birdsnest.family/racer"
+    expect(normalizePublicRacerUrl("https://roller-rumble.birdsnest.family")).toBe(
+      "https://roller-rumble.birdsnest.family/racer"
     );
-    expect(normalizePublicRacerUrl("https://goldsprints.birdsnest.family/racer")).toBe(
-      "https://goldsprints.birdsnest.family/racer"
+    expect(normalizePublicRacerUrl("https://roller-rumble.birdsnest.family/racer")).toBe(
+      "https://roller-rumble.birdsnest.family/racer"
     );
   });
 
   it("derives the public backend health URL from the racer page URL", () => {
-    expect(getPublicBackendHealthUrl("https://goldsprints.birdsnest.family/racer")).toBe(
-      "https://goldsprints.birdsnest.family/api/health"
+    expect(getPublicBackendHealthUrl("https://roller-rumble.birdsnest.family/racer")).toBe(
+      "https://roller-rumble.birdsnest.family/api/health"
     );
   });
 
   it("derives public racer page and websocket probe URLs", () => {
-    expect(getPublicRacerPageUrl("https://goldsprints.birdsnest.family")).toBe(
-      "https://goldsprints.birdsnest.family/racer"
+    expect(getPublicRacerPageUrl("https://roller-rumble.birdsnest.family")).toBe(
+      "https://roller-rumble.birdsnest.family/racer"
     );
-    expect(getPublicWebSocketProbeUrl("https://goldsprints.birdsnest.family/racer")).toBe(
-      "https://goldsprints.birdsnest.family/ws"
+    expect(getPublicWebSocketProbeUrl("https://roller-rumble.birdsnest.family/racer")).toBe(
+      "https://roller-rumble.birdsnest.family/ws"
     );
   });
 
@@ -60,7 +60,7 @@ describe("cloudflared tools", () => {
     const config = createCloudflaredConfig({
       dataDir,
       env: {
-        GOLDSPRINTS_CLOUDFLARED_PATH: "/custom/cloudflared"
+        ROLLER_RUMBLE_CLOUDFLARED_PATH: "/custom/cloudflared"
       }
     });
 
@@ -86,17 +86,17 @@ describe("cloudflared tools", () => {
     const config = createCloudflaredConfig({
       dataDir,
       env: {
-        GOLDSPRINTS_TUNNEL_MODE: "token",
-        GOLDSPRINTS_TUNNEL_NAME: "GoldSprints",
-        GOLDSPRINTS_TUNNEL_TOKEN: "secret-token",
-        GOLDSPRINTS_PUBLIC_RACER_URL: "https://goldsprints.birdsnest.family"
+        ROLLER_RUMBLE_TUNNEL_MODE: "token",
+        ROLLER_RUMBLE_TUNNEL_NAME: "Roller Rumble",
+        ROLLER_RUMBLE_TUNNEL_TOKEN: "secret-token",
+        ROLLER_RUMBLE_PUBLIC_RACER_URL: "https://roller-rumble.birdsnest.family"
       }
     });
 
     expect(buildCloudflaredStartCommand(config, "/bin/cloudflared", 3187)).toEqual({
       command: "/bin/cloudflared",
       args: ["tunnel", "--no-autoupdate", "run", "--token", "secret-token"],
-      publicUrl: "https://goldsprints.birdsnest.family/racer"
+      publicUrl: "https://roller-rumble.birdsnest.family/racer"
     });
   });
 });

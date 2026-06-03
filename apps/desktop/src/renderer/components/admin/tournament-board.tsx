@@ -5,8 +5,8 @@ import type {
   TournamentBundle,
   TournamentByeFillOptionsResponse,
   TournamentRacerRemovalOptionsResponse
-} from "@goldsprints/shared/types";
-import { Button, EmptyState, SearchableSelect } from "@goldsprints/shared-ui";
+} from "@roller-rumble/shared/types";
+import { Button, EmptyState, SearchableSelect } from "@roller-rumble/shared-ui";
 import { resolveTournamentRacerName } from "../../lib/admin-competition";
 import {
   fetchTournamentByeFillOptions,

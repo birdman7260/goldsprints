@@ -1,4 +1,4 @@
-import type { BracketNode, TournamentBundle } from "@goldsprints/shared/types";
+import type { BracketNode, TournamentBundle } from "@roller-rumble/shared/types";
 
 export function getRacerIdsWithIncompleteTournamentMatches(bundle: TournamentBundle): Set<string> {
   return new Set(

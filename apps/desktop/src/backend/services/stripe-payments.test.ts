@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { EventRecord, Racer } from "@goldsprints/shared/types";
+import type { EventRecord, Racer } from "@roller-rumble/shared/types";
 import {
   assertEventPaymentConfig,
   buildStripeCheckoutSessionParams,
@@ -40,11 +40,11 @@ describe("Stripe payment helpers", () => {
   it("normalizes public racer URLs that already include /racer", () => {
     expect(
       getStripeRuntimeConfig({
-        GOLDSPRINTS_STRIPE_SECRET_KEY: "sk_test",
-        GOLDSPRINTS_STRIPE_WEBHOOK_SECRET: "whsec_test",
-        GOLDSPRINTS_PUBLIC_RACER_URL: "https://goldsprints.example/racer"
+        ROLLER_RUMBLE_STRIPE_SECRET_KEY: "sk_test",
+        ROLLER_RUMBLE_STRIPE_WEBHOOK_SECRET: "whsec_test",
+        ROLLER_RUMBLE_PUBLIC_RACER_URL: "https://roller-rumble.example/racer"
       }).publicRacerUrl
-    ).toBe("https://goldsprints.example");
+    ).toBe("https://roller-rumble.example");
   });
 
   it("requires a usable event payment amount", () => {
@@ -63,15 +63,15 @@ describe("Stripe payment helpers", () => {
       paymentId: "payment-1",
       amountCents: 1000,
       currency: "usd",
-      publicRacerUrl: "https://goldsprints.example/",
+      publicRacerUrl: "https://roller-rumble.example/",
       queueIntent: { requestedType: "solo" }
     });
 
     expect(params).toMatchObject({
       mode: "payment",
       client_reference_id: "event-1:racer-1",
-      success_url: "https://goldsprints.example/racer?payment=success&payment_id=payment-1",
-      cancel_url: "https://goldsprints.example/racer?payment=cancelled&payment_id=payment-1",
+      success_url: "https://roller-rumble.example/racer?payment=success&payment_id=payment-1",
+      cancel_url: "https://roller-rumble.example/racer?payment=cancelled&payment_id=payment-1",
       metadata: {
         paymentId: "payment-1",
         eventId: "event-1",

@@ -4,8 +4,8 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import express from "express";
 import type { Response } from "express";
-import { themes } from "@goldsprints/shared/themes";
-import type { AppSnapshot, PhotoBoothSession, ThemeDefinition } from "@goldsprints/shared/types";
+import { themes } from "@roller-rumble/shared/themes";
+import type { AppSnapshot, PhotoBoothSession, ThemeDefinition } from "@roller-rumble/shared/types";
 import {
   GPhotoCameraAdapter,
   ManualScannerAdapter,
@@ -482,7 +482,7 @@ class PhotoBoothAgent {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goldsprints-booth-secret": this.config.pairingSecret
+        "x-roller-rumble-booth-secret": this.config.pairingSecret
       },
       body: JSON.stringify({
         token,
@@ -551,7 +551,7 @@ class PhotoBoothAgent {
     const response = await fetch(`${this.config.mainServerUrl}/api/booth/avatar-originals`, {
       method: "POST",
       headers: {
-        "x-goldsprints-booth-secret": this.config.pairingSecret
+        "x-roller-rumble-booth-secret": this.config.pairingSecret
       },
       body: form
     });
@@ -571,7 +571,7 @@ class PhotoBoothAgent {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goldsprints-booth-secret": this.config.pairingSecret
+        "x-roller-rumble-booth-secret": this.config.pairingSecret
       },
       body: JSON.stringify({
         boothId: this.config.boothId,

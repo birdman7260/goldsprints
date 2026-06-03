@@ -1,4 +1,4 @@
-import type { QueueEntry, QueueOccurrence } from "@goldsprints/shared/types";
+import type { QueueEntry, QueueOccurrence } from "@roller-rumble/shared/types";
 import { useMemo, useState } from "react";
 import {
   Button,
@@ -7,7 +7,7 @@ import {
   SearchableSelect,
   StatPill,
   TextInput
-} from "@goldsprints/shared-ui";
+} from "@roller-rumble/shared-ui";
 import {
   addQueueSignup,
   findNextQueuedEntry,

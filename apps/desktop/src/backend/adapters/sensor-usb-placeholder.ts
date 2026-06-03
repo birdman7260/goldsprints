@@ -1,4 +1,4 @@
-import type { RaceParticipant } from "@goldsprints/shared/types";
+import type { RaceParticipant } from "@roller-rumble/shared/types";
 import type { RotationListener, SensorAdapter } from "./sensor";
 
 export class UsbSensorPlaceholderAdapter implements SensorAdapter {

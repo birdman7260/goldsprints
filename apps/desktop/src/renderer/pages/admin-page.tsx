@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import type { ReactElement } from "react";
-import { competitionPresets } from "@goldsprints/shared/presets";
+import { competitionPresets } from "@roller-rumble/shared/presets";
 import type {
   TournamentBracketLayoutMode,
   TournamentBracketSize,
   TournamentPreset
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 import { EventTab } from "../components/admin/event-tab";
 import { AdminRaceTray } from "../components/admin/race-tray";
 import { RaceTab } from "../components/admin/race-tab";

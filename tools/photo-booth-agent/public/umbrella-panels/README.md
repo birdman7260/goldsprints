@@ -20,4 +20,4 @@ tools/photo-booth-agent/src/umbrella-panels.ts
 ```
 
 If your umbrella has a different number of panels, update that manifest and add/remove matching JPGs
-here. Keep `GOLDSPRINTS_UMBRELLA_PANEL_COUNT` in sync if you override it for the hardware helper.
+here. Keep `ROLLER_RUMBLE_UMBRELLA_PANEL_COUNT` in sync if you override it for the hardware helper.

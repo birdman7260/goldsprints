@@ -1,6 +1,6 @@
-import type { AppSnapshot, RaceRecord } from "@goldsprints/shared/types";
+import type { AppSnapshot, RaceRecord } from "@roller-rumble/shared/types";
 import { formatRacerNames } from "../../lib/snapshot-display";
-import { Button } from "@goldsprints/shared-ui";
+import { Button } from "@roller-rumble/shared-ui";
 
 export function CurrentRaceActionRows({
   currentRace,

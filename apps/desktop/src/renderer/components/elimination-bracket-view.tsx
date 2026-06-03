@@ -9,7 +9,7 @@ import {
   useUpdateNodeInternals
 } from "@xyflow/react";
 import type { NodeTypes, EdgeTypes } from "@xyflow/react";
-import type { AppSnapshot, TournamentBundle } from "@goldsprints/shared/types";
+import type { AppSnapshot, TournamentBundle } from "@roller-rumble/shared/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TournamentConnectorEdge } from "./tournament-connector-edge";
 import { TournamentMatchNode } from "./tournament-match-node";
@@ -20,7 +20,7 @@ import {
   type BracketFlowEdge,
   type BracketFlowNode
 } from "./tournament-flow-layout";
-import { Button as UiButton } from "@goldsprints/shared-ui";
+import { Button as UiButton } from "@roller-rumble/shared-ui";
 
 const nodeTypes: NodeTypes = {
   tournamentMatch: TournamentMatchNode

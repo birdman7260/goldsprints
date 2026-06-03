@@ -1,4 +1,4 @@
-import type { PhotoBoothSession } from "@goldsprints/shared/types";
+import type { PhotoBoothSession } from "@roller-rumble/shared/types";
 
 export const FAKE_QR_PREFIX = "fake";
 
@@ -18,7 +18,7 @@ function parseFakeJsonToken(payload: string): string | null {
     }
 
     const record = parsed as Record<string, unknown>;
-    if (record.type !== "goldsprints.photo-booth.fake-token") {
+    if (record.type !== "roller-rumble.photo-booth.fake-token") {
       return null;
     }
 

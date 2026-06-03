@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { RACER_NOTIFICATION_TYPES } from "@goldsprints/shared/constants";
+import { RACER_NOTIFICATION_TYPES } from "@roller-rumble/shared/constants";
 import type {
   AdminNotificationTargetType,
   AppSnapshot,
   RacerNotificationType
-} from "@goldsprints/shared/types";
-import { Button, EmptyState, Panel, StatPill, TextInput } from "@goldsprints/shared-ui";
+} from "@roller-rumble/shared/types";
+import { Button, EmptyState, Panel, StatPill, TextInput } from "@roller-rumble/shared-ui";
 import { sendAdminNotification } from "../lib/api";
 import { snapshotQueryKey, useNotificationConfigQuery, useSnapshotQuery } from "../lib/query";
 

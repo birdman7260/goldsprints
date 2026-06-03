@@ -5,14 +5,14 @@ import type {
   RacerNotificationType,
   TournamentBundle,
   WebPushSubscriptionInput
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 import type {
   StoredNotificationDeliveryRecord,
   StoredNotificationRecord,
   StoredPushSubscription
 } from "../db/Database";
 
-const DEFAULT_WEB_PUSH_SUBJECT = "mailto:goldsprints@localhost.local";
+const DEFAULT_WEB_PUSH_SUBJECT = "mailto:roller-rumble@localhost.local";
 const RACE_GET_READY_POSITION = 3;
 type WebPushSendSubscription = Parameters<typeof webpush.sendNotification>[0];
 
@@ -33,9 +33,9 @@ export interface NotificationPushPayload {
 export function getWebPushRuntimeConfig(
   env: NodeJS.ProcessEnv = process.env
 ): WebPushRuntimeConfig {
-  const publicKey = env.GOLDSPRINTS_WEB_PUSH_PUBLIC_KEY?.trim() ?? "";
-  const privateKey = env.GOLDSPRINTS_WEB_PUSH_PRIVATE_KEY?.trim() ?? "";
-  const configuredSubject = env.GOLDSPRINTS_WEB_PUSH_SUBJECT?.trim();
+  const publicKey = env.ROLLER_RUMBLE_WEB_PUSH_PUBLIC_KEY?.trim() ?? "";
+  const privateKey = env.ROLLER_RUMBLE_WEB_PUSH_PRIVATE_KEY?.trim() ?? "";
+  const configuredSubject = env.ROLLER_RUMBLE_WEB_PUSH_SUBJECT?.trim();
   const subject =
     configuredSubject !== undefined && configuredSubject.length > 0
       ? configuredSubject

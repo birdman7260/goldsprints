@@ -1,4 +1,4 @@
-import type { ThemeConfettiEffect } from "@goldsprints/shared/types";
+import type { ThemeConfettiEffect } from "@roller-rumble/shared/types";
 import confetti from "canvas-confetti";
 import { useEffect, useRef } from "react";
 import { scheduleConfettiEffect } from "../lib/confetti-effects";

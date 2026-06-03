@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { EventRecord, RaceResult, Racer } from "@goldsprints/shared/types";
+import type { EventRecord, RaceResult, Racer } from "@roller-rumble/shared/types";
 import {
   canAutomaticallyReplaceTournamentRacer,
   fillBracketByeSlot,

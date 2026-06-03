@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { QueueEntry, QueueOccurrence } from "@goldsprints/shared/types";
+import type { QueueEntry, QueueOccurrence } from "@roller-rumble/shared/types";
 import {
   addQueueSignup,
   findNextQueuedEntry,

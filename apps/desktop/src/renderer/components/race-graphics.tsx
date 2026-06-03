@@ -1,6 +1,10 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useLayoutEffect, useRef, useState } from "react";
-import type { RaceMetricsSnapshot, RacerSummary, ThemeDefinition } from "@goldsprints/shared/types";
+import type {
+  RaceMetricsSnapshot,
+  RacerSummary,
+  ThemeDefinition
+} from "@roller-rumble/shared/types";
 import { resolveBackendAssetUrl } from "../lib/assets";
 import { RaceSpriteAvatar } from "./race-sprite-avatar";
 

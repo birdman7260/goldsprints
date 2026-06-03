@@ -1,15 +1,15 @@
 import {
   TOURNAMENT_BRACKET_LAYOUT_MODES,
   TOURNAMENT_BRACKET_SIZES
-} from "@goldsprints/shared/constants";
-import { competitionPresets } from "@goldsprints/shared/presets";
+} from "@roller-rumble/shared/constants";
+import { competitionPresets } from "@roller-rumble/shared/presets";
 import type {
   AppSnapshot,
   TournamentBracketLayoutMode,
   TournamentBracketSize,
   TournamentBundle,
   TournamentPreset
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 
 export function getPresetLabel(preset: TournamentPreset): string {
   return competitionPresets.find((entry) => entry.id === preset)?.label ?? preset;

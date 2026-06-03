@@ -1,4 +1,4 @@
-import type { QueueEntry, QueueOccurrence } from "@goldsprints/shared/types";
+import type { QueueEntry, QueueOccurrence } from "@roller-rumble/shared/types";
 
 export interface QueueRacerStats {
   raceCount: number;

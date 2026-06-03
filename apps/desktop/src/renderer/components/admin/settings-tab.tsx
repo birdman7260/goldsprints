@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import type { AdminNotificationTargetType, AppSnapshot } from "@goldsprints/shared/types";
-import { Button, Panel, StatPill } from "@goldsprints/shared-ui";
+import type { AdminNotificationTargetType, AppSnapshot } from "@roller-rumble/shared/types";
+import { Button, Panel, StatPill } from "@roller-rumble/shared-ui";
 import {
   installCloudflared,
   rotatePhotoBoothPairing,
@@ -194,7 +194,7 @@ export function SettingsTab({
                 fireAndForget(updateSettings({ raceDisplayShowEventName: event.target.checked }));
               }}
             />
-            Show event name under the Gold Sprints title
+            Show event name under the Roller Rumble title
           </label>
           <label className="toggle">
             <input

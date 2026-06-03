@@ -1,5 +1,12 @@
 export type CountdownTriggerSource = "manual" | "os2l";
-export type CountdownTriggerListener = (source: CountdownTriggerSource) => void;
+export interface CountdownTriggerOptions {
+  countdownDurationMs?: number;
+}
+
+export type CountdownTriggerListener = (
+  source: CountdownTriggerSource,
+  options?: CountdownTriggerOptions
+) => void;
 
 export interface RaceTriggerAdapter {
   id: string;

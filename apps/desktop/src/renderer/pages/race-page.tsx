@@ -3,7 +3,7 @@ import type {
   QueueEntry,
   RaceRecord,
   TournamentBundle
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
@@ -13,7 +13,7 @@ import {
 } from "../components/elimination-bracket-view";
 import { RaceGraphic } from "../components/race-graphics";
 import { RaceResultsOverlay } from "../components/race-results-overlay";
-import { EmptyState, Panel } from "@goldsprints/shared-ui";
+import { EmptyState, Panel } from "@roller-rumble/shared-ui";
 import { WinnerConfetti } from "../components/winner-confetti";
 import { findBracketNodeByParticipantIds } from "../components/tournament-flow-layout";
 import { getActiveTournament } from "../lib/admin-competition";
@@ -144,7 +144,7 @@ function ProjectorBrand({
 }) {
   return (
     <header className="race-page__brand">
-      <h1>Gold Sprints</h1>
+      <h1>Roller Rumble</h1>
       {showEventName ? <p>{eventName}</p> : null}
     </header>
   );
@@ -310,7 +310,7 @@ function RacerSignupPrompt({
       <div className="race-page__signup-copy">
         <span>Race queue is open</span>
         <strong>Scan to race</strong>
-        <p>Register on your phone, pick your matchup, and jump into the next Gold Sprints run.</p>
+        <p>Register on your phone, pick your matchup, and jump into the next Roller Rumble run.</p>
       </div>
       <div className="race-page__signup-qr-wrap">
         {qrCodeDataUrl ? (

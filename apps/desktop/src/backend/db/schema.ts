@@ -15,7 +15,7 @@ import type {
   TournamentRecord,
   TournamentStage,
   WebPushSubscriptionInput
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 
 type JsonMap = Record<string, unknown>;
 type TournamentSettingsJson = JsonMap & { seeds?: TournamentParticipantSeed[] };

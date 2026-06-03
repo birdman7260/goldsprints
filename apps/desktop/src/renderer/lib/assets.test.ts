@@ -11,10 +11,10 @@ describe("backend asset URLs", () => {
   it("keeps already absolute asset URLs unchanged", () => {
     expect(
       resolveBackendAssetUrlFromBase(
-        "https://goldsprints.birdsnest.family/uploads/avatar.jpg",
+        "https://roller-rumble.birdsnest.family/uploads/avatar.jpg",
         "http://127.0.0.1:3187"
       )
-    ).toBe("https://goldsprints.birdsnest.family/uploads/avatar.jpg");
+    ).toBe("https://roller-rumble.birdsnest.family/uploads/avatar.jpg");
   });
 
   it("keeps inline preview URLs unchanged", () => {

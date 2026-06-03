@@ -48,10 +48,10 @@ importers:
 
   apps/desktop:
     dependencies:
-      '@goldsprints/shared':
+      '@roller-rumble/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@goldsprints/shared-ui':
+      '@roller-rumble/shared-ui':
         specifier: workspace:*
         version: link:../../packages/shared-ui
       '@simplewebauthn/browser':

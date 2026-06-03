@@ -10,10 +10,10 @@ import type {
   RacerNotification,
   TournamentBundle,
   WebPushSubscriptionInput
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 import { EliminationBracketView } from "../components/elimination-bracket-view";
 import { TournamentBracketBoard } from "../components/admin/tournament-board";
-import { Button, EmptyState, Panel, SearchableSelect, TextInput } from "@goldsprints/shared-ui";
+import { Button, EmptyState, Panel, SearchableSelect, TextInput } from "@roller-rumble/shared-ui";
 import {
   ApiError,
   cancelRacerCheckoutPayment,
@@ -47,7 +47,7 @@ import {
 
 type RegistrationOptionsJSON = Parameters<typeof startRegistration>[0]["optionsJSON"];
 type AuthenticationOptionsJSON = Parameters<typeof startAuthentication>[0]["optionsJSON"];
-const notificationQueuePromptStorageKey = "goldsprints.notifications.queuePromptedAt";
+const notificationQueuePromptStorageKey = "roller-rumble.notifications.queuePromptedAt";
 
 function formatPaymentAmount(amountCents: number | null | undefined, currency: string): string {
   if (typeof amountCents !== "number") {
@@ -261,22 +261,22 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
     null
   );
   const [selectedRacerId, setSelectedRacerId] = useState(
-    localStorage.getItem("goldsprints.racerId") ?? ""
+    localStorage.getItem("roller-rumble.racerId") ?? ""
   );
   const paymentReturnState = new URLSearchParams(window.location.search).get("payment");
   const paymentReturnId = new URLSearchParams(window.location.search).get("payment_id");
   const launchedNotificationId = new URLSearchParams(window.location.search).get("notificationId");
   const [accountlessId] = useState(() => {
     const existing =
-      localStorage.getItem("goldsprints.accountlessId") ??
-      localStorage.getItem("goldsprints.anonymousId");
+      localStorage.getItem("roller-rumble.accountlessId") ??
+      localStorage.getItem("roller-rumble.anonymousId");
     if (existing) {
-      localStorage.setItem("goldsprints.accountlessId", existing);
+      localStorage.setItem("roller-rumble.accountlessId", existing);
       return existing;
     }
 
     const created = crypto.randomUUID();
-    localStorage.setItem("goldsprints.accountlessId", created);
+    localStorage.setItem("roller-rumble.accountlessId", created);
     return created;
   });
   const racerNotificationsQuery = useRacerNotificationsQuery(Boolean(selectedRacerId));
@@ -291,11 +291,11 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
       queryClient.setQueryData(snapshotQueryKey, result.snapshot);
       if (result.racer) {
         rememberRacerSessionToken(result.sessionToken);
-        localStorage.setItem("goldsprints.racerId", result.racer.id);
+        localStorage.setItem("roller-rumble.racerId", result.racer.id);
         setSelectedRacerId(result.racer.id);
       } else {
         forgetRacerSessionToken();
-        localStorage.removeItem("goldsprints.racerId");
+        localStorage.removeItem("roller-rumble.racerId");
         setSelectedRacerId("");
       }
     }
@@ -386,7 +386,7 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
     sessionToken?: string | null;
   }): void {
     rememberRacerSessionToken(result.sessionToken);
-    localStorage.setItem("goldsprints.racerId", result.racer.id);
+    localStorage.setItem("roller-rumble.racerId", result.racer.id);
     setSelectedRacerId(result.racer.id);
     setAuthMessage(null);
     setQueueMessage(null);
@@ -468,7 +468,7 @@ export function RacerPage({ focusEventId }: { focusEventId?: string }) {
   async function handleSignOut(): Promise<void> {
     await signOutRacer();
     forgetRacerSessionToken();
-    localStorage.removeItem("goldsprints.racerId");
+    localStorage.removeItem("roller-rumble.racerId");
     setSelectedRacerId("");
     setAvatarUploadMessage(null);
     setNotificationPromptVisible(false);

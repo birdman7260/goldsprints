@@ -1,5 +1,5 @@
 {
-  "name": "@goldsprints/photo-booth-agent",
+  "name": "@roller-rumble/photo-booth-agent",
   "private": true,
   "packageManager": "pnpm@9.15.9",
   "type": "module",
@@ -11,8 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@goldsprints/shared": "file:../../packages/shared",
-    "@goldsprints/shared-ui": "file:../../packages/shared-ui",
+    "@roller-rumble/shared": "file:../../packages/shared",
+    "@roller-rumble/shared-ui": "file:../../packages/shared-ui",
     "better-sqlite3": "^11.10.0",
     "dotenv": "^17.4.2",
     "express": "^4.21.2",

@@ -13,7 +13,7 @@ describe("fake photo booth QR tokens", () => {
   it("creates a fake session from JSON scanner-style input", () => {
     const session = createFakePhotoBoothSession(
       JSON.stringify({
-        type: "goldsprints.photo-booth.fake-token",
+        type: "roller-rumble.photo-booth.fake-token",
         racerName: "Grace Hopper"
       })
     )!;

@@ -1,4 +1,9 @@
-import type { AppSnapshot, QueueEntry, RaceRecord, RacerSummary } from "@goldsprints/shared/types";
+import type {
+  AppSnapshot,
+  QueueEntry,
+  RaceRecord,
+  RacerSummary
+} from "@roller-rumble/shared/types";
 
 export function resolveRacerName(
   snapshot: AppSnapshot,

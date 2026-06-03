@@ -11,8 +11,8 @@ import type {
   TournamentPreset,
   TournamentRecord,
   TournamentStage
-} from "@goldsprints/shared/types";
-import { nowIso } from "@goldsprints/shared/utils";
+} from "@roller-rumble/shared/types";
+import { nowIso } from "@roller-rumble/shared/utils";
 import {
   advanceDoubleElimination,
   advanceSingleElimination,

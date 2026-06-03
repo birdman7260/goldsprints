@@ -1,8 +1,12 @@
-import { describe, expect, it, vi } from "vitest";
-import type { AppSnapshot, RaceRecord } from "@goldsprints/shared/types";
-import { GoldsprintsApp } from "./app";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { AppSnapshot, RaceRecord } from "@roller-rumble/shared/types";
+import { RollerRumbleApp } from "./app";
 
-type CountdownInvoker = (this: unknown, source: "manual" | "os2l") => AppSnapshot;
+type CountdownInvoker = (
+  this: unknown,
+  source: "manual" | "os2l",
+  options?: { countdownDurationMs?: number }
+) => AppSnapshot;
 type AutoStageInvoker = (this: unknown) => boolean;
 type ClearResultPresentationInvoker = (this: unknown) => void;
 type ReconcileQueueRaceStatusesInvoker = (this: unknown, eventId: string) => void;
@@ -12,7 +16,7 @@ type ResetRaceToStagedInvoker = (this: unknown) => AppSnapshot;
 type UnstageTournamentRaceInvoker = (this: unknown) => AppSnapshot;
 
 function getCountdownInvoker(): CountdownInvoker {
-  const candidate: unknown = Reflect.get(GoldsprintsApp.prototype, "startCountdown");
+  const candidate: unknown = Reflect.get(RollerRumbleApp.prototype, "startCountdown");
   if (typeof candidate !== "function") {
     throw new Error("Missing startCountdown implementation");
   }
@@ -21,7 +25,7 @@ function getCountdownInvoker(): CountdownInvoker {
 }
 
 function getAutoStageInvoker(): AutoStageInvoker {
-  const candidate: unknown = Reflect.get(GoldsprintsApp.prototype, "maybeAutoStageNextRace");
+  const candidate: unknown = Reflect.get(RollerRumbleApp.prototype, "maybeAutoStageNextRace");
   if (typeof candidate !== "function") {
     throw new Error("Missing maybeAutoStageNextRace implementation");
   }
@@ -30,7 +34,7 @@ function getAutoStageInvoker(): AutoStageInvoker {
 }
 
 function getClearResultPresentationInvoker(): ClearResultPresentationInvoker {
-  const candidate: unknown = Reflect.get(GoldsprintsApp.prototype, "clearRaceResultPresentation");
+  const candidate: unknown = Reflect.get(RollerRumbleApp.prototype, "clearRaceResultPresentation");
   if (typeof candidate !== "function") {
     throw new Error("Missing race result presentation clearing implementation");
   }
@@ -39,7 +43,7 @@ function getClearResultPresentationInvoker(): ClearResultPresentationInvoker {
 }
 
 function getReconcileQueueRaceStatusesInvoker(): ReconcileQueueRaceStatusesInvoker {
-  const candidate: unknown = Reflect.get(GoldsprintsApp.prototype, "reconcileQueueRaceStatuses");
+  const candidate: unknown = Reflect.get(RollerRumbleApp.prototype, "reconcileQueueRaceStatuses");
   if (typeof candidate !== "function") {
     throw new Error("Missing queue race status reconciliation implementation");
   }
@@ -49,7 +53,7 @@ function getReconcileQueueRaceStatusesInvoker(): ReconcileQueueRaceStatusesInvok
 
 function getUnstageOpenRaceInvoker(): UnstageOpenRaceInvoker {
   const candidate: unknown = Reflect.get(
-    GoldsprintsApp.prototype,
+    RollerRumbleApp.prototype,
     "unstageOpenTimeTrialRaceForTournament"
   );
   if (typeof candidate !== "function") {
@@ -60,7 +64,7 @@ function getUnstageOpenRaceInvoker(): UnstageOpenRaceInvoker {
 }
 
 function getUnstageCurrentRaceInvoker(): UnstageCurrentRaceInvoker {
-  const candidate: unknown = Reflect.get(GoldsprintsApp.prototype, "unstageCurrentRace");
+  const candidate: unknown = Reflect.get(RollerRumbleApp.prototype, "unstageCurrentRace");
   if (typeof candidate !== "function") {
     throw new Error("Missing current race unstaging implementation");
   }
@@ -69,7 +73,7 @@ function getUnstageCurrentRaceInvoker(): UnstageCurrentRaceInvoker {
 }
 
 function getResetRaceToStagedInvoker(): ResetRaceToStagedInvoker {
-  const candidate: unknown = Reflect.get(GoldsprintsApp.prototype, "resetCurrentRaceToStaged");
+  const candidate: unknown = Reflect.get(RollerRumbleApp.prototype, "resetCurrentRaceToStaged");
   if (typeof candidate !== "function") {
     throw new Error("Missing current race reset implementation");
   }
@@ -78,7 +82,7 @@ function getResetRaceToStagedInvoker(): ResetRaceToStagedInvoker {
 }
 
 function getUnstageTournamentRaceInvoker(): UnstageTournamentRaceInvoker {
-  const candidate: unknown = Reflect.get(GoldsprintsApp.prototype, "unstageCurrentTournamentRace");
+  const candidate: unknown = Reflect.get(RollerRumbleApp.prototype, "unstageCurrentTournamentRace");
   if (typeof candidate !== "function") {
     throw new Error("Missing tournament race unstaging implementation");
   }
@@ -88,14 +92,15 @@ function getUnstageTournamentRaceInvoker(): UnstageTournamentRaceInvoker {
 
 const invokeStartCountdown = (
   target: unknown,
-  source: "manual" | "os2l" = "manual"
+  source: "manual" | "os2l" = "manual",
+  options?: { countdownDurationMs?: number }
 ): AppSnapshot => {
   const invoker = getCountdownInvoker();
-  return invoker.call(target, source);
+  return invoker.call(target, source, options);
 };
 
 function withAppPrototype<T extends object>(target: T): T {
-  Object.setPrototypeOf(target, GoldsprintsApp.prototype);
+  Object.setPrototypeOf(target, RollerRumbleApp.prototype);
   return target;
 }
 
@@ -126,6 +131,15 @@ function buildRaceRecord(patch: Partial<RaceRecord> = {}): RaceRecord {
 }
 
 describe("app service countdown flow", () => {
+  beforeEach(() => {
+    vi.useRealTimers();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
   it("does not auto-stage an open time trial race when start is triggered without a staged race", () => {
     const snapshot = { generatedAt: "now" } as AppSnapshot;
     const getSnapshot = vi.fn(() => snapshot);
@@ -188,6 +202,45 @@ describe("app service countdown flow", () => {
 
     expect(result).toBe(false);
     expect(stageNextRace).not.toHaveBeenCalled();
+  });
+
+  it("uses an OS2L-provided countdown duration before activating the race", () => {
+    vi.useFakeTimers();
+    const snapshot = { generatedAt: "now" } as AppSnapshot;
+    const updateRace = vi.fn();
+    const emitSnapshot = vi.fn();
+    const activateRace = vi.fn();
+    const clearIntervalSpy = vi.spyOn(globalThis, "clearInterval");
+    const currentRace = buildRaceRecord();
+    const target = withAppPrototype({
+      countdownStartTimer: null,
+      countdownTicker: null,
+      countdownRuntime: null,
+      db: {
+        getActiveEvent: () => ({ id: "event-1" }),
+        getAdminSettings: () => ({ os2lEnabled: true }),
+        getCurrentRace: () => currentRace,
+        updateRace
+      },
+      emitSnapshot,
+      getSnapshot: () => snapshot,
+      os2lTrigger: {
+        disarmRace: vi.fn()
+      }
+    });
+    Object.defineProperty(target, "activateRace", {
+      configurable: true,
+      value: activateRace
+    });
+
+    invokeStartCountdown(target, "os2l", { countdownDurationMs: 5_500 });
+
+    expect(target.countdownRuntime).toEqual({ durationMs: 5_500, raceId: "race-1" });
+    vi.advanceTimersByTime(5_499);
+    expect(activateRace).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(activateRace).toHaveBeenCalledWith("race-1");
+    expect(clearIntervalSpy).toHaveBeenCalled();
   });
 
   it("auto-stages the next race when the winner modal clears", () => {

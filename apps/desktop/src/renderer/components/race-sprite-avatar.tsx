@@ -3,7 +3,7 @@ import type {
   RaceMetricsSnapshot,
   ThemeDefinition,
   ThemeSpriteAnimationDefinition
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 import { resolveThemeSpriteSheet } from "../lib/theme-sprites";
 
 interface RaceSpriteAvatarProps {

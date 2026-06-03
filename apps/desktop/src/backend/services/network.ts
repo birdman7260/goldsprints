@@ -1,5 +1,5 @@
 import os from "node:os";
-import { DEFAULT_PUBLIC_HOST } from "@goldsprints/shared/constants";
+import { DEFAULT_PUBLIC_HOST } from "@roller-rumble/shared/constants";
 
 interface NetworkInterfaceEntry {
   address: string;
@@ -73,8 +73,8 @@ function interfaceScore(interfaceName: string, address: string): number {
 
 function getOverrideHost(env: NodeJS.ProcessEnv): string | null {
   return (
-    normalizedEnvValue(env.GOLDSPRINTS_LOCAL_SERVER_HOST) ??
-    normalizedEnvValue(env.GOLDSPRINTS_PUBLIC_HOST)
+    normalizedEnvValue(env.ROLLER_RUMBLE_LOCAL_SERVER_HOST) ??
+    normalizedEnvValue(env.ROLLER_RUMBLE_PUBLIC_HOST)
   );
 }
 

@@ -26,14 +26,14 @@ function findWorkspaceRoot(): string {
 }
 
 function resolveDataDir(rootDir: string): string {
-  const configuredDataDir = process.env.GOLDSPRINTS_DATA_DIR;
+  const configuredDataDir = process.env.ROLLER_RUMBLE_DATA_DIR;
   if (configuredDataDir) {
     return path.isAbsolute(configuredDataDir)
       ? configuredDataDir
       : path.resolve(rootDir, configuredDataDir);
   }
 
-  return path.resolve(rootDir, ".goldsprints-dev/runtime");
+  return path.resolve(rootDir, ".roller-rumble-dev/runtime");
 }
 
 function printDiagnostics(label: string, diagnostics: ReturnType<typeof resolveCloudflared>): void {

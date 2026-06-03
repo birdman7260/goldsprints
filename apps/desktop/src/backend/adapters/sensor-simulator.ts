@@ -1,4 +1,4 @@
-import type { RaceParticipant } from "@goldsprints/shared/types";
+import type { RaceParticipant } from "@roller-rumble/shared/types";
 import type { RotationEvent, RotationListener, SensorAdapter } from "./sensor";
 
 interface LaneProfile {

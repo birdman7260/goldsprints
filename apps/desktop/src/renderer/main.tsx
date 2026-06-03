@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClientProvider } from "@tanstack/react-query";
 import "@xyflow/react/dist/style.css";
-import "@goldsprints/shared-ui/styles.css";
+import "@roller-rumble/shared-ui/styles.css";
 import { AppRouter } from "./router";
 import { queryClient } from "./lib/query";
 import "./app.css";

@@ -1,4 +1,4 @@
-import type { ThemeDefinition, ThemeSpriteSheetDefinition } from "@goldsprints/shared/types";
+import type { ThemeDefinition, ThemeSpriteSheetDefinition } from "@roller-rumble/shared/types";
 
 import frontierWagonUrl from "../assets/sprites/frontier-wagon.svg";
 import neonRiderUrl from "../assets/sprites/neon-rider.svg";

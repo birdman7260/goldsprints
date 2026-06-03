@@ -1,4 +1,4 @@
-import type { ThemeConfettiEffect } from "@goldsprints/shared/types";
+import type { ThemeConfettiEffect } from "@roller-rumble/shared/types";
 import type confetti from "canvas-confetti";
 
 const confettiEffects: Record<

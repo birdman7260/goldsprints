@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
-import { Button, Panel } from "@goldsprints/shared-ui";
+import { Button, Panel } from "@roller-rumble/shared-ui";
 import type { UmbrellaState } from "../../types";
 import { UMBRELLA_PANELS } from "../../umbrella-panels";
 import { normalizeWheelDeltaY, WHEEL_ITEM_PITCH } from "./wheel-input";

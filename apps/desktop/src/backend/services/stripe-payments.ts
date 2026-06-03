@@ -2,8 +2,8 @@ import type Stripe from "stripe";
 import {
   DEFAULT_PAYMENT_CURRENCY,
   STRIPE_MIN_PAYMENT_AMOUNT_CENTS
-} from "@goldsprints/shared/constants";
-import type { EventRecord, Racer, RacerQueueSignupInput } from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/constants";
+import type { EventRecord, Racer, RacerQueueSignupInput } from "@roller-rumble/shared/types";
 
 export interface StripeRuntimeConfig {
   configured: boolean;
@@ -25,10 +25,10 @@ function normalizePublicRacerBaseUrl(value: string | null): string | null {
 }
 
 export function getStripeRuntimeConfig(env: NodeJS.ProcessEnv = process.env): StripeRuntimeConfig {
-  const secretKey = env.GOLDSPRINTS_STRIPE_SECRET_KEY?.trim();
-  const webhookSecret = env.GOLDSPRINTS_STRIPE_WEBHOOK_SECRET?.trim();
+  const secretKey = env.ROLLER_RUMBLE_STRIPE_SECRET_KEY?.trim();
+  const webhookSecret = env.ROLLER_RUMBLE_STRIPE_WEBHOOK_SECRET?.trim();
   const publicRacerUrl = normalizePublicRacerBaseUrl(
-    env.GOLDSPRINTS_PUBLIC_RACER_URL?.trim() ?? null
+    env.ROLLER_RUMBLE_PUBLIC_RACER_URL?.trim() ?? null
   );
   const missing = [
     secretKey ? null : "secret key",
@@ -104,7 +104,7 @@ export function buildStripeCheckoutSessionParams(input: {
           unit_amount: input.amountCents,
           product_data: {
             name: `${input.event.name} entrance fee`,
-            description: `GoldSprints race entry for ${input.racer.displayName}`
+            description: `Roller Rumble race entry for ${input.racer.displayName}`
           }
         }
       }

@@ -13,7 +13,7 @@ show a real review image.
 You can override the path with:
 
 ```text
-GOLDSPRINTS_BOOTH_SIMULATOR_PHOTO_PATH=/absolute/path/to/sample.jpg
+ROLLER_RUMBLE_BOOTH_SIMULATOR_PHOTO_PATH=/absolute/path/to/sample.jpg
 ```
 
 Umbrella panel picker images are served as kiosk public assets, not simulator capture assets. Place

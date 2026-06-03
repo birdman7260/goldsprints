@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type Database from "better-sqlite3";
-import { nowIso } from "@goldsprints/shared/utils";
+import { nowIso } from "@roller-rumble/shared/utils";
 
 interface SqlMigration {
   version: number;

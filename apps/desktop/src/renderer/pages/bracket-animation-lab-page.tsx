@@ -10,17 +10,17 @@ import type {
   TournamentBracketLayoutMode,
   TournamentBundle,
   TournamentStage
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 import { useEffect, useRef, useState } from "react";
-import { getTheme, themes } from "@goldsprints/shared/themes";
+import { getTheme, themes } from "@roller-rumble/shared/themes";
 import {
   type BracketPresentationRequest,
   type BracketWinnerAdvance,
   EliminationBracketView
 } from "../components/elimination-bracket-view";
 import { AnimatePresence } from "framer-motion";
-import { Button, StatPill } from "@goldsprints/shared-ui";
-import { applyThemeToDocument } from "@goldsprints/shared-ui/theme";
+import { Button, StatPill } from "@roller-rumble/shared-ui";
+import { applyThemeToDocument } from "@roller-rumble/shared-ui/theme";
 import { getBracketLayoutLabel } from "../lib/admin-competition";
 import { RaceResultsOverlay } from "../components/race-results-overlay";
 

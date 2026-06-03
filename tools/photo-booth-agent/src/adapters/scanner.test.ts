@@ -8,7 +8,7 @@ describe("scanner payload parsing", () => {
 
   it("extracts QR JSON token payloads", () => {
     expect(
-      extractToken(JSON.stringify({ type: "goldsprints.photo-booth.token", token: "abc" }))
+      extractToken(JSON.stringify({ type: "roller-rumble.photo-booth.token", token: "abc" }))
     ).toBe("abc");
   });
 

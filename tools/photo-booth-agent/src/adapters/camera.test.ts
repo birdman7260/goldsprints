@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { SimulatedCameraAdapter } from "./camera";
 
 function createTempDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "goldsprints-camera-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "roller-rumble-camera-"));
 }
 
 describe("simulated camera adapter", () => {

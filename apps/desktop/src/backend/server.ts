@@ -8,8 +8,8 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import { WebSocketServer } from "ws";
-import { API_PREFIX, DEFAULT_SERVER_PORT, WS_PATH } from "@goldsprints/shared/constants";
-import type { AppSnapshot } from "@goldsprints/shared/types";
+import { API_PREFIX, DEFAULT_SERVER_PORT, WS_PATH } from "@roller-rumble/shared/constants";
+import type { AppSnapshot } from "@roller-rumble/shared/types";
 import {
   accountlessRacerSessionSchema,
   adminTournamentByeFillSchema,
@@ -36,8 +36,8 @@ import {
   updateRacerPaymentSchema,
   updatePhotoBoothStatusSchema,
   webPushSubscriptionSchema
-} from "@goldsprints/shared/validation";
-import { AppHttpError, GoldsprintsApp } from "./services/app";
+} from "@roller-rumble/shared/validation";
+import { AppHttpError, RollerRumbleApp } from "./services/app";
 
 interface BackendServerOptions {
   dataDir: string;
@@ -46,10 +46,10 @@ interface BackendServerOptions {
   rendererDevUrl?: string;
 }
 
-const RACER_SESSION_COOKIE = "goldsprints_racer_session";
+const RACER_SESSION_COOKIE = "roller_rumble_racer_session";
 
 export interface BackendServer {
-  service: GoldsprintsApp;
+  service: RollerRumbleApp;
   start(): Promise<{ port: number }>;
   stop(): Promise<void>;
 }
@@ -118,7 +118,7 @@ function clearRacerSessionCookie(req: express.Request, res: express.Response): v
   });
 }
 
-function requireRacerSession(req: express.Request, service: GoldsprintsApp) {
+function requireRacerSession(req: express.Request, service: RollerRumbleApp) {
   const racer = service.getRacerAuthSession(getSessionToken(req));
   if (!racer) {
     throw new AppHttpError("Please sign in before continuing.", 401, "auth_required");
@@ -197,7 +197,7 @@ function proxyDevWebSocketUpgrade(
 
 export function createBackendServer(options: BackendServerOptions): BackendServer {
   fs.mkdirSync(options.dataDir, { recursive: true });
-  const service = new GoldsprintsApp({
+  const service = new RollerRumbleApp({
     dataDir: options.dataDir,
     serverPort: options.port ?? DEFAULT_SERVER_PORT
   });
@@ -220,7 +220,7 @@ export function createBackendServer(options: BackendServerOptions): BackendServe
   const upload = multer({ storage });
 
   const wsServer = new WebSocketServer({ noServer: true });
-  const debugEnabled = process.env.GOLDSPRINTS_DEBUG === "1";
+  const debugEnabled = process.env.ROLLER_RUMBLE_DEBUG === "1";
 
   httpServer.on("upgrade", (req, socket, head) => {
     const pathname = new URL(req.url ?? "/", "http://localhost").pathname;
@@ -382,7 +382,7 @@ export function createBackendServer(options: BackendServerOptions): BackendServe
 
   app.post(`${API_PREFIX}/booth/status`, (req, res) => {
     const input = updatePhotoBoothStatusSchema.parse(req.body);
-    service.assertPhotoBoothSecret(input.boothId, req.get("x-goldsprints-booth-secret"));
+    service.assertPhotoBoothSecret(input.boothId, req.get("x-roller-rumble-booth-secret"));
     res.json(service.updatePhotoBoothStatus(input));
   });
 
@@ -399,7 +399,7 @@ export function createBackendServer(options: BackendServerOptions): BackendServe
   app.post(`${API_PREFIX}/booth/sessions/resolve`, (req, res) => {
     const input = resolvePhotoBoothSessionSchema.parse(req.body);
     if (input.boothId) {
-      service.assertPhotoBoothSecret(input.boothId, req.get("x-goldsprints-booth-secret"));
+      service.assertPhotoBoothSecret(input.boothId, req.get("x-roller-rumble-booth-secret"));
     }
     res.json(service.resolvePhotoBoothSession(input));
   });
@@ -415,7 +415,7 @@ export function createBackendServer(options: BackendServerOptions): BackendServe
     const token = typeof body.token === "string" ? body.token : "";
     const capturedAt =
       typeof body.capturedAt === "string" ? body.capturedAt : new Date().toISOString();
-    service.assertPhotoBoothSecret(boothId, req.get("x-goldsprints-booth-secret"));
+    service.assertPhotoBoothSecret(boothId, req.get("x-roller-rumble-booth-secret"));
     res.json(
       service.acceptPhotoBoothAvatarOriginal({
         boothId,

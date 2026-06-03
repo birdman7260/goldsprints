@@ -18,13 +18,13 @@ import type {
   WebAuthnCredential
 } from "@simplewebauthn/server";
 import {
-  COUNTDOWN_SECONDS,
+  COUNTDOWN_DURATION_MS,
   DEFAULT_OS2L_PORT,
   DEFAULT_PAYMENT_CURRENCY,
   DEFAULT_SERVER_PORT,
   STRIPE_MIN_PAYMENT_AMOUNT_CENTS
-} from "@goldsprints/shared/constants";
-import { themes, getTheme } from "@goldsprints/shared/themes";
+} from "@roller-rumble/shared/constants";
+import { themes, getTheme } from "@roller-rumble/shared/themes";
 import type {
   BracketNode,
   AdminSettings,
@@ -64,8 +64,8 @@ import type {
   TunnelState,
   UpdateEventPaymentConfigInput,
   WebPushSubscriptionInput
-} from "@goldsprints/shared/types";
-import { nowIso } from "@goldsprints/shared/utils";
+} from "@roller-rumble/shared/types";
+import { nowIso } from "@roller-rumble/shared/utils";
 import {
   AppDatabase,
   type StoredPasskeyCredential,
@@ -275,7 +275,7 @@ function moveFile(sourcePath: string, destinationPath: string): void {
   }
 }
 
-export class GoldsprintsApp extends EventEmitter {
+export class RollerRumbleApp extends EventEmitter {
   readonly dataDir: string;
   readonly uploadsDir: string;
   readonly db: AppDatabase;
@@ -285,12 +285,13 @@ export class GoldsprintsApp extends EventEmitter {
   // Debug sessions sometimes need a second app instance; allowing the OS2L port to move keeps
   // the duplicate instance isolated without affecting the normal production default.
   private readonly os2lTrigger = new Os2lRaceTriggerAdapter(
-    Number(process.env.GOLDSPRINTS_OS2L_PORT ?? DEFAULT_OS2L_PORT)
+    Number(process.env.ROLLER_RUMBLE_OS2L_PORT ?? DEFAULT_OS2L_PORT)
   );
   private readonly tunnelManager: CloudflaredTunnelManager;
   private readonly tournaments = new TournamentService();
   private countdownTicker: NodeJS.Timeout | null = null;
   private countdownStartTimer: NodeJS.Timeout | null = null;
+  private countdownRuntime: { raceId: string; durationMs: number } | null = null;
   private currentRuntime: CurrentRaceRuntime | null = null;
   private resultPresentation: RaceResultPresentation | null = null;
   private resultPresentationTimer: NodeJS.Timeout | null = null;
@@ -313,8 +314,8 @@ export class GoldsprintsApp extends EventEmitter {
     this.db.init();
     const settings = this.db.getAdminSettings();
     this.serverPort = settings.serverPort;
-    this.manualTrigger.start(() => this.startCountdown("manual"));
-    this.os2lTrigger.start(() => this.startCountdown("os2l"));
+    this.manualTrigger.start((source, options) => this.startCountdown(source, options));
+    this.os2lTrigger.start((source, options) => this.startCountdown(source, options));
     this.os2lTrigger.setEnabled(settings.os2lEnabled);
     this.sensorAdapter.connect((event) =>
       this.handleRotation(event.racerId, event.timestampMs, event.deltaRotations)
@@ -360,6 +361,12 @@ export class GoldsprintsApp extends EventEmitter {
     }
   }
 
+  private getCountdownDurationMs(raceId: string): number {
+    return this.countdownRuntime?.raceId === raceId
+      ? this.countdownRuntime.durationMs
+      : COUNTDOWN_DURATION_MS;
+  }
+
   private getStripeConfig(): StripeRuntimeConfig {
     return getStripeRuntimeConfig();
   }
@@ -388,7 +395,7 @@ export class GoldsprintsApp extends EventEmitter {
     if (!this.stripeClient || this.stripeSecretKey !== config.secretKey) {
       this.stripeClient = new Stripe(config.secretKey, {
         appInfo: {
-          name: "GoldSprints"
+          name: "Roller Rumble"
         }
       });
       this.stripeSecretKey = config.secretKey;
@@ -602,8 +609,9 @@ export class GoldsprintsApp extends EventEmitter {
         ? Math.max(
             0,
             Math.ceil(
-              COUNTDOWN_SECONDS -
-                (Date.now() - new Date(currentRace.countdownStartedAt).getTime()) / 1000
+              (this.getCountdownDurationMs(currentRace.id) -
+                (Date.now() - new Date(currentRace.countdownStartedAt).getTime())) /
+                1000
             )
           )
         : null;
@@ -1262,7 +1270,7 @@ export class GoldsprintsApp extends EventEmitter {
   async getPhotoBoothAdminStatus(): Promise<PhotoBoothAdminStatus> {
     const pairing = this.getPhotoBoothPairing();
     const payload = {
-      type: "goldsprints.photo-booth.pairing",
+      type: "roller-rumble.photo-booth.pairing",
       version: 1,
       serverBaseUrl: this.getLocalBaseUrl(),
       boothId: pairing.boothId,
@@ -1350,7 +1358,7 @@ export class GoldsprintsApp extends EventEmitter {
     };
     const token = createSignedPhotoBoothToken(payload, this.getPhotoBoothPairing().pairingSecret);
     const qrPayload = JSON.stringify({
-      type: "goldsprints.photo-booth.token",
+      type: "roller-rumble.photo-booth.token",
       version: 1,
       token
     });
@@ -1472,7 +1480,7 @@ export class GoldsprintsApp extends EventEmitter {
 
   getPasskeyRequestContext(origin: string): PasskeyRequestContext {
     const parsedOrigin = new URL(origin);
-    const configuredRpId = process.env.GOLDSPRINTS_PASSKEY_RP_ID?.trim();
+    const configuredRpId = process.env.ROLLER_RUMBLE_PASSKEY_RP_ID?.trim();
     return {
       origin: parsedOrigin.origin,
       rpId:
@@ -1682,7 +1690,7 @@ export class GoldsprintsApp extends EventEmitter {
         }))
       : [];
     const options = await generateRegistrationOptions({
-      rpName: "GoldSprints",
+      rpName: "Roller Rumble",
       rpID: context.rpId,
       userName: email,
       userDisplayName: input.displayName,
@@ -2396,6 +2404,7 @@ export class GoldsprintsApp extends EventEmitter {
       this.countdownTicker = null;
     }
     this.clearCountdownStartTimer();
+    this.countdownRuntime = null;
     if (this.currentRuntime?.finalizeTimer) {
       clearTimeout(this.currentRuntime.finalizeTimer);
     }
@@ -2470,7 +2479,10 @@ export class GoldsprintsApp extends EventEmitter {
     return this.getSnapshot();
   }
 
-  startCountdown(source: "manual" | "os2l"): AppSnapshot {
+  startCountdown(
+    source: "manual" | "os2l",
+    options: { countdownDurationMs?: number } = {}
+  ): AppSnapshot {
     const activeEvent = this.db.getActiveEvent()!;
     const currentRace = this.db.getCurrentRace(activeEvent.id);
     const settings = this.db.getAdminSettings();
@@ -2488,6 +2500,16 @@ export class GoldsprintsApp extends EventEmitter {
     }
 
     const countdownStartedAt = nowIso();
+    const countdownDurationMs =
+      options.countdownDurationMs != null &&
+      Number.isFinite(options.countdownDurationMs) &&
+      options.countdownDurationMs >= 0
+        ? Math.round(options.countdownDurationMs)
+        : COUNTDOWN_DURATION_MS;
+    this.countdownRuntime = {
+      raceId: currentRace.id,
+      durationMs: countdownDurationMs
+    };
     this.db.updateRace(currentRace.id, {
       state: "countdown",
       countdownStartedAt
@@ -2510,7 +2532,7 @@ export class GoldsprintsApp extends EventEmitter {
         this.countdownTicker = null;
       }
       this.activateRace(currentRace.id);
-    }, COUNTDOWN_SECONDS * 1000);
+    }, countdownDurationMs);
 
     this.emitSnapshot();
     return this.getSnapshot();

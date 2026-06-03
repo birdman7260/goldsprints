@@ -1,6 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { applyThemeToDocument } from "@goldsprints/shared-ui/theme";
+import { applyThemeToDocument } from "@roller-rumble/shared-ui/theme";
 import { useSnapshotQuery, useSnapshotStream } from "../lib/query";
 
 export function AppLayout() {
@@ -27,7 +27,7 @@ export function AppLayout() {
     <div className="app-shell">
       <aside className="app-shell__nav">
         <div>
-          <p className="eyebrow">GoldSprints</p>
+          <p className="eyebrow">Roller Rumble</p>
           <h1>Operations</h1>
         </div>
         <nav className="app-nav">

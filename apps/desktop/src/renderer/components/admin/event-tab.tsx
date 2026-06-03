@@ -1,8 +1,8 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
-import type { AppSnapshot, RaceRecord, TournamentBundle } from "@goldsprints/shared/types";
-import { Button, EmptyState, Panel, StatPill, TextInput } from "@goldsprints/shared-ui";
-import { STRIPE_MIN_PAYMENT_AMOUNT_CENTS } from "@goldsprints/shared/constants";
+import type { AppSnapshot, RaceRecord, TournamentBundle } from "@roller-rumble/shared/types";
+import { Button, EmptyState, Panel, StatPill, TextInput } from "@roller-rumble/shared-ui";
+import { STRIPE_MIN_PAYMENT_AMOUNT_CENTS } from "@roller-rumble/shared/constants";
 import { createEvent, updateEventPaymentConfig } from "../../lib/api";
 import { formatRacerNames } from "../../lib/snapshot-display";
 import { fireAndForget } from "../../lib/ui-actions";

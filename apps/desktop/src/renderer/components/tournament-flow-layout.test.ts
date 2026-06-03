@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { AppSnapshot, TournamentBundle } from "@goldsprints/shared/types";
+import type { AppSnapshot, TournamentBundle } from "@roller-rumble/shared/types";
 import { buildBracketFlow } from "./tournament-flow-layout";
 
 describe("tournament flow layout", () => {

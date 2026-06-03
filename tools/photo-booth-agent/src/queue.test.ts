@@ -7,7 +7,7 @@ import { BoothQueue } from "./queue";
 const tempDirs: string[] = [];
 
 function createTempDir(): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "goldsprints-booth-queue-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "roller-rumble-booth-queue-"));
   tempDirs.push(dir);
   return dir;
 }

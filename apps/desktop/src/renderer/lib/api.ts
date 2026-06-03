@@ -29,7 +29,7 @@ import type {
   UpdateEventPaymentConfigInput,
   UpdateRacerPaymentInput,
   WebPushSubscriptionInput
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 
 export class ApiError extends Error {
   constructor(
@@ -75,7 +75,7 @@ export function resolveApiBase(
 }
 
 export const apiBase = resolveApiBase(window.location);
-const racerSessionStorageKey = "goldsprints.racerSessionToken";
+const racerSessionStorageKey = "roller-rumble.racerSessionToken";
 
 function buildUrl(path: string): string {
   return path.startsWith("http") ? path : `${apiBase}${path}`;

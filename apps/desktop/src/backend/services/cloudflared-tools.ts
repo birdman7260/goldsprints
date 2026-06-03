@@ -3,8 +3,8 @@ import fs from "node:fs";
 import https from "node:https";
 import os from "node:os";
 import path from "node:path";
-import { API_PREFIX, WS_PATH } from "@goldsprints/shared/constants";
-import type { TunnelDiagnostics } from "@goldsprints/shared/types";
+import { API_PREFIX, WS_PATH } from "@roller-rumble/shared/constants";
+import type { TunnelDiagnostics } from "@roller-rumble/shared/types";
 
 type CloudflaredBinarySource = TunnelDiagnostics["binarySource"];
 type TunnelMode = TunnelDiagnostics["mode"];
@@ -121,14 +121,14 @@ export function createCloudflaredConfig({
   dataDir,
   env = process.env
 }: CloudflaredConfigOptions): CloudflaredConfig {
-  const token = normalizedEnvValue(env.GOLDSPRINTS_TUNNEL_TOKEN);
+  const token = normalizedEnvValue(env.ROLLER_RUMBLE_TUNNEL_TOKEN);
   return {
     dataDir,
-    mode: normalizeTunnelMode(env.GOLDSPRINTS_TUNNEL_MODE, Boolean(token)),
-    tunnelName: normalizedEnvValue(env.GOLDSPRINTS_TUNNEL_NAME),
+    mode: normalizeTunnelMode(env.ROLLER_RUMBLE_TUNNEL_MODE, Boolean(token)),
+    tunnelName: normalizedEnvValue(env.ROLLER_RUMBLE_TUNNEL_NAME),
     token,
-    publicRacerUrl: normalizePublicRacerUrl(env.GOLDSPRINTS_PUBLIC_RACER_URL),
-    configuredBinaryPath: normalizedEnvValue(env.GOLDSPRINTS_CLOUDFLARED_PATH)
+    publicRacerUrl: normalizePublicRacerUrl(env.ROLLER_RUMBLE_PUBLIC_RACER_URL),
+    configuredBinaryPath: normalizedEnvValue(env.ROLLER_RUMBLE_CLOUDFLARED_PATH)
   };
 }
 
@@ -303,7 +303,7 @@ export function resolveCloudflared(config: CloudflaredConfig): TunnelDiagnostics
     downloadUrl: download?.url ?? null,
     supportedPlatform: Boolean(download),
     message: download
-      ? "cloudflared is not installed for GoldSprints yet"
+      ? "cloudflared is not installed for Roller Rumble yet"
       : `App-managed cloudflared install is not supported on ${os.platform()}/${os.arch()}`,
     lastError: lastErrors.at(-1) ?? null
   };
@@ -316,10 +316,10 @@ export function buildCloudflaredStartCommand(
 ): CloudflaredCommand {
   if (config.mode === "token") {
     if (!config.token) {
-      throw new Error("GOLDSPRINTS_TUNNEL_TOKEN is required when tunnel mode is token.");
+      throw new Error("ROLLER_RUMBLE_TUNNEL_TOKEN is required when tunnel mode is token.");
     }
     if (!config.publicRacerUrl) {
-      throw new Error("GOLDSPRINTS_PUBLIC_RACER_URL is required when tunnel mode is token.");
+      throw new Error("ROLLER_RUMBLE_PUBLIC_RACER_URL is required when tunnel mode is token.");
     }
 
     return {

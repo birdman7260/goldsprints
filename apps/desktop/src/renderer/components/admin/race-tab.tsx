@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { AppSnapshot, RaceRecord } from "@goldsprints/shared/types";
+import type { AppSnapshot, RaceRecord } from "@roller-rumble/shared/types";
 import {
   Button,
   EmptyState,
@@ -7,7 +7,7 @@ import {
   SearchableSelect,
   StatPill,
   TextInput
-} from "@goldsprints/shared-ui";
+} from "@roller-rumble/shared-ui";
 import { removeRacerFromQueueEntry } from "../../lib/api";
 import { describeQueueEntry, formatRacerNames, resolveRacerName } from "../../lib/snapshot-display";
 import { fireAndForget } from "../../lib/ui-actions";

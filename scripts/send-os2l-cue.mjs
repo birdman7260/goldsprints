@@ -11,6 +11,9 @@ const { values } = parseArgs({
       type: "string",
       default: "start"
     },
+    countdownMs: {
+      type: "string"
+    },
     event: {
       type: "string",
       default: "cue"
@@ -21,7 +24,7 @@ const { values } = parseArgs({
     },
     id: {
       type: "string",
-      default: "goldsprints-start"
+      default: "roller-rumble-start"
     },
     message: {
       type: "string"
@@ -39,6 +42,7 @@ const { values } = parseArgs({
 
 const port = Number(values.port);
 const timeoutMs = Number(values.timeoutMs);
+const countdownMs = values.countdownMs == null ? undefined : Number(values.countdownMs);
 
 if (!Number.isInteger(port) || port <= 0) {
   console.error(`Invalid port: ${values.port}`);
@@ -50,6 +54,11 @@ if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
   process.exit(1);
 }
 
+if (values.countdownMs != null && (!Number.isFinite(countdownMs) || countdownMs < 0)) {
+  console.error(`Invalid countdownMs: ${values.countdownMs}`);
+  process.exit(1);
+}
+
 // The backend trigger only looks for a few cue-like substrings, so the default
 // JSON payload mirrors a simple start cue without requiring the full real-world
 // OS2L sender format from VirtualDJ.
@@ -57,10 +66,11 @@ const payload =
   values.message ??
   JSON.stringify({
     action: values.action,
+    ...(countdownMs == null ? {} : { countdownMs: Math.round(countdownMs) }),
     evt: values.event,
     id: values.id,
     sentAt: new Date().toISOString(),
-    source: "goldsprints-os2l-simulator"
+    source: "roller-rumble-os2l-simulator"
   });
 
 const socket = net.createConnection(

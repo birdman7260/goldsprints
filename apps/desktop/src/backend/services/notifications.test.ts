@@ -1,6 +1,6 @@
 import webpush from "web-push";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { QueueEntry, TournamentBundle } from "@goldsprints/shared/types";
+import type { QueueEntry, TournamentBundle } from "@roller-rumble/shared/types";
 import {
   buildNotificationPushPayload,
   getThirdUpcomingQueueEntry,
@@ -43,9 +43,9 @@ describe("notification helpers", () => {
   it("reports Web Push as configured when VAPID keys are present", () => {
     expect(
       getWebPushRuntimeConfig({
-        GOLDSPRINTS_WEB_PUSH_PUBLIC_KEY: "public",
-        GOLDSPRINTS_WEB_PUSH_PRIVATE_KEY: "private",
-        GOLDSPRINTS_WEB_PUSH_SUBJECT: "mailto:test@example.com"
+        ROLLER_RUMBLE_WEB_PUSH_PUBLIC_KEY: "public",
+        ROLLER_RUMBLE_WEB_PUSH_PRIVATE_KEY: "private",
+        ROLLER_RUMBLE_WEB_PUSH_SUBJECT: "mailto:test@example.com"
       })
     ).toMatchObject({
       configured: true,

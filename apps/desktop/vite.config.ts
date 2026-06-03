@@ -5,8 +5,8 @@ import { fileURLToPath, URL } from "node:url";
 
 function configuredAllowedHosts(): string[] {
   return [
-    "goldsprints.birdsnest.family",
-    ...(process.env.GOLDSPRINTS_VITE_ALLOWED_HOSTS ?? "")
+    "roller-rumble.birdsnest.family",
+    ...(process.env.ROLLER_RUMBLE_VITE_ALLOWED_HOSTS ?? "")
       .split(",")
       .map((host) => host.trim())
       .filter(Boolean)

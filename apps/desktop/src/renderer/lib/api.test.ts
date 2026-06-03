@@ -24,28 +24,28 @@ describe("api routing", () => {
     expect(
       resolveApiBase(
         {
-          hostname: "goldsprints.birdsnest.family",
-          origin: "https://goldsprints.birdsnest.family",
+          hostname: "roller-rumble.birdsnest.family",
+          origin: "https://roller-rumble.birdsnest.family",
           port: ""
         },
         "http://127.0.0.1:3187"
       )
-    ).toBe("https://goldsprints.birdsnest.family");
+    ).toBe("https://roller-rumble.birdsnest.family");
   });
 
   it("creates secure websocket URLs for public HTTPS origins", () => {
-    expect(createWebSocketUrlFromApiBase("https://goldsprints.birdsnest.family")).toBe(
-      "wss://goldsprints.birdsnest.family/ws"
+    expect(createWebSocketUrlFromApiBase("https://roller-rumble.birdsnest.family")).toBe(
+      "wss://roller-rumble.birdsnest.family/ws"
     );
   });
 
   it("stores and clears the durable racer session fallback token", () => {
     rememberRacerSessionToken("signed-session-token");
 
-    expect(localStorage.getItem("goldsprints.racerSessionToken")).toBe("signed-session-token");
+    expect(localStorage.getItem("roller-rumble.racerSessionToken")).toBe("signed-session-token");
 
     forgetRacerSessionToken();
 
-    expect(localStorage.getItem("goldsprints.racerSessionToken")).toBeNull();
+    expect(localStorage.getItem("roller-rumble.racerSessionToken")).toBeNull();
   });
 });

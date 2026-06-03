@@ -1,4 +1,4 @@
-# GoldSprints Product Requirements
+# Roller Rumble Product Requirements
 
 This document supersedes the original chat requirements and reflects the product decisions and
 implementation direction established through the current build.
@@ -12,7 +12,7 @@ Status legend:
 
 ## Product Goal
 
-GoldSprints is a local-first Electron application for running live stationary-bike race events with:
+Roller Rumble is a local-first Electron application for running live stationary-bike race events with:
 
 - an `Admin Display` for hosts on the laptop
 - a `Race Display` for the projector or crowd screen
@@ -108,10 +108,15 @@ Requirements:
   `Implemented`
 - The app must support OS2L / VirtualDJ cue-based race starts behind an admin toggle. `Partial`
 - OS2L listening must only matter when a race is staged and cue starts are enabled. `Partial`
+- OS2L cue payloads may include a `countdownMs` attribute that controls how many milliseconds to
+  count down before activating the race. If the attribute is missing or invalid, the countdown must
+  default to `3000` milliseconds, and the race display must continue to show whole-second countdown
+  values. `Implemented`
 
 Current delivery notes:
 
-- The cue-start seam and admin toggle exist. `Implemented`
+- The cue-start seam, admin toggle, default countdown, cue-provided countdown duration, and local
+  simulator script exist. `Implemented`
 - Real-world VirtualDJ cue behavior has not yet been fully validated in production use. `Partial`
 
 ## Admin Display
@@ -285,12 +290,12 @@ Requirements:
   `Implemented`
 - Projector layout must be optimized for a likely `1080p` display with large audience-readable
   text and minimal non-race chrome. `Implemented`
-- Horizontal race themes must show `Gold Sprints` centered at the top, optionally show the active
+- Horizontal race themes must show `Roller Rumble` centered at the top, optionally show the active
   event name underneath, let the race lanes fill the main middle area, and show a centered
   `Fiercely Local` footer with a real logo asset between the words. The logo should be loaded from
   the desktop public brand asset directory with SVG preferred and raster fallbacks supported.
   `Implemented`
-- Vertical race themes must show `Gold Sprints` and the optional event name in the top-left,
+- Vertical race themes must show `Roller Rumble` and the optional event name in the top-left,
   `Fiercely Local` with the same logo asset in the top-right, keep the race indicator centered
   from top to bottom, and keep racer identity and stats inside each lane rather than in separate
   bottom cards. `Implemented`
@@ -623,7 +628,7 @@ Requirements:
 
 - The photo booth should be a dedicated Raspberry Pi appliance so the admin laptop can remain free
   for race operations. `Implemented`
-- The Raspberry Pi booth agent must pair with the main GoldSprints backend using a booth id and
+- The Raspberry Pi booth agent must pair with the main Roller Rumble backend using a booth id and
   shared secret from admin settings. `Implemented`
 - Photo booth pairing must advertise a LAN-reachable desktop backend URL, not `localhost` or
   `127.0.0.1`, so the Raspberry Pi can connect over the event network. The LAN host should
@@ -681,14 +686,14 @@ Requirements:
 - The booth must support an explicit development-only fake QR path so a host can type
   `fake:Test Rider` into the kiosk manual QR input and test photo mode without a signed racer QR.
   Fake QR testing is automatically enabled for simulator/manual booth configurations and can be
-  forced on or off with `GOLDSPRINTS_BOOTH_ALLOW_FAKE_QR`. Fake sessions must not upload or leave
+  forced on or off with `ROLLER_RUMBLE_BOOTH_ALLOW_FAKE_QR`. Fake sessions must not upload or leave
   invalid captures in the sync queue. `Implemented`
 - The admin photo booth card must show richer hardware health for the scanner, camera, lights,
   umbrella, and hall sensor. `Implemented`
 - Accepted photo originals must upload to the main backend and update the racer's avatar across all
   app surfaces. `Implemented`
 - If the main backend is unavailable, accepted booth photos must be queued locally on the Pi in a
-  SQLite queue at `GOLDSPRINTS_BOOTH_DATA_DIR/photo-booth.sqlite` and synced later. `Implemented`
+  SQLite queue at `ROLLER_RUMBLE_BOOTH_DATA_DIR/photo-booth.sqlite` and synced later. `Implemented`
 - The main backend must store full DSLR originals separately from the avatar display asset so
   originals can be exported later. `Implemented`
 - Avatar display assets are currently generated as original-backed derivative copies; true
@@ -709,15 +714,15 @@ Current delivery notes:
 Current delivery notes:
 
 - Stable tunnel mode is configured with backend-only dotenv variables such as
-  `GOLDSPRINTS_TUNNEL_MODE=token`, `GOLDSPRINTS_TUNNEL_NAME=GoldSprints`,
-  `GOLDSPRINTS_PUBLIC_RACER_URL=https://goldsprints.birdsnest.family/racer`, and
-  `GOLDSPRINTS_TUNNEL_TOKEN`. Tokens must stay in ignored local env files. `Implemented`
-- Cloudflared lookup prefers `GOLDSPRINTS_CLOUDFLARED_PATH`, then the app-managed runtime install,
+  `ROLLER_RUMBLE_TUNNEL_MODE=token`, `ROLLER_RUMBLE_TUNNEL_NAME=Roller Rumble`,
+  `ROLLER_RUMBLE_PUBLIC_RACER_URL=https://roller-rumble.birdsnest.family/racer`, and
+  `ROLLER_RUMBLE_TUNNEL_TOKEN`. Tokens must stay in ignored local env files. `Implemented`
+- Cloudflared lookup prefers `ROLLER_RUMBLE_CLOUDFLARED_PATH`, then the app-managed runtime install,
   then a system `PATH` binary. Admin diagnostics and scripts expose the active source/version.
   `Implemented`
 - Vite dev mode must allow the stable racer-page hostname through host protection so tunneled dev
-  testing works at `goldsprints.birdsnest.family`; additional hosts can be configured with
-  `GOLDSPRINTS_VITE_ALLOWED_HOSTS`. `Implemented`
+  testing works at `roller-rumble.birdsnest.family`; additional hosts can be configured with
+  `ROLLER_RUMBLE_VITE_ALLOWED_HOSTS`. `Implemented`
 - Stable Cloudflare Public Hostnames must route the hostname root to the embedded backend port
   (`http://127.0.0.1:3187` by default), with no `/racer` path restriction, so assets, APIs, uploads,
   and WebSocket traffic are all reachable. `Implemented`
@@ -751,6 +756,8 @@ Requirements:
 - Developers must have an easy dev-data reset path. `Implemented`
 - Developers must have a supported debug flow for Electron main, backend, and renderer code.
   `Implemented`
+- The local dev runner must treat an intentional terminal `Ctrl+C` as a clean shutdown while
+  preserving non-zero exits for real Vite or Electron startup/runtime failures. `Implemented`
 - Developers must have manual visual test pages for tournament bracket camera/connector handoff
   animations and open time trial queue projection without needing to mutate real event data.
   `Implemented`
@@ -759,10 +766,10 @@ Current tooling requirements now include:
 
 - SQL migration files in `apps/desktop/src/backend/db/migrations`
 - a typed Drizzle schema mirror in `apps/desktop/src/backend/db/schema.ts`
-- `@goldsprints/desktop` as the workspace package that owns Electron, the embedded backend, and the
+- `@roller-rumble/desktop` as the workspace package that owns Electron, the embedded backend, and the
   renderer app
-- `@goldsprints/shared` for shared constants, types, validation, presets, themes, and utility code
-- `@goldsprints/shared-ui` for React UI primitives shared by the desktop renderer and the booth
+- `@roller-rumble/shared` for shared constants, types, validation, presets, themes, and utility code
+- `@roller-rumble/shared-ui` for React UI primitives shared by the desktop renderer and the booth
   kiosk
 - shared base TypeScript configs that package/app tsconfigs extend instead of duplicating common
   compiler settings

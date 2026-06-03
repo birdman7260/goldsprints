@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""GoldSprints photo booth umbrella helper.
+"""Roller Rumble photo booth umbrella helper.
 
 This process owns GPIO timing for the stepper driver and hall sensor so the TypeScript booth agent
 can stay focused on orchestration. It speaks newline-delimited JSON over stdin/stdout.

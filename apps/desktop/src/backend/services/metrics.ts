@@ -1,5 +1,5 @@
-import { DEFAULT_WHEEL_CIRCUMFERENCE_METERS } from "@goldsprints/shared/constants";
-import type { RaceMetricsSnapshot, RaceParticipant } from "@goldsprints/shared/types";
+import { DEFAULT_WHEEL_CIRCUMFERENCE_METERS } from "@roller-rumble/shared/constants";
+import type { RaceMetricsSnapshot, RaceParticipant } from "@roller-rumble/shared/types";
 
 export interface RotationSample {
   timestampMs: number;

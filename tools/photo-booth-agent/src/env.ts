@@ -25,7 +25,7 @@ function loadDotenvFilesFrom(dir: string, shellProvidedKeys: Set<string>): void 
   }
 }
 
-function isGoldSprintsRepoRoot(dir: string): boolean {
+function isRollerRumbleRepoRoot(dir: string): boolean {
   return (
     fs.existsSync(path.join(dir, "package.json")) &&
     fs.existsSync(path.join(dir, "tools", "photo-booth-agent", "package.json"))
@@ -38,7 +38,7 @@ export function loadBoothDotenv(): void {
   const packageDir = path.resolve(path.dirname(sourcePath), "..");
   const repoRoot = path.resolve(packageDir, "..", "..");
 
-  if (isGoldSprintsRepoRoot(repoRoot)) {
+  if (isRollerRumbleRepoRoot(repoRoot)) {
     loadDotenvFilesFrom(repoRoot, shellProvidedKeys);
   }
   loadDotenvFilesFrom(packageDir, shellProvidedKeys);

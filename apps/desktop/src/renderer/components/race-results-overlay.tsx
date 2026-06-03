@@ -3,8 +3,8 @@ import type {
   RaceParticipant,
   RaceRecord,
   RacerSummary
-} from "@goldsprints/shared/types";
-import { Panel } from "@goldsprints/shared-ui";
+} from "@roller-rumble/shared/types";
+import { Panel } from "@roller-rumble/shared-ui";
 import { motion } from "framer-motion";
 import { resolveBackendAssetUrl } from "../lib/assets";
 

@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { RacerSummary } from "@goldsprints/shared/types";
-import { Button, Panel, TextInput } from "@goldsprints/shared-ui";
+import type { RacerSummary } from "@roller-rumble/shared/types";
+import { Button, Panel, TextInput } from "@roller-rumble/shared-ui";
 import { removeRacerFromUpcoming, signUpQueue, updateRacerPayment } from "../../lib/api";
 import { fireAndForget } from "../../lib/ui-actions";
 

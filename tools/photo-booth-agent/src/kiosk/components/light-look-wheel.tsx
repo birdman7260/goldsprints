@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
-import { Panel } from "@goldsprints/shared-ui";
+import { Panel } from "@roller-rumble/shared-ui";
 import { LIGHT_LOOKS, type LightLookDefinition, type LightLookPreview } from "../../light-looks";
 import type { LightSelection } from "../../types";
 import { normalizeWheelDeltaY, WHEEL_ITEM_PITCH } from "./wheel-input";

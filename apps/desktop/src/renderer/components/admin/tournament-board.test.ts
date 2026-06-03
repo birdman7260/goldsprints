@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { BracketNode, TournamentBundle } from "@goldsprints/shared/types";
+import type { BracketNode, TournamentBundle } from "@roller-rumble/shared/types";
 import {
   canFillByeNode,
   canRemoveRacerFromBracketNode,

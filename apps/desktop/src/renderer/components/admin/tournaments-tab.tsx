@@ -1,15 +1,15 @@
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { competitionPresets } from "@goldsprints/shared/presets";
+import { competitionPresets } from "@roller-rumble/shared/presets";
 import type {
   AppSnapshot,
   TournamentBracketSize,
   TournamentBundle,
   TournamentBracketLayoutMode,
   TournamentPreset
-} from "@goldsprints/shared/types";
-import { Button, EmptyState, Panel, StatPill, TextInput } from "@goldsprints/shared-ui";
+} from "@roller-rumble/shared/types";
+import { Button, EmptyState, Panel, StatPill, TextInput } from "@roller-rumble/shared-ui";
 import {
   createTournament,
   endTournamentEarly,

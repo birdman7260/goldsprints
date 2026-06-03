@@ -1,5 +1,5 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
-import type { TunnelDiagnostics, TunnelState } from "@goldsprints/shared/types";
+import type { TunnelDiagnostics, TunnelState } from "@roller-rumble/shared/types";
 import {
   buildCloudflaredStartCommand,
   createCloudflaredConfig,
@@ -25,7 +25,7 @@ function isOriginRequestFailure(text: string): boolean {
 function originRequestFailureMessage(): string {
   return [
     "cloudflared is running, but at least one public request could not reach the app origin.",
-    "Verify the Cloudflare Public Hostname has an empty Path and service http://127.0.0.1:3187 so /racer, /assets, /api, /uploads, and /ws all route to GoldSprints."
+    "Verify the Cloudflare Public Hostname has an empty Path and service http://127.0.0.1:3187 so /racer, /assets, /api, /uploads, and /ws all route to Roller Rumble."
   ].join(" ");
 }
 

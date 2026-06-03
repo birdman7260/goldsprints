@@ -5,7 +5,7 @@ dist-electron
 coverage
 release
 out
-.goldsprints-dev
+.roller-rumble-dev
 .pnpm-store
 .tanstack
 .DS_Store
@@ -15,4 +15,4 @@ pnpm-debug.log*
 .env.*
 !.env.example
 !.env.*.example
-.goldsprints-booth
+.roller-rumble-booth

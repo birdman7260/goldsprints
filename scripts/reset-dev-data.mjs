@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const devRuntimeDir = path.resolve(process.argv[2] ?? ".goldsprints-dev/runtime");
+const devRuntimeDir = path.resolve(process.argv[2] ?? ".roller-rumble-dev/runtime");
 
 fs.rmSync(devRuntimeDir, { recursive: true, force: true });
 

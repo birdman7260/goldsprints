@@ -11,7 +11,7 @@ import {
   DEFAULT_TARGET_DISTANCE_METERS,
   DEFAULT_TICKER_SPEED_PIXELS_PER_SECOND,
   DEFAULT_THEME_ID
-} from "@goldsprints/shared/constants";
+} from "@roller-rumble/shared/constants";
 import type {
   AdminSettings,
   AppSetting,
@@ -37,8 +37,8 @@ import type {
   TournamentRecord,
   TournamentStage,
   WebPushSubscriptionInput
-} from "@goldsprints/shared/types";
-import { nowIso } from "@goldsprints/shared/utils";
+} from "@roller-rumble/shared/types";
+import { nowIso } from "@roller-rumble/shared/utils";
 import { computeRoundRobinStandings } from "../services/competition";
 import { applyMigrations } from "./migrations";
 import {
@@ -461,7 +461,7 @@ export class AppDatabase {
 
   constructor(private readonly dataDir: string) {
     fs.mkdirSync(dataDir, { recursive: true });
-    const dbFile = path.join(dataDir, "goldsprints.sqlite");
+    const dbFile = path.join(dataDir, "roller-rumble.sqlite");
     this.db = new Database(dbFile);
     this.db.pragma("journal_mode = WAL");
     this.db.pragma("foreign_keys = ON");

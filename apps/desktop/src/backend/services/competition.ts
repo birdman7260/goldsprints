@@ -7,7 +7,7 @@ import type {
   RoundRobinStanding,
   TournamentParticipantSeed,
   TournamentPreset
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 
 interface EliminationRouting {
   winnerSlot?: "a" | "b";

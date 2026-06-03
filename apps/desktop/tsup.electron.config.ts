@@ -9,5 +9,5 @@ export default defineConfig({
   external: ["electron"],
   // Workspace packages export source TypeScript for Vite/dev mode, so the Electron bundle must
   // inline them instead of leaving runtime imports that Electron cannot load after `pnpm build`.
-  noExternal: [/^@goldsprints\/shared(\/.*)?$/]
+  noExternal: [/^@roller-rumble\/shared(\/.*)?$/]
 });

@@ -1,6 +1,6 @@
-# GoldSprints
+# Roller Rumble
 
-GoldSprints is a local-first Electron app for running live stationary-bike race events. It ships one desktop shell with an embedded backend and three user-facing surfaces:
+Roller Rumble is a local-first Electron app for running live stationary-bike race events. It ships one desktop shell with an embedded backend and three user-facing surfaces:
 
 - `Admin Display` for hosts on the laptop
 - `Race Display` for the projector or secondary screen
@@ -131,9 +131,9 @@ can resolve cash, comp, or edge-case desk flows.
 
 Stripe is enabled with:
 
-- `GOLDSPRINTS_STRIPE_SECRET_KEY`
-- `GOLDSPRINTS_STRIPE_WEBHOOK_SECRET`
-- `GOLDSPRINTS_PUBLIC_RACER_URL`
+- `ROLLER_RUMBLE_STRIPE_SECRET_KEY`
+- `ROLLER_RUMBLE_STRIPE_WEBHOOK_SECRET`
+- `ROLLER_RUMBLE_PUBLIC_RACER_URL`
 
 Apple Pay, Google Pay, Link, and cards are handled by Stripe-hosted Checkout and the payment methods
 enabled in the Stripe Dashboard. In local development, use the Stripe CLI to forward webhooks to
@@ -154,9 +154,9 @@ pnpm notifications:keys
 
 Then add the values to `.env.local`:
 
-- `GOLDSPRINTS_WEB_PUSH_PUBLIC_KEY`
-- `GOLDSPRINTS_WEB_PUSH_PRIVATE_KEY`
-- `GOLDSPRINTS_WEB_PUSH_SUBJECT`
+- `ROLLER_RUMBLE_WEB_PUSH_PUBLIC_KEY`
+- `ROLLER_RUMBLE_WEB_PUSH_PRIVATE_KEY`
+- `ROLLER_RUMBLE_WEB_PUSH_SUBJECT`
 
 Automatic notifications currently include the “3rd match coming up” queue alert and tournament-start
 alerts for racers seeded into an active tournament. Admins can also send messages from the Settings
@@ -218,7 +218,7 @@ the racer page with that notification selected so the matching in-app modal appe
 ## Project Layout
 
 - `apps/desktop`
-  - workspace package `@goldsprints/desktop`
+  - workspace package `@roller-rumble/desktop`
   - owns the Electron shell, embedded backend, Vite renderer, Drizzle config, and desktop build
 - `apps/desktop/src/electron`
   - Electron main-process entrypoint
@@ -232,10 +232,10 @@ the racer page with that notification selected so the matching in-app modal appe
   - bundled race-avatar sprite sheets live in `apps/desktop/src/renderer/assets/sprites`
   - generated TanStack route tree lives in `apps/desktop/src/renderer/routeTree.gen.ts`
 - `packages/shared/src`
-  - workspace package `@goldsprints/shared`
+  - workspace package `@roller-rumble/shared`
   - shared constants, types, validation, presets, and themes imported through package subpaths
 - `packages/shared-ui/src`
-  - workspace package `@goldsprints/shared-ui`
+  - workspace package `@roller-rumble/shared-ui`
   - React UI primitives, shared component CSS, and theme DOM helpers used by the desktop renderer
     and Raspberry Pi booth kiosk
 - `tools/photo-booth-agent`
@@ -246,19 +246,19 @@ the racer page with that notification selected so the matching in-app modal appe
 
 Important files:
 
-- [apps/desktop/src/electron/main.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/electron/main.ts)
-- [apps/desktop/src/backend/server.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/server.ts)
-- [apps/desktop/src/backend/db/migrations/0001_initial-schema.sql](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/db/migrations/0001_initial-schema.sql)
-- [apps/desktop/src/backend/db/schema.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/db/schema.ts)
-- [apps/desktop/drizzle.config.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/drizzle.config.ts)
-- [apps/desktop/src/backend/services/app.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/services/app.ts)
-- [apps/desktop/src/backend/services/competition.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/services/competition.ts)
-- [apps/desktop/src/backend/services/notifications.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/backend/services/notifications.ts)
-- [apps/desktop/src/renderer/router.tsx](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/renderer/router.tsx)
-- [apps/desktop/src/renderer/components/elimination-bracket-view.tsx](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/renderer/components/elimination-bracket-view.tsx)
-- [apps/desktop/src/renderer/components/tournament-flow-layout.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/renderer/components/tournament-flow-layout.ts)
-- [packages/shared/src/themes.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/packages/shared/src/themes.ts)
-- [tools/photo-booth-agent/src/agent.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/tools/photo-booth-agent/src/agent.ts)
+- [apps/desktop/src/electron/main.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/electron/main.ts)
+- [apps/desktop/src/backend/server.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/backend/server.ts)
+- [apps/desktop/src/backend/db/migrations/0001_initial-schema.sql](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/backend/db/migrations/0001_initial-schema.sql)
+- [apps/desktop/src/backend/db/schema.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/backend/db/schema.ts)
+- [apps/desktop/drizzle.config.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/drizzle.config.ts)
+- [apps/desktop/src/backend/services/app.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/backend/services/app.ts)
+- [apps/desktop/src/backend/services/competition.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/backend/services/competition.ts)
+- [apps/desktop/src/backend/services/notifications.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/backend/services/notifications.ts)
+- [apps/desktop/src/renderer/router.tsx](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/renderer/router.tsx)
+- [apps/desktop/src/renderer/components/elimination-bracket-view.tsx](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/renderer/components/elimination-bracket-view.tsx)
+- [apps/desktop/src/renderer/components/tournament-flow-layout.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/renderer/components/tournament-flow-layout.ts)
+- [packages/shared/src/themes.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/packages/shared/src/themes.ts)
+- [tools/photo-booth-agent/src/agent.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/tools/photo-booth-agent/src/agent.ts)
 
 ## Stack
 
@@ -280,7 +280,7 @@ Important files:
 
 - Node.js 22 or newer is recommended
 - macOS or Windows for the intended desktop runtime
-- `cloudflared` is optional at first run: GoldSprints can use an existing binary, or install an
+- `cloudflared` is optional at first run: Roller Rumble can use an existing binary, or install an
   app-managed macOS/Windows binary into its runtime tools folder.
 
 ## Getting Started
@@ -311,13 +311,13 @@ Development mode starts:
 - the embedded backend on `http://127.0.0.1:3187` by default
 - an Electron admin window
 - an Electron race display window
-- dev runtime data inside `.goldsprints-dev/runtime`
+- dev runtime data inside `.roller-rumble-dev/runtime`
 
 The racer page is available through the backend route at `/racer`. Admin QR codes and photo booth
 pairing use the machine's LAN address when one can be detected, for example
 `http://192.168.1.42:3187/racer`, so phones and the Raspberry Pi can reach the host app over the
 event network. If the laptop has multiple adapters and the auto-detected address is wrong, set
-`GOLDSPRINTS_LOCAL_SERVER_HOST=<laptop LAN IP>` in `.env.local`.
+`ROLLER_RUMBLE_LOCAL_SERVER_HOST=<laptop LAN IP>` in `.env.local`.
 
 ## Environment Configuration
 
@@ -342,12 +342,12 @@ setup. The booth agent also loads those files directly when started from
 `tools/photo-booth-agent`, so Raspberry Pi deployments still work if you run the package script
 without the root launcher.
 
-`GOLDSPRINTS_LOCAL_SERVER_HOST` optionally overrides the LAN host advertised by the desktop app in
+`ROLLER_RUMBLE_LOCAL_SERVER_HOST` optionally overrides the LAN host advertised by the desktop app in
 local QR codes and Raspberry Pi photo booth pairing. Leave it unset for Wi-Fi/Ethernet auto-detect;
 set it when macOS/Windows chooses a VPN, virtual adapter, or other address the Pi cannot reach.
 
 Only variables prefixed with `VITE_` are exposed to browser renderer code by Vite. Keep secrets such
-as `GOLDSPRINTS_BOOTH_SECRET` in backend/agent dotenv files, not in `VITE_*` variables.
+as `ROLLER_RUMBLE_BOOTH_SECRET` in backend/agent dotenv files, not in `VITE_*` variables.
 `VITE_API_BASE` is only honored for loopback pages such as the local Vite dev server; public tunnel
 visitors use the current `https://...` origin so REST and WebSocket requests route through
 Cloudflare instead of trying to connect to `127.0.0.1` on the visitor's device.
@@ -356,21 +356,21 @@ Stable Cloudflare tunnels are configured through backend-only variables. For the
 domain, keep the token in `.env.local` and never commit it:
 
 ```bash
-GOLDSPRINTS_TUNNEL_MODE=token
-GOLDSPRINTS_TUNNEL_NAME=GoldSprints
-GOLDSPRINTS_PUBLIC_RACER_URL=https://goldsprints.birdsnest.family/racer
-GOLDSPRINTS_TUNNEL_TOKEN=<token from Cloudflare>
+ROLLER_RUMBLE_TUNNEL_MODE=token
+ROLLER_RUMBLE_TUNNEL_NAME=Roller Rumble
+ROLLER_RUMBLE_PUBLIC_RACER_URL=https://roller-rumble.birdsnest.family/racer
+ROLLER_RUMBLE_TUNNEL_TOKEN=<token from Cloudflare>
 ```
 
-Quick tunnel mode remains available with `GOLDSPRINTS_TUNNEL_MODE=quick`. Binary lookup prefers
-`GOLDSPRINTS_CLOUDFLARED_PATH`, then the app-managed install, then a `cloudflared` found on `PATH`.
-Dev mode allows `goldsprints.birdsnest.family` through Vite's host protection; add more
-comma-separated hosts with `GOLDSPRINTS_VITE_ALLOWED_HOSTS` if a future event uses another public
+Quick tunnel mode remains available with `ROLLER_RUMBLE_TUNNEL_MODE=quick`. Binary lookup prefers
+`ROLLER_RUMBLE_CLOUDFLARED_PATH`, then the app-managed install, then a `cloudflared` found on `PATH`.
+Dev mode allows `roller-rumble.birdsnest.family` through Vite's host protection; add more
+comma-separated hosts with `ROLLER_RUMBLE_VITE_ALLOWED_HOSTS` if a future event uses another public
 domain while pointed at the Vite dev server.
 
-In Cloudflare Zero Trust, the `GoldSprints` Public Hostname should be configured with:
+In Cloudflare Zero Trust, the `Roller Rumble` Public Hostname should be configured with:
 
-- Hostname: `goldsprints.birdsnest.family`
+- Hostname: `roller-rumble.birdsnest.family`
 - Path: empty
 - Service type: `HTTP`
 - Service URL: `127.0.0.1:3187`
@@ -387,6 +387,8 @@ testing does not produce unrelated Vite websocket failures.
   - Starts the Vite dev server and the Electron app together.
   - Electron points at the live Vite renderer while still using the embedded backend.
   - `--strictPort` keeps Vite pinned to `5173` so Electron always knows where to connect.
+  - Intentional shutdown with `Ctrl+C` exits cleanly without reporting a pnpm lifecycle failure,
+    while real child-process failures still exit non-zero.
 - `pnpm dev:debug`
   - Starts the app in dev mode with Electron's Node inspector on `9229` and Chromium remote debugging on `9223`.
   - Opens renderer DevTools automatically.
@@ -401,7 +403,7 @@ testing does not produce unrelated Vite websocket failures.
   - This creates distributable app assets in `apps/desktop/dist/`, but it does not create an installer.
 - `pnpm cloudflared:install`
   - Downloads the official `cloudflared` release for macOS arm64, macOS x64, or Windows x64 into
-    the GoldSprints runtime tools folder.
+    the Roller Rumble runtime tools folder.
   - Verifies the binary with `cloudflared --version`.
   - Does not use Homebrew, winget, or admin-level system installs.
 - `pnpm cloudflared:doctor`
@@ -418,7 +420,7 @@ testing does not produce unrelated Vite websocket failures.
   - Generates VAPID keys for browser Web Push and prints the `.env.local` variables to add.
   - The private key should stay local and must not be committed.
 - `pnpm dev:reset-data`
-  - Deletes the repo-local dev runtime directory at `.goldsprints-dev/runtime`.
+  - Deletes the repo-local dev runtime directory at `.roller-rumble-dev/runtime`.
   - Use this when you want a fresh SQLite database, cleared uploads, and no leftover dev event data.
   - Stop the running dev app first so SQLite files are not in use.
 - `pnpm db:studio`
@@ -456,9 +458,12 @@ testing does not produce unrelated Vite websocket failures.
 - `pnpm os2l:cue`
   - Sends a TCP payload to the local OS2L listener so you can simulate a VirtualDJ cue while the app is running.
   - The app must have `OS2L listening` enabled and a race must already be staged so the trigger is armed.
+  - If the payload includes `countdownMs`, Roller Rumble counts down for that many milliseconds
+    before the race starts. If it is omitted, the countdown defaults to `3000` milliseconds.
   - Optional overrides can be passed through npm, for example:
     - `pnpm os2l:cue -- --event play`
-    - `pnpm os2l:cue -- --message '{"evt":"cue","action":"start","id":"race-start"}'`
+    - `pnpm os2l:cue -- --countdownMs 5000`
+    - `pnpm os2l:cue -- --message '{"evt":"cue","action":"start","id":"race-start","countdownMs":2500}'`
 - `pnpm photo-booth:agent`
   - Starts the Raspberry Pi photo booth kiosk server.
   - Builds and serves the package-local React touchscreen kiosk before starting the booth agent.
@@ -468,30 +473,30 @@ testing does not produce unrelated Vite websocket failures.
     `better-sqlite3` never collides with the Electron-built desktop app dependency.
   - Loads `.env`, `.env.local`, `.env.photo-booth`, and `.env.photo-booth.local` before launching
     the isolated package.
-  - Stores accepted photos waiting to sync in `GOLDSPRINTS_BOOTH_DATA_DIR/photo-booth.sqlite`.
+  - Stores accepted photos waiting to sync in `ROLLER_RUMBLE_BOOTH_DATA_DIR/photo-booth.sqlite`.
   - For local fake-token testing, open the kiosk and type `fake:Test Rider` into the manual QR
     input. Fake QR is enabled automatically when the booth camera is in simulator mode or the
-    scanner is manual/simulated. Set `GOLDSPRINTS_BOOTH_ALLOW_FAKE_QR=1` to force-enable it for
-    hardware tests, or `GOLDSPRINTS_BOOTH_ALLOW_FAKE_QR=0` to force-disable it.
+    scanner is manual/simulated. Set `ROLLER_RUMBLE_BOOTH_ALLOW_FAKE_QR=1` to force-enable it for
+    hardware tests, or `ROLLER_RUMBLE_BOOTH_ALLOW_FAKE_QR=0` to force-disable it.
   - To make simulator capture/review look real, put your sample image at
     `tools/photo-booth-agent/assets/simulated-dslr-photo.jpg`. Simulator camera captures copy that
-    file into the temporary capture folder. Override with `GOLDSPRINTS_BOOTH_SIMULATOR_PHOTO_PATH`
+    file into the temporary capture folder. Override with `ROLLER_RUMBLE_BOOTH_SIMULATOR_PHOTO_PATH`
     if you want a different location; relative paths are resolved from the repo root first and the
     booth package directory second.
   - Configure the real booth with environment variables:
-    - `GOLDSPRINTS_BOOTH_SERVER_URL=http://<admin-laptop-ip>:3187`
-    - `GOLDSPRINTS_BOOTH_ID=<value from admin settings>`
-    - `GOLDSPRINTS_BOOTH_SECRET=<value from admin settings>`
-    - `GOLDSPRINTS_BOOTH_CAMERA=gphoto2`
-    - `GOLDSPRINTS_BOOTH_SCANNER_MODE=serial`
-    - `GOLDSPRINTS_BOOTH_SCANNER_SERIAL_PORT=/dev/serial0`
-    - `GOLDSPRINTS_WLED_SERIAL_PORT=/dev/ttyUSB0`
-    - `GOLDSPRINTS_UMBRELLA_MODE=process`
-    - `GOLDSPRINTS_UMBRELLA_STEP_PIN=17`
-    - `GOLDSPRINTS_UMBRELLA_DIR_PIN=27`
-    - `GOLDSPRINTS_UMBRELLA_ENABLE_PIN=22`
-    - `GOLDSPRINTS_UMBRELLA_HALL_PIN=23`
-    - `GOLDSPRINTS_BOOTH_DATA_DIR=/home/pi/goldsprints-booth`
+    - `ROLLER_RUMBLE_BOOTH_SERVER_URL=http://<admin-laptop-ip>:3187`
+    - `ROLLER_RUMBLE_BOOTH_ID=<value from admin settings>`
+    - `ROLLER_RUMBLE_BOOTH_SECRET=<value from admin settings>`
+    - `ROLLER_RUMBLE_BOOTH_CAMERA=gphoto2`
+    - `ROLLER_RUMBLE_BOOTH_SCANNER_MODE=serial`
+    - `ROLLER_RUMBLE_BOOTH_SCANNER_SERIAL_PORT=/dev/serial0`
+    - `ROLLER_RUMBLE_WLED_SERIAL_PORT=/dev/ttyUSB0`
+    - `ROLLER_RUMBLE_UMBRELLA_MODE=process`
+    - `ROLLER_RUMBLE_UMBRELLA_STEP_PIN=17`
+    - `ROLLER_RUMBLE_UMBRELLA_DIR_PIN=27`
+    - `ROLLER_RUMBLE_UMBRELLA_ENABLE_PIN=22`
+    - `ROLLER_RUMBLE_UMBRELLA_HALL_PIN=23`
+    - `ROLLER_RUMBLE_BOOTH_DATA_DIR=/home/pi/roller-rumble-booth`
 - `pnpm photo-booth:doctor`
   - Runs booth hardware diagnostics without starting a racer session.
   - Checks the scanner, camera, WLED serial control, umbrella helper, hall sensor status, and local
@@ -523,15 +528,136 @@ testing does not produce unrelated Vite websocket failures.
 
 Runtime data is stored under Electron's user-data directory in a `runtime` folder. That includes:
 
-- `goldsprints.sqlite`
+- `roller-rumble.sqlite`
 - uploaded racer avatars
 - photo booth DSLR originals and generated avatar display assets
 
-When running `pnpm dev`, runtime data defaults to `.goldsprints-dev/runtime` so local resets are easy
-and safe. Set `GOLDSPRINTS_DATA_DIR` in `.env.local` if you need a different local database/upload
+When running `pnpm dev`, runtime data defaults to `.roller-rumble-dev/runtime` so local resets are easy
+and safe. Set `ROLLER_RUMBLE_DATA_DIR` in `.env.local` if you need a different local database/upload
 folder.
 
 The app is designed to recover from restarts. If shutdown happens during countdown or an active race, that race is restored as interrupted and can be resumed, restarted, or finalized from the admin UI.
+
+## VirtualDJ Cue Starts
+
+Roller Rumble can start a staged race from a VirtualDJ OS2L cue. Use this when a song has a specific
+moment where the race countdown should begin and you want the race to start exactly after that
+countdown.
+
+Plain-language version:
+
+- VirtualDJ sends a tiny OS2L message when the song reaches an action cue.
+- Roller Rumble listens for that message only on the same computer, on `127.0.0.1:9996` by default.
+- Roller Rumble only reacts when `Enable VirtualDJ cue start` is on and a race is already staged.
+- The OS2L message must include `roller-rumble-start`.
+- Add `countdownMs=<number>` when you want a custom countdown length.
+- The number is milliseconds, so `3000` means 3 seconds, `5000` means 5 seconds, and `2500` means
+  2.5 seconds.
+- If `countdownMs` is missing, Roller Rumble uses `3000`.
+- The projector countdown display stays in whole seconds. For example, `2500` milliseconds displays
+  `3`, then `2`, then `1`, then starts.
+
+Roller Rumble accepts these VirtualDJ actions:
+
+```text
+os2l_button "roller-rumble-start" on
+```
+
+```text
+os2l_button "roller-rumble-start countdownMs=5000" on
+```
+
+Use the first one for the normal 3-second countdown. Use the second one for a 5-second countdown.
+Change only the number after `countdownMs=` when you need a different length.
+
+Before editing songs:
+
+1. Start Roller Rumble with `pnpm dev`.
+2. In the admin window, create or select the event.
+3. Stage a race. The race must be staged before VirtualDJ can start it.
+4. Open `Settings`.
+5. Turn on `Enable VirtualDJ cue start`.
+6. Optional quick test from Terminal:
+
+```bash
+pnpm os2l:cue -- --countdownMs 5000
+```
+
+If a race is staged and the setting is enabled, the projector should show a 5-second countdown and
+then start the race. This confirms Roller Rumble is listening before you involve VirtualDJ.
+
+To add a race-start cue to a song in VirtualDJ:
+
+1. Open VirtualDJ on the same computer as Roller Rumble.
+2. Find the song in the VirtualDJ browser.
+3. Right-click the song and open `POI Editor`.
+4. Click `New`.
+5. Move the new marker to the exact point where the Roller Rumble countdown should begin.
+6. Set `Type` to `Action`.
+7. For `Cue Option`, choose the cue behavior you want:
+   - Choose an invisible/action-only cue if this should trigger automatically while the song plays.
+   - Choose a visible cue/hot cue if the DJ should be able to see or trigger it manually.
+8. In `Macro Action`, paste one of these:
+
+```text
+os2l_button "roller-rumble-start" on
+```
+
+or:
+
+```text
+os2l_button "roller-rumble-start countdownMs=5000" on
+```
+
+9. Close the POI Editor so VirtualDJ saves the cue.
+10. Test the song from a little before the cue marker. When playback reaches the marker, Roller
+    Rumble should start the countdown.
+
+Placement tip: put the VirtualDJ action cue where you want the countdown to appear, not where you
+want the race to begin. If the race should start on a big downbeat and you use
+`countdownMs=3000`, place the cue 3 seconds before that downbeat. If you use `countdownMs=5000`,
+place it 5 seconds before that downbeat.
+
+Common examples:
+
+- Normal 3-second countdown:
+
+```text
+os2l_button "roller-rumble-start" on
+```
+
+- Explicit 3-second countdown:
+
+```text
+os2l_button "roller-rumble-start countdownMs=3000" on
+```
+
+- 5-second countdown:
+
+```text
+os2l_button "roller-rumble-start countdownMs=5000" on
+```
+
+- 2.5-second countdown:
+
+```text
+os2l_button "roller-rumble-start countdownMs=2500" on
+```
+
+Troubleshooting:
+
+- If nothing happens, confirm the race is staged in Roller Rumble.
+- Confirm `Settings -> Enable VirtualDJ cue start` is turned on.
+- Confirm VirtualDJ is running on the same computer as Roller Rumble.
+- Confirm the action contains `roller-rumble-start`.
+- Confirm `countdownMs` has no comma, decimal unit, or `ms` suffix. Use `5000`, not `5,000`,
+  `5s`, or `5000ms`.
+- If you changed the listener port with `ROLLER_RUMBLE_OS2L_PORT`, make sure any external OS2L
+  sender is using the same port. The normal VirtualDJ same-computer setup should use the default.
+
+VirtualDJ's own OS2L documentation describes `os2l_button` actions and action POIs in the
+[VirtualDJ OS2L guide](https://www.virtualdj.com/wiki/os2l). The VirtualDJ script manual also lists
+`os2l_button` in the [VDJScript verbs reference](https://virtualdj.com/manuals/virtualdj/appendix/vdjscriptverbs.html).
 
 ## Kaleidoscope Photo Booth
 
@@ -552,7 +678,7 @@ Flow:
 5. The capture button starts a countdown, freezes the umbrella for the DSLR shot, keeps the selected
    LED look active, captures with the Sony, and shows a preview.
 6. The racer accepts, retakes, or cancels.
-7. Accepted originals upload to the main GoldSprints backend. If the backend is unavailable, the Pi
+7. Accepted originals upload to the main Roller Rumble backend. If the backend is unavailable, the Pi
    stores the accepted capture in a local SQLite queue and syncs it later.
 8. The main backend stores the DSLR original separately from the app avatar URL and updates the
    racer avatar across admin, racer, and race displays.
@@ -572,7 +698,7 @@ LED looks are defined in the booth package as a TypeScript manifest. The kiosk i
 visual-only picker items and supports infinite direct touch/mouse drag scrolling plus mousewheel or
 trackpad input without visible recentering, while labels remain available for accessibility, status
 messages, and tests. Use
-`GOLDSPRINTS_WLED_DEFAULT_LOOK=<look-id>` if a booth should idle back to a non-white default look.
+`ROLLER_RUMBLE_WLED_DEFAULT_LOOK=<look-id>` if a booth should idle back to a non-white default look.
 Built-in look ids are `solid-white`, `solid-red`, `solid-blue`, `kaleidoscope-rainbow`,
 `chasing-rainbow`, `sparkle`, and `pride`.
 
@@ -594,15 +720,15 @@ through the existing stepper endpoint so the motor follows the picker.
 
 Manual fake QR testing is supported for development only. Type `fake:Your Name` into the kiosk's
 manual QR input to enter photo mode without a signed racer QR or running main app resolver. Fake QR
-is enabled automatically for simulator/manual booth runs; use `GOLDSPRINTS_BOOTH_ALLOW_FAKE_QR=1`
-to force-enable it with real hardware, or `GOLDSPRINTS_BOOTH_ALLOW_FAKE_QR=0` to force-disable it.
+is enabled automatically for simulator/manual booth runs; use `ROLLER_RUMBLE_BOOTH_ALLOW_FAKE_QR=1`
+to force-enable it with real hardware, or `ROLLER_RUMBLE_BOOTH_ALLOW_FAKE_QR=0` to force-disable it.
 This lets you test lights, umbrella controls, capture, retry, and keep with simulator or real booth
 hardware.
 
 For full fake-mode photo review, add a sample image named `simulated-dslr-photo.jpg` in
 `tools/photo-booth-agent/assets`. The simulator DSLR adapter copies that file for each fake capture
 instead of showing a transparent placeholder. If you configure
-`GOLDSPRINTS_BOOTH_SIMULATOR_PHOTO_PATH`, relative paths are resolved from the repo root first and
+`ROLLER_RUMBLE_BOOTH_SIMULATOR_PHOTO_PATH`, relative paths are resolved from the repo root first and
 the booth package directory second.
 
 The booth agent intentionally lives in `tools/photo-booth-agent` instead of the root runtime. That
@@ -696,17 +822,17 @@ components and CSS should branch on manifest attributes such as `orientation`, `
 `surfaceStyle`, `connectorStyle`, and `raceGraphic.variant`, not on concrete theme IDs.
 
 The shared UI package owns the base component style contract and DOM theme helper. Import
-`@goldsprints/shared-ui/styles.css` before surface-specific CSS, use
-`@goldsprints/shared-ui/theme` to apply a selected `ThemeDefinition`, then keep each surface
+`@roller-rumble/shared-ui/styles.css` before surface-specific CSS, use
+`@roller-rumble/shared-ui/theme` to apply a selected `ThemeDefinition`, then keep each surface
 stylesheet focused on layout, page choreography, and screen-specific controls. If a shared
 primitive needs a new visual variation, add a shared modifier or CSS variable in
-`@goldsprints/shared-ui` instead of redefining `.button`, `.panel`, `.search-select`, `.stat-pill`,
+`@roller-rumble/shared-ui` instead of redefining `.button`, `.panel`, `.search-select`, `.stat-pill`,
 or `.empty-state` locally.
 
 Moving race avatars are resolved in the renderer from the theme's sprite-sheet id. To replace a
-theme sprite, keep the declared frame grid in [packages/shared/src/themes.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/packages/shared/src/themes.ts) aligned with the asset in [apps/desktop/src/renderer/assets/sprites](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/src/renderer/assets/sprites): row `0` is the slower animation and row `1` is the faster animation by default.
+theme sprite, keep the declared frame grid in [packages/shared/src/themes.ts](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/packages/shared/src/themes.ts) aligned with the asset in [apps/desktop/src/renderer/assets/sprites](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/src/renderer/assets/sprites): row `0` is the slower animation and row `1` is the faster animation by default.
 
-The projector `Fiercely Local` mark is loaded from [apps/desktop/public/brand/fiercely-local-logo.svg](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/goldSprints/apps/desktop/public/brand/fiercely-local-logo.svg). Replace that placeholder with the real logo when ready. If the asset is not SVG, use the same basename with `.png`, `.webp`, or `.jpg`; the race display checks those fallbacks automatically.
+The projector `Fiercely Local` mark is loaded from [apps/desktop/public/brand/fiercely-local-logo.svg](/Users/BIRDMX5/go/src/bitbucket.org/newyuinc/roller-rumble/apps/desktop/public/brand/fiercely-local-logo.svg). Replace that placeholder with the real logo when ready. If the asset is not SVG, use the same basename with `.png`, `.webp`, or `.jpg`; the race display checks those fallbacks automatically.
 
 The DOS-inspired `Oregon Trail '90` theme also bundles an IBM VGA bitmap recreation so the intended projector typography does not depend on fonts installed on the host machine.
 

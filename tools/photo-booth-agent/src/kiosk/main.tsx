@@ -1,10 +1,10 @@
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Button, Panel, StatPill, TextInput } from "@goldsprints/shared-ui";
-import "@goldsprints/shared-ui/styles.css";
-import { applyThemeToDocument } from "@goldsprints/shared-ui/theme";
-import { themes } from "@goldsprints/shared/themes";
-import type { ThemeDefinition } from "@goldsprints/shared/types";
+import { Button, Panel, StatPill, TextInput } from "@roller-rumble/shared-ui";
+import "@roller-rumble/shared-ui/styles.css";
+import { applyThemeToDocument } from "@roller-rumble/shared-ui/theme";
+import { themes } from "@roller-rumble/shared/themes";
+import type { ThemeDefinition } from "@roller-rumble/shared/types";
 import { DEFAULT_LIGHT_LOOK } from "../light-looks";
 import type {
   DiagnosticsResult,
@@ -152,7 +152,7 @@ function App() {
     <main className={`kiosk kiosk--${state.flow}`}>
       <Panel className="hero-card">
         <div>
-          <p className="eyebrow">GoldSprints Kaleidoscope</p>
+          <p className="eyebrow">Roller Rumble Kaleidoscope</p>
           <h1>{state.racerName ?? "Scan Your Racer QR"}</h1>
           <p>{error ?? state.message ?? "Show your racer QR to the mounted scanner."}</p>
         </div>

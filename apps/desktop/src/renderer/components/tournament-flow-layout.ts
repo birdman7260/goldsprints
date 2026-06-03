@@ -5,7 +5,7 @@ import type {
   BracketNode,
   TournamentBracketLayoutMode,
   TournamentBundle
-} from "@goldsprints/shared/types";
+} from "@roller-rumble/shared/types";
 import {
   getTournamentBracketLayoutMode,
   getTournamentBracketSize,

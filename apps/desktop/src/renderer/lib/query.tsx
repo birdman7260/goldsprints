@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { queryOptions, QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { AppSnapshot } from "@goldsprints/shared/types";
+import type { AppSnapshot } from "@roller-rumble/shared/types";
 import {
   createWebSocketUrl,
   fetchMeta,

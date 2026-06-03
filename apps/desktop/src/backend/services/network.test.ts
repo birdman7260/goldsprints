@@ -16,7 +16,7 @@ describe("local network host resolution", () => {
   it("uses an explicit local host override first", () => {
     expect(
       getLocalNetworkHost({
-        env: { GOLDSPRINTS_LOCAL_SERVER_HOST: "192.168.4.25" },
+        env: { ROLLER_RUMBLE_LOCAL_SERVER_HOST: "192.168.4.25" },
         networkInterfaces: {}
       })
     ).toBe("192.168.4.25");
@@ -25,7 +25,7 @@ describe("local network host resolution", () => {
   it("supports the legacy public host override name", () => {
     expect(
       getLocalNetworkHost({
-        env: { GOLDSPRINTS_PUBLIC_HOST: "192.168.4.26" },
+        env: { ROLLER_RUMBLE_PUBLIC_HOST: "192.168.4.26" },
         networkInterfaces: {}
       })
     ).toBe("192.168.4.26");

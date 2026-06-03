@@ -8,10 +8,10 @@ importers:
 
   .:
     dependencies:
-      '@goldsprints/shared':
+      '@roller-rumble/shared':
         specifier: file:../../packages/shared
         version: file:../../packages/shared
-      '@goldsprints/shared-ui':
+      '@roller-rumble/shared-ui':
         specifier: file:../../packages/shared-ui
         version: file:../../packages/shared-ui(react@19.2.6)
       better-sqlite3:
@@ -234,14 +234,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@goldsprints/shared-ui@file:../../packages/shared-ui':
-    resolution: {directory: ../../packages/shared-ui, type: directory}
-    peerDependencies:
-      react: ^19.0.0
-
-  '@goldsprints/shared@file:../../packages/shared':
-    resolution: {directory: ../../packages/shared, type: directory}
-
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
@@ -348,6 +340,14 @@ packages:
 
   '@rolldown/pluginutils@1.0.0-rc.7':
     resolution: {integrity: sha512-qujRfC8sFVInYSPPMLQByRh7zhwkGFS4+tyMQ83srV1qrxL4g8E2tyxVVyxd0+8QeBM1mIk9KbWxkegRr76XzA==}
+
+  '@roller-rumble/shared-ui@file:../../packages/shared-ui':
+    resolution: {directory: ../../packages/shared-ui, type: directory}
+    peerDependencies:
+      react: ^19.0.0
+
+  '@roller-rumble/shared@file:../../packages/shared':
+    resolution: {directory: ../../packages/shared, type: directory}
 
   '@rollup/rollup-android-arm-eabi@4.60.3':
     resolution: {integrity: sha512-x35CNW/ANXG3hE/EZpRU8MXX1JDN86hBb2wMGAtltkz7pc6cxgjpy1OMMfDosOQ+2hWqIkag/fGok1Yady9nGw==}
@@ -1519,14 +1519,6 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
-  '@goldsprints/shared-ui@file:../../packages/shared-ui(react@19.2.6)':
-    dependencies:
-      react: 19.2.6
-
-  '@goldsprints/shared@file:../../packages/shared':
-    dependencies:
-      zod: 3.25.76
-
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
@@ -1590,6 +1582,14 @@ snapshots:
   '@rolldown/pluginutils@1.0.0-rc.18': {}
 
   '@rolldown/pluginutils@1.0.0-rc.7': {}
+
+  '@roller-rumble/shared-ui@file:../../packages/shared-ui(react@19.2.6)':
+    dependencies:
+      react: 19.2.6
+
+  '@roller-rumble/shared@file:../../packages/shared':
+    dependencies:
+      zod: 3.25.76
 
   '@rollup/rollup-android-arm-eabi@4.60.3':
     optional: true

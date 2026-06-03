@@ -6,7 +6,7 @@ const appDir = path.dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = path.resolve(appDir, "../..");
 const dataDir = path.resolve(
   workspaceRoot,
-  process.env.GOLDSPRINTS_DATA_DIR ?? ".goldsprints-dev/runtime"
+  process.env.ROLLER_RUMBLE_DATA_DIR ?? ".roller-rumble-dev/runtime"
 );
 
 export default defineConfig({
@@ -14,6 +14,6 @@ export default defineConfig({
   schema: path.join(appDir, "src/backend/db/schema.ts"),
   out: path.join(appDir, "src/backend/db/drizzle"),
   dbCredentials: {
-    url: path.join(dataDir, "goldsprints.sqlite")
+    url: path.join(dataDir, "roller-rumble.sqlite")
   }
 });

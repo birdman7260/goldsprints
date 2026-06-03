@@ -34,11 +34,11 @@ function isDev(): boolean {
 }
 
 function isDebugEnabled(): boolean {
-  return process.env.GOLDSPRINTS_DEBUG === "1";
+  return process.env.ROLLER_RUMBLE_DEBUG === "1";
 }
 
 function shouldOpenDevTools(): boolean {
-  return process.env.GOLDSPRINTS_OPEN_DEVTOOLS === "1";
+  return process.env.ROLLER_RUMBLE_OPEN_DEVTOOLS === "1";
 }
 
 function resolveRendererDistDir(): string {
@@ -48,14 +48,14 @@ function resolveRendererDistDir(): string {
 }
 
 function resolveRuntimeDataDir(): string {
-  const override = process.env.GOLDSPRINTS_DATA_DIR;
+  const override = process.env.ROLLER_RUMBLE_DATA_DIR;
   if (override) {
     // Dev mode can pin data into the repo so resets are predictable and don't touch real app data.
     return path.resolve(workspaceRoot, override);
   }
 
   if (isDev()) {
-    return path.resolve(workspaceRoot, ".goldsprints-dev/runtime");
+    return path.resolve(workspaceRoot, ".roller-rumble-dev/runtime");
   }
 
   return path.join(app.getPath("userData"), "runtime");
@@ -90,7 +90,7 @@ async function createWindows(port: number): Promise<void> {
   adminWindow = new BrowserWindow({
     width: 1440,
     height: 960,
-    title: "GoldSprints Admin",
+    title: "Roller Rumble Admin",
     autoHideMenuBar: true,
     backgroundColor: "#08111d",
     webPreferences: {
@@ -104,7 +104,7 @@ async function createWindows(port: number): Promise<void> {
     height: secondaryDisplay?.workArea.height ?? 900,
     x: secondaryDisplay?.bounds.x,
     y: secondaryDisplay?.bounds.y,
-    title: "GoldSprints Race Display",
+    title: "Roller Rumble Race Display",
     autoHideMenuBar: true,
     backgroundColor: "#08111d",
     fullscreen: Boolean(secondaryDisplay),
@@ -138,7 +138,7 @@ async function bootstrap(): Promise<void> {
   const userDataDir = resolveRuntimeDataDir();
   backend = createBackendServer({
     dataDir: userDataDir,
-    port: Number(process.env.GOLDSPRINTS_PORT ?? "3187"),
+    port: Number(process.env.ROLLER_RUMBLE_PORT ?? "3187"),
     rendererDistDir: resolveRendererDistDir(),
     rendererDevUrl: process.env.ELECTRON_RENDERER_URL
   });
@@ -170,7 +170,7 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
   void (async () => {
     if (BrowserWindow.getAllWindows().length === 0 && backend) {
-      const port = Number(process.env.GOLDSPRINTS_PORT ?? "3187");
+      const port = Number(process.env.ROLLER_RUMBLE_PORT ?? "3187");
       await createWindows(port);
     }
   })();

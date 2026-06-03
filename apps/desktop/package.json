@@ -1,14 +1,14 @@
 {
-  "name": "@goldsprints/desktop",
+  "name": "@roller-rumble/desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "Electron app for orchestrating GoldSprints races, queues, and tournaments.",
+  "description": "Electron app for orchestrating Roller Rumble races, queues, and tournaments.",
   "main": "dist/electron/main.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k \"vite --strictPort\" \"wait-on tcp:5173 && cross-env NODE_OPTIONS=--import=tsx ELECTRON_RENDERER_URL=http://127.0.0.1:5173 electron src/electron/main.ts\"",
-    "dev:debug": "concurrently -k \"vite --strictPort\" \"wait-on tcp:5173 && cross-env GOLDSPRINTS_DEBUG=1 GOLDSPRINTS_OPEN_DEVTOOLS=1 NODE_OPTIONS=--import=tsx ELECTRON_RENDERER_URL=http://127.0.0.1:5173 electron --inspect=9229 --remote-debugging-port=9223 src/electron/main.ts\"",
-    "dev:debug:break": "concurrently -k \"vite --strictPort\" \"wait-on tcp:5173 && cross-env GOLDSPRINTS_DEBUG=1 GOLDSPRINTS_OPEN_DEVTOOLS=1 NODE_OPTIONS=--import=tsx ELECTRON_RENDERER_URL=http://127.0.0.1:5173 electron --inspect-brk=9229 --remote-debugging-port=9223 src/electron/main.ts\"",
+    "dev": "node scripts/run-dev.mjs",
+    "dev:debug": "node scripts/run-dev.mjs debug",
+    "dev:debug:break": "node scripts/run-dev.mjs debug:break",
     "build": "vite build && tsup --config tsup.electron.config.ts && node ../../scripts/copy-runtime-assets.mjs",
     "cloudflared:doctor": "tsx src/backend/services/cloudflared-cli.ts doctor",
     "cloudflared:install": "tsx src/backend/services/cloudflared-cli.ts install",
@@ -26,8 +26,8 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "build": {
-    "appId": "org.newyuinc.goldsprints",
-    "productName": "GoldSprints",
+    "appId": "org.newyuinc.roller-rumble",
+    "productName": "Roller Rumble",
     "files": [
       "dist/**/*",
       "package.json"
@@ -41,8 +41,8 @@
     }
   },
   "dependencies": {
-    "@goldsprints/shared": "workspace:*",
-    "@goldsprints/shared-ui": "workspace:*",
+    "@roller-rumble/shared": "workspace:*",
+    "@roller-rumble/shared-ui": "workspace:*",
     "@simplewebauthn/browser": "^13.3.0",
     "@simplewebauthn/server": "^13.3.1",
     "@tanstack/react-query": "^5.76.1",

@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { AppSnapshot, TournamentBundle } from "@goldsprints/shared/types";
+import type { AppSnapshot, TournamentBundle } from "@roller-rumble/shared/types";
 import {
   dismissRaceResultPresentation,
   finalizeCurrentRace,
@@ -13,7 +13,7 @@ import {
 } from "../../lib/api";
 import { describeQueueEntry, resolveRacerName } from "../../lib/snapshot-display";
 import { fireAndForget } from "../../lib/ui-actions";
-import { Button } from "@goldsprints/shared-ui";
+import { Button } from "@roller-rumble/shared-ui";
 import { CurrentRaceActionRows, CurrentRaceSummary } from "./current-race-controls";
 import type { AdminTabId } from "./types";
 

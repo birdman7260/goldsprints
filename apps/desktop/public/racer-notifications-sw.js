@@ -2,10 +2,10 @@
 
 self.addEventListener("push", (event) => {
   const fallback = {
-    title: "GoldSprints",
+    title: "Roller Rumble",
     body: "You have a race update.",
     url: "/racer",
-    notificationId: "goldsprints-update"
+    notificationId: "roller-rumble-update"
   };
   const payload = event.data ? event.data.json() : fallback;
   const notification = {
@@ -20,7 +20,7 @@ self.addEventListener("push", (event) => {
         notificationId: notification.notificationId,
         url: notification.url || "/racer"
       },
-      tag: notification.notificationId || "goldsprints-update",
+      tag: notification.notificationId || "roller-rumble-update",
       renotify: true
     })
   );

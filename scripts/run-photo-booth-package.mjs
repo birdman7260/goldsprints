@@ -11,13 +11,13 @@ const corepackCommand = process.platform === "win32" ? "corepack.cmd" : "corepac
 
 function createPhotoBoothEnv() {
   const env = { ...process.env };
-  const configuredDataDir = env.GOLDSPRINTS_BOOTH_DATA_DIR;
+  const configuredDataDir = env.ROLLER_RUMBLE_BOOTH_DATA_DIR;
   if (!configuredDataDir) {
-    env.GOLDSPRINTS_BOOTH_DATA_DIR = path.join(rootDir, ".goldsprints-booth");
+    env.ROLLER_RUMBLE_BOOTH_DATA_DIR = path.join(rootDir, ".roller-rumble-booth");
     return env;
   }
 
-  env.GOLDSPRINTS_BOOTH_DATA_DIR = path.isAbsolute(configuredDataDir)
+  env.ROLLER_RUMBLE_BOOTH_DATA_DIR = path.isAbsolute(configuredDataDir)
     ? configuredDataDir
     : path.resolve(rootDir, configuredDataDir);
   return env;

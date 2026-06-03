@@ -91,7 +91,7 @@ function readOptionalBoolean(name: string): boolean | null {
 }
 
 function readDataDir(): string {
-  const dataDir = process.env.GOLDSPRINTS_BOOTH_DATA_DIR ?? ".goldsprints-booth";
+  const dataDir = process.env.ROLLER_RUMBLE_BOOTH_DATA_DIR ?? ".roller-rumble-booth";
   return path.isAbsolute(dataDir) ? dataDir : path.resolve(process.cwd(), dataDir);
 }
 
@@ -117,87 +117,87 @@ function resolveBoothPath(configuredPath: string | undefined, fallbackPath: stri
 }
 
 function defaultLightSelection(): LightSelection {
-  return resolveDefaultLightSelection(process.env.GOLDSPRINTS_WLED_DEFAULT_LOOK);
+  return resolveDefaultLightSelection(process.env.ROLLER_RUMBLE_WLED_DEFAULT_LOOK);
 }
 
 function resolveScannerMode(): BoothAgentConfig["scanner"]["mode"] {
-  const requested = process.env.GOLDSPRINTS_BOOTH_SCANNER_MODE;
+  const requested = process.env.ROLLER_RUMBLE_BOOTH_SCANNER_MODE;
   if (requested === "serial" || requested === "manual" || requested === "simulator") {
     return requested;
   }
 
-  return process.env.GOLDSPRINTS_BOOTH_SCANNER_SERIAL_PORT ? "serial" : "simulator";
+  return process.env.ROLLER_RUMBLE_BOOTH_SCANNER_SERIAL_PORT ? "serial" : "simulator";
 }
 
 function resolveLightMode(): BoothAgentConfig["lights"]["mode"] {
-  return process.env.GOLDSPRINTS_WLED_SERIAL_PORT ? "wled-serial" : "simulator";
+  return process.env.ROLLER_RUMBLE_WLED_SERIAL_PORT ? "wled-serial" : "simulator";
 }
 
 function resolveUmbrellaMode(): BoothAgentConfig["umbrella"]["mode"] {
-  const requested = process.env.GOLDSPRINTS_UMBRELLA_MODE;
+  const requested = process.env.ROLLER_RUMBLE_UMBRELLA_MODE;
   if (requested === "process" || requested === "simulator") {
     return requested;
   }
 
-  return process.env.GOLDSPRINTS_UMBRELLA_STEP_PIN &&
-    process.env.GOLDSPRINTS_UMBRELLA_DIR_PIN &&
-    process.env.GOLDSPRINTS_UMBRELLA_HALL_PIN
+  return process.env.ROLLER_RUMBLE_UMBRELLA_STEP_PIN &&
+    process.env.ROLLER_RUMBLE_UMBRELLA_DIR_PIN &&
+    process.env.ROLLER_RUMBLE_UMBRELLA_HALL_PIN
     ? "process"
     : "simulator";
 }
 
 export function getConfig(): BoothAgentConfig {
-  const cameraMode = process.env.GOLDSPRINTS_BOOTH_CAMERA === "gphoto2" ? "gphoto2" : "simulator";
+  const cameraMode = process.env.ROLLER_RUMBLE_BOOTH_CAMERA === "gphoto2" ? "gphoto2" : "simulator";
   const scannerMode = resolveScannerMode();
-  const fakeQrOverride = readOptionalBoolean("GOLDSPRINTS_BOOTH_ALLOW_FAKE_QR");
+  const fakeQrOverride = readOptionalBoolean("ROLLER_RUMBLE_BOOTH_ALLOW_FAKE_QR");
   const allowFakeQr =
     fakeQrOverride ?? (cameraMode === "simulator" || ["manual", "simulator"].includes(scannerMode));
 
   return {
-    boothId: process.env.GOLDSPRINTS_BOOTH_ID ?? "booth-dev",
-    pairingSecret: process.env.GOLDSPRINTS_BOOTH_SECRET ?? "dev-secret",
-    mainServerUrl: process.env.GOLDSPRINTS_BOOTH_SERVER_URL ?? "http://127.0.0.1:3187",
+    boothId: process.env.ROLLER_RUMBLE_BOOTH_ID ?? "booth-dev",
+    pairingSecret: process.env.ROLLER_RUMBLE_BOOTH_SECRET ?? "dev-secret",
+    mainServerUrl: process.env.ROLLER_RUMBLE_BOOTH_SERVER_URL ?? "http://127.0.0.1:3187",
     dataDir: readDataDir(),
-    port: readNumber("GOLDSPRINTS_BOOTH_PORT", 3197),
+    port: readNumber("ROLLER_RUMBLE_BOOTH_PORT", 3197),
     kioskDistDir: path.join(packageDir, "dist", "kiosk"),
     camera: {
       mode: cameraMode,
-      gphotoPath: process.env.GOLDSPRINTS_GPHOTO_PATH ?? "gphoto2",
+      gphotoPath: process.env.ROLLER_RUMBLE_GPHOTO_PATH ?? "gphoto2",
       simulatorPhotoPath: resolveBoothPath(
-        process.env.GOLDSPRINTS_BOOTH_SIMULATOR_PHOTO_PATH,
+        process.env.ROLLER_RUMBLE_BOOTH_SIMULATOR_PHOTO_PATH,
         path.join(packageDir, "assets", "simulated-dslr-photo.jpg")
       )
     },
     scanner: {
       mode: scannerMode,
-      serialPort: process.env.GOLDSPRINTS_BOOTH_SCANNER_SERIAL_PORT,
-      baudRate: readNumber("GOLDSPRINTS_BOOTH_SCANNER_BAUD", 9_600)
+      serialPort: process.env.ROLLER_RUMBLE_BOOTH_SCANNER_SERIAL_PORT,
+      baudRate: readNumber("ROLLER_RUMBLE_BOOTH_SCANNER_BAUD", 9_600)
     },
     lights: {
       mode: resolveLightMode(),
-      serialPort: process.env.GOLDSPRINTS_WLED_SERIAL_PORT,
-      baudRate: readNumber("GOLDSPRINTS_WLED_BAUD", 115_200),
-      idlePreset: readOptionalNumber("GOLDSPRINTS_WLED_IDLE_PRESET") ?? null,
+      serialPort: process.env.ROLLER_RUMBLE_WLED_SERIAL_PORT,
+      baudRate: readNumber("ROLLER_RUMBLE_WLED_BAUD", 115_200),
+      idlePreset: readOptionalNumber("ROLLER_RUMBLE_WLED_IDLE_PRESET") ?? null,
       defaultSelection: defaultLightSelection()
     },
     umbrella: {
       mode: resolveUmbrellaMode(),
-      pythonCommand: process.env.GOLDSPRINTS_BOOTH_PYTHON ?? "python3",
+      pythonCommand: process.env.ROLLER_RUMBLE_BOOTH_PYTHON ?? "python3",
       helperPath: resolveBoothPath(
-        process.env.GOLDSPRINTS_UMBRELLA_HELPER_PATH,
+        process.env.ROLLER_RUMBLE_UMBRELLA_HELPER_PATH,
         path.join(packageDir, "hardware", "umbrella_helper.py")
       ),
-      stepPin: readOptionalNumber("GOLDSPRINTS_UMBRELLA_STEP_PIN"),
-      directionPin: readOptionalNumber("GOLDSPRINTS_UMBRELLA_DIR_PIN"),
-      enablePin: readOptionalNumber("GOLDSPRINTS_UMBRELLA_ENABLE_PIN"),
-      hallPin: readOptionalNumber("GOLDSPRINTS_UMBRELLA_HALL_PIN"),
-      panelCount: readNumber("GOLDSPRINTS_UMBRELLA_PANEL_COUNT", UMBRELLA_PANEL_COUNT),
-      stepsPerRevolution: readNumber("GOLDSPRINTS_UMBRELLA_STEPS_PER_REVOLUTION", 200),
-      microsteps: readNumber("GOLDSPRINTS_UMBRELLA_MICROSTEPS", 16),
-      homeDirection: readDirection("GOLDSPRINTS_UMBRELLA_HOME_DIRECTION", -1),
-      spinRpm: readNumber("GOLDSPRINTS_UMBRELLA_SPIN_RPM", 3),
-      moveRpm: readNumber("GOLDSPRINTS_UMBRELLA_MOVE_RPM", 8),
-      homingTimeoutMs: readNumber("GOLDSPRINTS_UMBRELLA_HOMING_TIMEOUT_MS", 15_000)
+      stepPin: readOptionalNumber("ROLLER_RUMBLE_UMBRELLA_STEP_PIN"),
+      directionPin: readOptionalNumber("ROLLER_RUMBLE_UMBRELLA_DIR_PIN"),
+      enablePin: readOptionalNumber("ROLLER_RUMBLE_UMBRELLA_ENABLE_PIN"),
+      hallPin: readOptionalNumber("ROLLER_RUMBLE_UMBRELLA_HALL_PIN"),
+      panelCount: readNumber("ROLLER_RUMBLE_UMBRELLA_PANEL_COUNT", UMBRELLA_PANEL_COUNT),
+      stepsPerRevolution: readNumber("ROLLER_RUMBLE_UMBRELLA_STEPS_PER_REVOLUTION", 200),
+      microsteps: readNumber("ROLLER_RUMBLE_UMBRELLA_MICROSTEPS", 16),
+      homeDirection: readDirection("ROLLER_RUMBLE_UMBRELLA_HOME_DIRECTION", -1),
+      spinRpm: readNumber("ROLLER_RUMBLE_UMBRELLA_SPIN_RPM", 3),
+      moveRpm: readNumber("ROLLER_RUMBLE_UMBRELLA_MOVE_RPM", 8),
+      homingTimeoutMs: readNumber("ROLLER_RUMBLE_UMBRELLA_HOMING_TIMEOUT_MS", 15_000)
     },
     testing: {
       allowFakeQr

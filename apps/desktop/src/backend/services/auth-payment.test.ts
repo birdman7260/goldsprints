@@ -5,8 +5,8 @@ import type {
   EventRecord,
   Racer,
   RacerQueueSignupResponse
-} from "@goldsprints/shared/types";
-import { AppHttpError, GoldsprintsApp } from "./app";
+} from "@roller-rumble/shared/types";
+import { AppHttpError, RollerRumbleApp } from "./app";
 
 vi.mock("@simplewebauthn/server", () => ({
   generateAuthenticationOptions: vi.fn(async () => ({
@@ -154,7 +154,7 @@ function makeRacer(id: string, displayName: string, email?: string): Racer {
 }
 
 function getPrototypeMethod(name: string): unknown {
-  const method: unknown = Reflect.get(GoldsprintsApp.prototype, name);
+  const method: unknown = Reflect.get(RollerRumbleApp.prototype, name);
   if (typeof method !== "function") {
     throw new Error(`Missing ${name} implementation`);
   }
@@ -201,7 +201,7 @@ function makeFakeTarget(): FakeTarget & {
       hasWebhookSecret: true,
       secretKey: "sk_test_fake",
       webhookSecret: "whsec_fake",
-      publicRacerUrl: "https://goldsprints.example",
+      publicRacerUrl: "https://roller-rumble.example",
       message: "Stripe Checkout is ready."
     })),
     getStripeClient: vi.fn(() => ({
@@ -332,7 +332,7 @@ function makeFakeTarget(): FakeTarget & {
     }
   };
 
-  Object.setPrototypeOf(target, GoldsprintsApp.prototype);
+  Object.setPrototypeOf(target, RollerRumbleApp.prototype);
   return target;
 }
 
