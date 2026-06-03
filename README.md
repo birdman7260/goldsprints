@@ -599,6 +599,29 @@ Current builds are unsigned. Windows may show a SmartScreen warning, and macOS m
 right-clicking the app and choosing `Open`. Removing those warnings requires paid code-signing and
 notarization setup.
 
+Release builds do not need event runtime secrets in GitHub Actions. Do not put Stripe keys, Web Push
+private keys, Cloudflare Tunnel tokens, passkey RP settings, or photo booth pairing secrets into the
+release workflow. The packaged app reads those `ROLLER_RUMBLE_*` values at runtime from the host
+machine's environment or local dotenv files.
+
+Build-time environment used by the release workflow:
+
+- `CSC_IDENTITY_AUTO_DISCOVERY=false`
+  - disables automatic macOS code-signing identity discovery so unsigned CI builds do not fail while
+    signing is not configured
+- `GITHUB_TOKEN`
+  - provided automatically by GitHub Actions and used only by the publish job to create the GitHub
+    Release and upload assets
+
+Optional build-time variables:
+
+- `ROLLER_RUMBLE_VITE_ALLOWED_HOSTS`
+  - only needed if CI should bake extra Vite dev-server allowed hosts into the renderer build; the
+    normal release build does not need this
+- `VITE_API_BASE`
+  - should normally be omitted for release builds; packaged Electron should use the current app
+    origin and embedded backend instead of a hard-coded development API URL
+
 ## VirtualDJ Cue Starts
 
 Roller Rumble can start a staged race from a VirtualDJ OS2L cue. Use this when a song has a specific
