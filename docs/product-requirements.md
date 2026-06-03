@@ -264,6 +264,9 @@ Requirements:
 - Auto-stage-next-race toggle for open time trial. `Implemented`
 - Event-only vs all-time race-data toggle. `Implemented`
 - Allow-accountless-racer-signup toggle, disabled by default. `Implemented`
+- Show-public-racer-info-before-sign-in toggle, disabled by default. When enabled, unauthenticated
+  QR visitors may browse read-only race, queue, tournament, and racer information before signing in.
+  `Implemented`
 - Tunnel start/stop controls. `Implemented`
 - Web Push setup health must show whether public notification configuration is present without
   exposing private VAPID keys. `Implemented`
@@ -317,6 +320,9 @@ Requirements:
   and sign up, even if there are already upcoming queue entries. This prompt should be centered in
   a wide full-stage layout even when the selected theme normally uses a vertical race
   visualization. `Implemented`
+- Projector/admin racer QR codes must include non-secret event context as
+  `/racer?eventId=<activeEventId>&source=projector`, while authoritative state still comes from the
+  snapshot API. `Implemented`
 - The race visualizer components must animate live racer progress with Framer Motion rather than
   only snapping through layout/CSS updates. `Implemented`
 - The display must show:
@@ -445,6 +451,14 @@ Requirements:
 - Accountless identity must be stored locally for reuse. `Implemented`
 - Accountless racers must be able to attach email plus a passkey later and keep the same racer
   profile. `Implemented`
+- The racer page must use mobile-first bottom tabs for `Race`, `Queue`, `Tournament`, `Racers`, and
+  `Me`, with `Race` as the default flow and an optional `tab` query param for direct focus.
+  `Implemented`
+- Racer bottom-tab switches must reset the tab content to the top without visible slide-up motion,
+  and the currently active tab button must be inert. `Implemented`
+- When public racer info is disabled, signed-out racers should only see event context plus the
+  sign-in/register flow. When enabled, signed-out racers may browse read-only race state, queue,
+  tournament, and racer stats. Racer-owned actions must always require sign-in. `Implemented`
 - Racers must be able to upload an avatar. `Implemented`
 - Uploaded avatar images must resolve through the backend asset origin so they display correctly
   from local Vite dev, packaged desktop, local-network racer pages, and Cloudflare tunnel URLs.
@@ -461,11 +475,41 @@ Requirements:
   `Implemented`
 - If a racer challenges an unpaid opponent, checkout must not start and the racer should see that
   the opponent needs to pay first. `Implemented`
+- If a racer attempts to queue after already reaching the configured maximum active queue entries,
+  the racer page must show a modal prompt from whichever tab triggered the action instead of
+  failing silently or moving the racer to a different tab. `Implemented`
 - Admin queue actions must be allowed to add racers even when they are unpaid. `Implemented`
 - Racer-facing opponent selection must support typing to filter the available racer list.
   `Implemented`
+- The racer-facing Racers tab must allow signed-in racers to challenge another racer directly from
+  each racer row when open queueing is available. `Implemented`
+- Tapping a racer name area in the racer-facing Racers tab must expand that row inline with event
+  record, career record, best finish, speed, power, queue status, tournament status, and available
+  actions, while collapsing any other expanded racer row. Expanded stats must not show payment
+  status. `Implemented`
 - The racer page queue and challenge controls must reflow cleanly on narrow mobile screens so
   buttons stay legible and the opponent picker remains usable at phone widths. `Implemented`
+- The Queue tab must show the queue list first, then signed-in queue controls below it for
+  convenience. `Implemented`
+- While tournament mode is active, the Queue tab must show a tournament-mode notice above the queue
+  and grey out the open queue list to make clear that open queueing is paused. `Implemented`
+- In open queue mode, the Race tab must preview the next three queued matches and link to the Queue
+  tab when more matches exist, with that preview shown as its own card. `Implemented`
+- In tournament mode, the Race tab must hide open queue controls and open queue previews, show
+  current-stage tournament match cards styled like bracket nodes, including completed matches and
+  BYEs from the currently actionable round, and link to the Tournament tab. Tournament opt-out
+  controls for seeded racers should appear near the top of the Race tab. `Implemented`
+- The Me tab must hide the race-notification setup card once notifications are enabled on the
+  current device. `Implemented`
+- The Me tab must show the racer's full stats in a dedicated card, keep the identity card free of
+  duplicate race/win summary text, and present the racer's avatar at a larger profile size.
+  `Implemented`
+- When a racer already has an avatar, replacement upload must be available from a small pencil icon
+  control on the avatar image. The standalone `Upload avatar` control should only appear for racers
+  who do not yet have an avatar. `Implemented`
+- The racer photo booth QR must live in its own `Me` tab card. Racers without an avatar should see
+  that card directly below `Your Race Card`; racers who already have an avatar should see it at the
+  bottom of the tab. `Implemented`
 - Racers must be able to view:
   - upcoming races
   - registered racers
@@ -474,6 +518,9 @@ Requirements:
     `Implemented`
 - Racer-facing tournament viewing should happen in-place on the racer page rather than depending on
   a separate `Open` button flow. `Implemented`
+- Mobile racer-facing elimination brackets must hide embedded fit, expand, and React Flow zoom
+  controls, with `Focus Current` exposed above the bracket next to the tournament title instead.
+  `Implemented`
 - The racer page should show only the active tournament for the current event, or the most recent
   completed tournament when no tournament is currently active. `Implemented`
 - Racers must be prompted to enable notifications the first time they try to queue or challenge,

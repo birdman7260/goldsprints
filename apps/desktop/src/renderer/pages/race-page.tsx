@@ -606,8 +606,7 @@ export function RacePage() {
   // projector layout instead of inheriting the current theme's horizontal/vertical race-track
   // geometry. The bottom ticker still communicates any queued upcoming races.
   const showSignupPrompt = !bracketBundle && displayRace == null;
-  const racerPageUrl =
-    snapshot.tunnel.publicUrl ?? (meta ? `${meta.localBaseUrl}/racer` : "/racer");
+  const racerPageUrl = meta?.racerPageUrl ?? snapshot.tunnel.publicUrl ?? "/racer";
 
   return (
     <div

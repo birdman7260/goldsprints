@@ -281,7 +281,10 @@ export function findBracketNodeByParticipantIds(
   );
 }
 
-function getCurrentMatchNodeId(snapshot: AppSnapshot, bundle: TournamentBundle): string | null {
+export function getCurrentMatchNodeId(
+  snapshot: AppSnapshot,
+  bundle: TournamentBundle
+): string | null {
   const currentRace = snapshot.raceProjection.race;
   if (currentRace?.tournamentId !== bundle.tournament.id) {
     return null;

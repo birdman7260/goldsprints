@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { accountlessRacerSessionSchema, adminNotificationSchema } from "./validation";
+import {
+  accountlessRacerSessionSchema,
+  adminNotificationSchema,
+  settingUpdateSchema
+} from "./validation";
 
 describe("accountless racer session validation", () => {
   it("requires a display name", () => {
@@ -42,5 +46,15 @@ describe("admin notification validation", () => {
         type: "mystery_message"
       }).success
     ).toBe(false);
+  });
+});
+
+describe("admin settings validation", () => {
+  it("accepts the public racer info setting", () => {
+    expect(
+      settingUpdateSchema.safeParse({
+        showPublicRacerInfoWithoutLogin: true
+      }).success
+    ).toBe(true);
   });
 });

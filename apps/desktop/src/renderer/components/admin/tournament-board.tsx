@@ -15,7 +15,10 @@ import {
   removeRacerFromTournament
 } from "../../lib/api";
 import { fireAndForget } from "../../lib/ui-actions";
-import { EliminationBracketView } from "../elimination-bracket-view";
+import {
+  EliminationBracketView,
+  type BracketPresentationRequest
+} from "../elimination-bracket-view";
 import {
   canFillByeNode,
   canRemoveRacerFromBracketNode,
@@ -43,7 +46,9 @@ export function TournamentBracketBoard({
   expanded,
   onExpandedChange,
   onStageMatch,
-  onUndoMatch
+  onUndoMatch,
+  presentationRequest,
+  showViewportControls = true
 }: {
   snapshot: AppSnapshot;
   bundle: TournamentBundle;
@@ -53,6 +58,8 @@ export function TournamentBracketBoard({
   onExpandedChange: (expanded: boolean) => void;
   onStageMatch?: (nodeId: string) => void;
   onUndoMatch?: (nodeId: string) => void;
+  presentationRequest?: BracketPresentationRequest | null;
+  showViewportControls?: boolean;
 }) {
   const [menuNodeId, setMenuNodeId] = useState<string | null>(null);
   const [removeDialog, setRemoveDialog] = useState<{
@@ -226,6 +233,8 @@ export function TournamentBracketBoard({
         expandMode="container"
         expanded={expanded}
         onExpandedChange={onExpandedChange}
+        presentationRequest={presentationRequest}
+        showViewportControls={showViewportControls}
         onMatchSelect={(nodeId) => {
           setBoardMessage(null);
           setMenuNodeId(nodeId);

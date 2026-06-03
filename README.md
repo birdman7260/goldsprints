@@ -193,6 +193,7 @@ the racer page with that notification selected so the matching in-app modal appe
     draws after the source matchup is marked advanced and before the bracket commits the winner
     into the next slot
 - `/racer`
+  - mobile-first bottom tabs for `Race`, `Queue`, `Tournament`, `Racers`, and `Me`
   - email/passkey sign-in and registration
   - optional admin-enabled accountless registration with a required display name
   - accountless-to-passkey account upgrade
@@ -200,11 +201,21 @@ the racer page with that notification selected so the matching in-app modal appe
   - short-lived photo booth QR for DSLR avatar capture after registration
   - payment-aware queue signup
   - Web Push opt-in plus full-screen in-page notification modals
-  - challenge signup
-  - upcoming races
-  - racer list and stats
-  - the active tournament, or the most recent completed tournament when none is active
-  - in-place live tournament brackets and standings
+  - challenge signup from Race controls or the Racers tab
+  - upcoming races, with the Race tab previewing the next three open queue matches and linking to
+    the full Queue tab when more are waiting
+  - racer list with inline expanded stats for each event racer
+  - full personal stats in the `Me` tab alongside account, avatar, and notification tools, with
+    existing-avatar replacement available from a small image edit control and the photo booth QR in
+    its own card
+  - the active tournament, or the most recent completed tournament when none is active; while a
+    tournament is active, the Race tab previews current-stage tournament matches instead of open
+    queue controls
+  - in-place live tournament brackets and standings, with racer-facing mobile bracket controls kept
+    outside the canvas
+  - optional admin-enabled read-only public browsing before sign-in; queueing, challenges,
+    notifications, avatars, photo booth QR, account upgrades, sign-out, and tournament opt-out still
+    require a signed-in racer
 - `/bracket-lab`
   - developer test page for replaying tournament bracket camera and connector handoff animations
     against mocked bracket data
@@ -313,11 +324,16 @@ Development mode starts:
 - an Electron race display window
 - dev runtime data inside `.roller-rumble-dev/runtime`
 
-The racer page is available through the backend route at `/racer`. Admin QR codes and photo booth
-pairing use the machine's LAN address when one can be detected, for example
-`http://192.168.1.42:3187/racer`, so phones and the Raspberry Pi can reach the host app over the
-event network. If the laptop has multiple adapters and the auto-detected address is wrong, set
-`ROLLER_RUMBLE_LOCAL_SERVER_HOST=<laptop LAN IP>` in `.env.local`.
+The racer page is available through the backend route at `/racer`. Projector/admin racer QR codes
+point to `/racer?eventId=<activeEventId>&source=projector` so phones can carry non-secret event
+context from the scan. The live event state still comes from `/api/snapshot`; the query params are
+advisory context, not authorization.
+
+Admin QR codes and photo booth pairing use the machine's LAN address when one can be detected, for
+example `http://192.168.1.42:3187/racer?eventId=event_123&source=projector`, so phones and the
+Raspberry Pi can reach the host app over the event network. If the laptop has multiple adapters and
+the auto-detected address is wrong, set `ROLLER_RUMBLE_LOCAL_SERVER_HOST=<laptop LAN IP>` in
+`.env.local`.
 
 ## Environment Configuration
 

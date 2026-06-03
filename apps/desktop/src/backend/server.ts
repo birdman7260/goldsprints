@@ -298,6 +298,7 @@ export function createBackendServer(options: BackendServerOptions): BackendServe
   app.get(`${API_PREFIX}/meta`, async (_req, res) => {
     res.json({
       localBaseUrl: service.getLocalBaseUrl(),
+      racerPageUrl: service.getRacerPageUrl(),
       qrCodeDataUrl: await service.getQrCodeDataUrl()
     });
   });

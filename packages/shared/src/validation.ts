@@ -132,6 +132,7 @@ export const settingUpdateSchema = z.object({
   autoStageNextRace: z.boolean().optional(),
   includeAllRaceData: z.boolean().optional(),
   allowAccountlessRacerSignup: z.boolean().optional(),
+  showPublicRacerInfoWithoutLogin: z.boolean().optional(),
   showRacerNotificationDebugList: z.boolean().optional(),
   raceDisplayLaneColorsFlipped: z.boolean().optional(),
   raceDisplayShowEventName: z.boolean().optional(),

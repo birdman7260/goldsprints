@@ -1227,12 +1227,28 @@ export class RollerRumbleApp extends EventEmitter {
   }
 
   async getQrCodeDataUrl(): Promise<string> {
-    const tunnel = this.tunnelManager.getState();
-    const url = tunnel.publicUrl ?? `${this.getLocalBaseUrl()}/racer`;
-    return QRCode.toDataURL(url, {
+    return QRCode.toDataURL(this.getRacerPageUrl(), {
       margin: 1,
       width: 220
     });
+  }
+
+  getRacerPageUrl(): string {
+    const tunnel = this.tunnelManager.getState();
+    const activeEvent = this.db.getActiveEvent();
+    const baseUrl = tunnel.publicUrl ?? `${this.getLocalBaseUrl()}/racer`;
+    const url = new URL(baseUrl);
+
+    if (!url.pathname.endsWith("/racer")) {
+      url.pathname = "/racer";
+    }
+
+    if (activeEvent) {
+      url.searchParams.set("eventId", activeEvent.id);
+    }
+    url.searchParams.set("source", "projector");
+
+    return url.toString();
   }
 
   private getPhotoBoothPairing(): PhotoBoothPairing {
@@ -2297,23 +2313,31 @@ export class RollerRumbleApp extends EventEmitter {
     if (input.opponentRacerId) {
       this.db.ensureEventRegistration(activeEvent.id, input.opponentRacerId);
     }
-    const updated = addQueueSignup(this.db.listQueueOccurrences(activeEvent.id), {
-      eventId: activeEvent.id,
-      racerId: input.racerId,
-      opponentRacerId: input.opponentRacerId,
-      requestedType: input.requestedType,
-      occurrenceId: nanoid(),
-      opponentOccurrenceId: input.opponentRacerId ? nanoid() : undefined,
-      lockGroupId: input.opponentRacerId ? nanoid() : undefined,
-      timestamp,
-      signupSequence: this.db.getNextQueueSignupSequence(activeEvent.id),
-      raceCountAtJoin: racerStatsById.get(input.racerId)?.raceCount ?? 0,
-      opponentRaceCountAtJoin: input.opponentRacerId
-        ? (racerStatsById.get(input.opponentRacerId)?.raceCount ?? 0)
-        : undefined,
-      maxActiveOccurrencesPerRacer: settings.maxActiveQueueEntriesPerRacer,
-      racerStatsById
-    });
+    let updated: ReturnType<typeof addQueueSignup>;
+    try {
+      updated = addQueueSignup(this.db.listQueueOccurrences(activeEvent.id), {
+        eventId: activeEvent.id,
+        racerId: input.racerId,
+        opponentRacerId: input.opponentRacerId,
+        requestedType: input.requestedType,
+        occurrenceId: nanoid(),
+        opponentOccurrenceId: input.opponentRacerId ? nanoid() : undefined,
+        lockGroupId: input.opponentRacerId ? nanoid() : undefined,
+        timestamp,
+        signupSequence: this.db.getNextQueueSignupSequence(activeEvent.id),
+        raceCountAtJoin: racerStatsById.get(input.racerId)?.raceCount ?? 0,
+        opponentRaceCountAtJoin: input.opponentRacerId
+          ? (racerStatsById.get(input.opponentRacerId)?.raceCount ?? 0)
+          : undefined,
+        maxActiveOccurrencesPerRacer: settings.maxActiveQueueEntriesPerRacer,
+        racerStatsById
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("maximum of")) {
+        throw new AppHttpError(error.message, 409, "max_active_queue_entries");
+      }
+      throw error;
+    }
     this.saveProjectedQueue(activeEvent.id, updated, timestamp);
     if (!this.maybeAutoStageNextRace()) {
       this.runQueueNotificationTriggers(activeEvent.id);

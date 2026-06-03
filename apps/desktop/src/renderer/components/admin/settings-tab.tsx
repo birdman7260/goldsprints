@@ -58,7 +58,7 @@ export function SettingsTab({
   meta
 }: {
   snapshot: AppSnapshot;
-  meta?: { localBaseUrl: string; qrCodeDataUrl: string };
+  meta?: { localBaseUrl: string; racerPageUrl: string; qrCodeDataUrl: string };
 }) {
   const photoBoothStatusQuery = usePhotoBoothStatusQuery();
   const notificationConfigQuery = useNotificationConfigQuery();
@@ -73,8 +73,7 @@ export function SettingsTab({
   const [notificationTitle, setNotificationTitle] = useState("");
   const [notificationBody, setNotificationBody] = useState("");
   const [notificationSendStatus, setNotificationSendStatus] = useState<string | null>(null);
-  const tunnelUrl =
-    snapshot.tunnel.publicUrl ?? (meta ? `${meta.localBaseUrl}/racer` : "Tunnel inactive");
+  const tunnelUrl = meta?.racerPageUrl ?? snapshot.tunnel.publicUrl ?? "Tunnel inactive";
   const canInstallCloudflared =
     snapshot.tunnel.binarySource === "missing" && snapshot.tunnel.status !== "active";
 
@@ -163,6 +162,18 @@ export function SettingsTab({
               }}
             />
             Allow accountless racer signup
+          </label>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={snapshot.settings.showPublicRacerInfoWithoutLogin}
+              onChange={(event) => {
+                fireAndForget(
+                  updateSettings({ showPublicRacerInfoWithoutLogin: event.target.checked })
+                );
+              }}
+            />
+            Show race info before racer sign-in
           </label>
           <label>
             Max active queue entries per racer

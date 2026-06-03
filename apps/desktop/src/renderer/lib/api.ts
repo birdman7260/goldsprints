@@ -122,7 +122,11 @@ export async function fetchSnapshot(): Promise<AppSnapshot> {
   return parseJson(await fetch(buildUrl("/api/snapshot")));
 }
 
-export async function fetchMeta(): Promise<{ localBaseUrl: string; qrCodeDataUrl: string }> {
+export async function fetchMeta(): Promise<{
+  localBaseUrl: string;
+  racerPageUrl: string;
+  qrCodeDataUrl: string;
+}> {
   return parseJson(await fetch(buildUrl("/api/meta")));
 }
 

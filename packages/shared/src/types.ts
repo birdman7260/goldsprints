@@ -556,6 +556,7 @@ export interface AdminSettings {
   autoStageNextRace: boolean;
   includeAllRaceData: boolean;
   allowAccountlessRacerSignup: boolean;
+  showPublicRacerInfoWithoutLogin: boolean;
   showRacerNotificationDebugList: boolean;
   raceDisplayLaneColorsFlipped: boolean;
   raceDisplayShowEventName: boolean;

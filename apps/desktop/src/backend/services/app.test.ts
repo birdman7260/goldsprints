@@ -180,6 +180,25 @@ describe("app service countdown flow", () => {
     expect(result).toBe(snapshot);
   });
 
+  it("builds the projector racer URL with active event context", () => {
+    const target = withAppPrototype({
+      db: {
+        getActiveEvent: () => ({ id: "event-123" })
+      },
+      getLocalBaseUrl: () => "http://192.168.1.50:3187",
+      tunnelManager: {
+        getState: () => ({ publicUrl: null })
+      }
+    });
+
+    const url = new URL((target as unknown as RollerRumbleApp).getRacerPageUrl());
+
+    expect(url.origin).toBe("http://192.168.1.50:3187");
+    expect(url.pathname).toBe("/racer");
+    expect(url.searchParams.get("eventId")).toBe("event-123");
+    expect(url.searchParams.get("source")).toBe("projector");
+  });
+
   it("auto-stages the next queued race only in open time trial when the setting is enabled", () => {
     const stageNextRace = vi.fn();
     const autoStageInvoker = getAutoStageInvoker();

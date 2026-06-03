@@ -180,6 +180,7 @@ function getDefaultAdminSettings(): AdminSettings {
     autoStageNextRace: false,
     includeAllRaceData: false,
     allowAccountlessRacerSignup: false,
+    showPublicRacerInfoWithoutLogin: false,
     showRacerNotificationDebugList: false,
     raceDisplayLaneColorsFlipped: false,
     raceDisplayShowEventName: true,

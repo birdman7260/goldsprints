@@ -174,6 +174,8 @@ a {
 .racer-page-grid {
   min-height: 100%;
   align-content: start;
+  overflow-y: auto;
+  padding-right: 0.2rem;
 }
 
 .racer-page-grid--bracket-expanded {
@@ -187,6 +189,12 @@ a {
 
 .racer-page-grid__card {
   min-width: 0;
+}
+
+.racer-card-stack {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
 }
 
 .racer-page-grid__card--supporting {
@@ -218,6 +226,278 @@ a {
   grid-template-rows: auto minmax(0, 1fr);
   min-height: 100%;
   overflow: hidden;
+}
+
+.racer-page-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 1rem;
+  width: min(100%, 1120px);
+  height: 100dvh;
+  max-height: 100dvh;
+  margin-inline: auto;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.racer-page-shell--expanded {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  padding: 0;
+}
+
+.racer-page-shell--auth-only {
+  width: min(100%, 480px);
+  gap: 0.6rem;
+}
+
+.racer-page-shell--auth-only .racer-event-bar {
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.65rem;
+  box-shadow: none;
+}
+
+.racer-page-shell--auth-only .racer-event-bar strong {
+  font-size: 1rem;
+}
+
+.racer-page-shell--auth-only .racer-event-bar__meta {
+  display: none;
+}
+
+.racer-page-shell--auth-only .panel {
+  --ui-panel-gap: 0.55rem;
+  --ui-panel-padding: 0.75rem;
+  --ui-radius-panel: 0.8rem;
+}
+
+.racer-event-bar {
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--theme-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--theme-surface) 94%, transparent);
+  box-shadow: 0 0.7rem 1.4rem rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(14px);
+}
+
+.racer-event-bar span,
+.racer-public-summary span,
+.racer-state-card span,
+.racer-payment-summary span {
+  color: var(--theme-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.racer-event-bar strong {
+  display: block;
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+}
+
+.racer-event-bar__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: 0.45rem;
+}
+
+.racer-event-bar__meta span {
+  padding: 0.32rem 0.55rem;
+  border-radius: 999px;
+  background: var(--theme-surface-raised);
+  color: var(--theme-text);
+}
+
+.racer-bottom-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border: 1px solid var(--theme-border);
+  border-radius: 0.75rem;
+  background: var(--theme-surface);
+}
+
+.racer-bottom-tab {
+  min-height: 3.15rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--theme-text-muted);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.racer-bottom-tab.is-active {
+  background: var(--theme-accent);
+  color: var(--theme-surface);
+}
+
+.racer-bottom-tab:disabled {
+  cursor: default;
+}
+
+.racer-bottom-tab:hover:not(:disabled) {
+  color: var(--theme-text);
+}
+
+.racer-public-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.racer-public-summary div,
+.racer-state-card,
+.racer-payment-summary,
+.racer-signin-cta {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid var(--theme-border);
+  border-radius: 0.7rem;
+  background: var(--theme-surface-raised);
+}
+
+.racer-public-summary strong,
+.racer-state-card strong,
+.racer-payment-summary strong {
+  font-size: 1.2rem;
+}
+
+.racer-state-card--urgent {
+  border-color: var(--theme-warning);
+  background: color-mix(in srgb, var(--theme-warning) 15%, var(--theme-surface-raised));
+}
+
+.racer-signin-cta {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.racer-inline-link {
+  width: fit-content;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--theme-accent);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 0.18rem;
+}
+
+.racer-race-preview,
+.racer-tournament-preview {
+  min-width: 0;
+}
+
+.racer-queue-list--paused {
+  opacity: 0.46;
+  filter: grayscale(1);
+}
+
+.racer-tournament-match-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 0.75rem;
+}
+
+.racer-tournament-match-grid .tournament-match-node {
+  width: 100%;
+  min-height: 10rem;
+}
+
+.list-row.racer-list-row {
+  display: grid;
+  gap: 1rem;
+}
+
+.racer-list-row__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.racer-list-row__main {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.racer-list-row__identity {
+  min-width: 0;
+}
+
+.racer-list-row__avatar {
+  flex: 0 0 auto;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  object-fit: cover;
+  box-shadow: 0 0.35rem 0.9rem rgba(0, 0, 0, 0.18);
+}
+
+.racer-list-row__avatar--expanded {
+  width: 9.4rem;
+  height: 9.4rem;
+  border-radius: 1rem;
+}
+
+.racer-list-row__expanded {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.racer-detail-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.racer-detail-stat,
+.racer-detail-section {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.85rem;
+  border: 1px solid var(--theme-border);
+  border-radius: 0.7rem;
+  background: var(--theme-surface-raised);
+}
+
+.racer-detail-stat span {
+  color: var(--theme-text-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.racer-detail-stat strong {
+  font-size: 1.25rem;
+}
+
+.racer-detail-section h3 {
+  font-size: 1rem;
 }
 
 .admin-layout {
@@ -2219,6 +2499,73 @@ p {
   font-weight: 800;
 }
 
+.racer-avatar-frame {
+  position: relative;
+  flex: 0 0 auto;
+  width: fit-content;
+}
+
+.racer-avatar--large {
+  width: 12rem;
+  height: 12rem;
+  max-width: 42vw;
+  max-height: 42vw;
+}
+
+.racer-avatar-edit-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 64%, transparent);
+  border-radius: 999px;
+  color: var(--theme-text);
+  background: color-mix(in srgb, var(--theme-surface) 86%, transparent);
+  box-shadow: 0 0.55rem 1.1rem rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+}
+
+.racer-avatar-edit-button:hover {
+  background: color-mix(in srgb, var(--theme-accent-soft) 72%, var(--theme-surface));
+  transform: translateY(-1px);
+}
+
+.racer-avatar-edit-button:has(input:focus-visible) {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
+
+.racer-avatar-edit-button:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+.racer-avatar-edit-button.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.racer-avatar-edit-button svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.racer-avatar-edit-button__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .racer-avatar--small {
   width: 2.5rem;
   height: 2.5rem;
@@ -3148,6 +3495,43 @@ button.tournament-match-node:active {
   .app-shell__content,
   .race-page {
     padding: 1rem;
+  }
+
+  .racer-page-shell {
+    gap: 0.75rem;
+    padding: 0.75rem 0.75rem max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .racer-event-bar {
+    align-items: start;
+    border-radius: 0.6rem;
+  }
+
+  .racer-event-bar,
+  .racer-signin-cta {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .racer-event-bar__meta {
+    justify-content: start;
+  }
+
+  .racer-bottom-tabs {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-radius: 0.8rem;
+    box-shadow: 0 0.7rem 1.4rem rgba(0, 0, 0, 0.18);
+  }
+
+  .racer-bottom-tab {
+    min-width: 0;
+    min-height: 3rem;
+    padding-inline: 0.2rem;
+    font-size: 0.78rem;
+  }
+
+  .racer-public-summary {
+    grid-template-columns: 1fr;
   }
 
   .race-page__stage {
