@@ -12,6 +12,14 @@ All notable Roller Rumble changes should be recorded here before a release.
 
 ### Fixed
 
+## 0.1.3 - 2026-06-03
+
+### Added
+
+### Changed
+
+### Fixed
+
 - The publish script was not aware of the GitHub repo
 
 ## 0.1.2 - 2026-06-03
