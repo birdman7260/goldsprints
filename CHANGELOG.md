@@ -8,6 +8,14 @@ All notable Roller Rumble changes should be recorded here before a release.
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## 0.1.5 - 2026-06-09
+
+### Added
+
 - Admin settings to make it easier to manage the ENV file
 - The app now looks for .env.local both in the installed location as well as:
   - Windows: %APPDATA%\Roller Rumble\.env.local
