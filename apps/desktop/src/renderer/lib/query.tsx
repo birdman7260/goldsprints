@@ -3,6 +3,7 @@ import { queryOptions, QueryClient, useQuery, useQueryClient } from "@tanstack/r
 import type { AppSnapshot } from "@roller-rumble/shared/types";
 import {
   createWebSocketUrl,
+  fetchRuntimeEnvInfo,
   fetchMeta,
   fetchNotificationConfig,
   fetchPhotoBoothStatus,
@@ -12,6 +13,7 @@ import {
 
 export const snapshotQueryKey = ["snapshot"];
 export const metaQueryKey = ["meta"];
+export const runtimeEnvQueryKey = ["runtime-env"];
 export const photoBoothStatusQueryKey = ["photo-booth-status"];
 export const notificationConfigQueryKey = ["notification-config"];
 export const racerNotificationsQueryKey = ["racer-notifications"];
@@ -22,6 +24,10 @@ const snapshotQueryOptions = queryOptions({
 const metaQueryOptions = queryOptions({
   queryKey: metaQueryKey,
   queryFn: fetchMeta
+});
+const runtimeEnvQueryOptions = queryOptions({
+  queryKey: runtimeEnvQueryKey,
+  queryFn: fetchRuntimeEnvInfo
 });
 const photoBoothStatusQueryOptions = queryOptions({
   queryKey: photoBoothStatusQueryKey,
@@ -53,6 +59,10 @@ export function useSnapshotQuery() {
 
 export function useMetaQuery() {
   return useQuery(metaQueryOptions);
+}
+
+export function useRuntimeEnvQuery() {
+  return useQuery(runtimeEnvQueryOptions);
 }
 
 export function usePhotoBoothStatusQuery() {

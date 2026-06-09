@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { AppSnapshot, RaceRecord } from "@roller-rumble/shared/types";
+import type { AdminSettings, AppSnapshot, RaceRecord } from "@roller-rumble/shared/types";
 import { RollerRumbleApp } from "./app";
 
 type CountdownInvoker = (
@@ -14,6 +14,7 @@ type UnstageOpenRaceInvoker = (this: unknown, eventId: string) => void;
 type UnstageCurrentRaceInvoker = (this: unknown) => AppSnapshot;
 type ResetRaceToStagedInvoker = (this: unknown) => AppSnapshot;
 type UnstageTournamentRaceInvoker = (this: unknown) => AppSnapshot;
+type UpdateSettingsInvoker = (this: unknown, patch: Partial<AdminSettings>) => AppSnapshot;
 
 function getCountdownInvoker(): CountdownInvoker {
   const candidate: unknown = Reflect.get(RollerRumbleApp.prototype, "startCountdown");
@@ -88,6 +89,15 @@ function getUnstageTournamentRaceInvoker(): UnstageTournamentRaceInvoker {
   }
 
   return candidate as UnstageTournamentRaceInvoker;
+}
+
+function getUpdateSettingsInvoker(): UpdateSettingsInvoker {
+  const candidate: unknown = Reflect.get(RollerRumbleApp.prototype, "updateSettings");
+  if (typeof candidate !== "function") {
+    throw new Error("Missing settings update implementation");
+  }
+
+  return candidate as UpdateSettingsInvoker;
 }
 
 const invokeStartCountdown = (
@@ -260,6 +270,45 @@ describe("app service countdown flow", () => {
     vi.advanceTimersByTime(1);
     expect(activateRace).toHaveBeenCalledWith("race-1");
     expect(clearIntervalSpy).toHaveBeenCalled();
+  });
+
+  it("arms an already staged race when OS2L is enabled after staging", () => {
+    const snapshot = { generatedAt: "now" } as AppSnapshot;
+    const settings = {
+      os2lEnabled: true,
+      targetDistanceMeters: 250
+    } as AdminSettings;
+    const armRace = vi.fn();
+    const disarmRace = vi.fn();
+    const emitSnapshot = vi.fn();
+    const getSnapshot = vi.fn(() => snapshot);
+    const setEnabled = vi.fn();
+    const updateSettingsInvoker = getUpdateSettingsInvoker();
+    const target = withAppPrototype({
+      db: {
+        getActiveEvent: () => ({ id: "event-1" }),
+        getCurrentRace: () => buildRaceRecord({ state: "staging" }),
+        updateAdminSettings: vi.fn(() => settings)
+      },
+      emitSnapshot,
+      getSnapshot,
+      maybeAutoStageNextRace: () => false,
+      os2lTrigger: {
+        armRace,
+        disarmRace,
+        setEnabled
+      },
+      serverPort: 3187
+    });
+
+    const result = updateSettingsInvoker.call(target, { os2lEnabled: true });
+
+    expect(setEnabled).toHaveBeenCalledWith(true);
+    expect(armRace).toHaveBeenCalledWith("race-1");
+    expect(disarmRace).not.toHaveBeenCalled();
+    expect(emitSnapshot).toHaveBeenCalledTimes(1);
+    expect(getSnapshot).toHaveBeenCalledTimes(1);
+    expect(result).toBe(snapshot);
   });
 
   it("auto-stages the next race when the winner modal clears", () => {

@@ -1,9 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AdminNotificationTargetType, AppSnapshot } from "@roller-rumble/shared/types";
 import { Button, Panel, StatPill } from "@roller-rumble/shared-ui";
 import {
+  ensureRuntimeEnvFile,
+  generateRuntimeEnvPushKeys,
   installCloudflared,
+  openRuntimeEnvFile,
   rotatePhotoBoothPairing,
   sendAdminNotification,
   startTunnel,
@@ -12,8 +15,10 @@ import {
 } from "../../lib/api";
 import {
   photoBoothStatusQueryKey,
+  runtimeEnvQueryKey,
   useNotificationConfigQuery,
-  usePhotoBoothStatusQuery
+  usePhotoBoothStatusQuery,
+  useRuntimeEnvQuery
 } from "../../lib/query";
 import { fireAndForget } from "../../lib/ui-actions";
 
@@ -53,6 +58,56 @@ function cloudflaredSourceLabel(source: AppSnapshot["tunnel"]["binarySource"]): 
   }
 }
 
+function useMasonryGrid() {
+  const gridRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid || typeof ResizeObserver === "undefined") {
+      return undefined;
+    }
+
+    let animationFrame = 0;
+    const updateLayout = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        const styles = getComputedStyle(grid);
+        const rowHeight = Number.parseFloat(styles.gridAutoRows) || 8;
+        const rowGap = Number.parseFloat(styles.rowGap) || 0;
+        const rowUnit = rowHeight + rowGap;
+
+        for (const child of Array.from(grid.children)) {
+          if (!(child instanceof HTMLElement)) {
+            continue;
+          }
+
+          child.style.gridRowEnd = "";
+          const height = child.getBoundingClientRect().height;
+          const span = Math.max(1, Math.ceil((height + rowGap) / rowUnit));
+          child.style.gridRowEnd = `span ${span}`;
+        }
+      });
+    };
+
+    const observer = new ResizeObserver(updateLayout);
+    observer.observe(grid);
+    for (const child of Array.from(grid.children)) {
+      observer.observe(child);
+    }
+
+    updateLayout();
+    window.addEventListener("resize", updateLayout);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      window.removeEventListener("resize", updateLayout);
+      observer.disconnect();
+    };
+  }, []);
+
+  return gridRef;
+}
+
 export function SettingsTab({
   snapshot,
   meta
@@ -62,11 +117,15 @@ export function SettingsTab({
 }) {
   const photoBoothStatusQuery = usePhotoBoothStatusQuery();
   const notificationConfigQuery = useNotificationConfigQuery();
+  const runtimeEnvQuery = useRuntimeEnvQuery();
+  const masonryGridRef = useMasonryGrid();
   const queryClient = useQueryClient();
   const photoBoothAdminStatus = photoBoothStatusQuery.data;
   const photoBoothStatus = photoBoothAdminStatus?.status ?? snapshot.photoBooth;
   const tickerMessageInputRef = useRef<HTMLTextAreaElement | null>(null);
   const [cloudflaredInstalling, setCloudflaredInstalling] = useState(false);
+  const [runtimeEnvWorking, setRuntimeEnvWorking] = useState(false);
+  const [runtimeEnvStatus, setRuntimeEnvStatus] = useState<string | null>(null);
   const [notificationTargetType, setNotificationTargetType] =
     useState<AdminNotificationTargetType>("event");
   const [notificationRacerIds, setNotificationRacerIds] = useState<string[]>([]);
@@ -83,6 +142,36 @@ export function SettingsTab({
       await installCloudflared();
     } finally {
       setCloudflaredInstalling(false);
+    }
+  }
+
+  async function ensureRuntimeEnvFromAdmin(openAfterCreate = false): Promise<void> {
+    setRuntimeEnvWorking(true);
+    setRuntimeEnvStatus(null);
+    try {
+      const result = openAfterCreate ? await openRuntimeEnvFile() : await ensureRuntimeEnvFile();
+      await queryClient.invalidateQueries({ queryKey: runtimeEnvQueryKey });
+      setRuntimeEnvStatus(
+        openAfterCreate
+          ? `Opened ${result.path}. Restart Roller Rumble after saving changes.`
+          : `Created ${result.path}. Restart Roller Rumble after editing it.`
+      );
+    } finally {
+      setRuntimeEnvWorking(false);
+    }
+  }
+
+  async function generatePushKeysFromAdmin(): Promise<void> {
+    setRuntimeEnvWorking(true);
+    setRuntimeEnvStatus(null);
+    try {
+      const result = await generateRuntimeEnvPushKeys();
+      await queryClient.invalidateQueries({ queryKey: runtimeEnvQueryKey });
+      setRuntimeEnvStatus(
+        `Generated Web Push keys in ${result.path}. Open the env file if you want to change the subject email, then restart Roller Rumble.`
+      );
+    } finally {
+      setRuntimeEnvWorking(false);
     }
   }
 
@@ -103,7 +192,7 @@ export function SettingsTab({
   }
 
   return (
-    <div className="page-grid">
+    <div ref={masonryGridRef} className="page-grid settings-page-grid">
       <Panel title="Settings">
         <div className="form-grid">
           <label>
@@ -379,9 +468,100 @@ export function SettingsTab({
       </Panel>
 
       <Panel
+        className="settings-panel"
+        title="Environment"
+        actions={
+          <div className="panel-action-row settings-panel__actions">
+            {runtimeEnvQuery.data?.exists ? (
+              <Button
+                variant="ghost"
+                disabled={runtimeEnvWorking}
+                onClick={() => {
+                  fireAndForget(ensureRuntimeEnvFromAdmin(true), "open runtime env file");
+                }}
+              >
+                {runtimeEnvWorking ? "Opening..." : "Open Env File"}
+              </Button>
+            ) : (
+              <Button
+                disabled={runtimeEnvWorking}
+                onClick={() => {
+                  fireAndForget(ensureRuntimeEnvFromAdmin(true), "create runtime env file");
+                }}
+              >
+                {runtimeEnvWorking ? "Creating..." : "Create & Open Env File"}
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              disabled={runtimeEnvWorking}
+              onClick={() => {
+                if (
+                  notificationConfigQuery.data?.configured &&
+                  !window.confirm(
+                    "Web Push already looks configured. Generating new keys can require racers to enable notifications again. Continue?"
+                  )
+                ) {
+                  return;
+                }
+                fireAndForget(generatePushKeysFromAdmin(), "generate push keys");
+              }}
+            >
+              Generate Push Keys
+            </Button>
+          </div>
+        }
+      >
+        <div className="stack-sm">
+          <div className="stat-grid">
+            <StatPill
+              label="Local Env File"
+              value={
+                runtimeEnvQuery.isLoading
+                  ? "Checking"
+                  : runtimeEnvQuery.data?.exists
+                    ? "Present"
+                    : "Missing"
+              }
+            />
+            <StatPill label="Loaded Files" value={runtimeEnvQuery.data?.loadedFiles.length ?? 0} />
+          </div>
+          <p>
+            Runtime variables are read when Roller Rumble starts. Edit this file for installed app
+            secrets and machine-specific settings, then restart the app.
+          </p>
+          <p>
+            Use `Generate Push Keys` to fill in the Web Push notification settings automatically. It
+            creates the file first if needed.
+          </p>
+          <p>
+            Generate keys once during setup. If racers have already enabled notifications, replacing
+            the keys may require them to enable notifications again.
+          </p>
+          {runtimeEnvQuery.data ? (
+            <code className="breakable-value">{runtimeEnvQuery.data.path}</code>
+          ) : null}
+          {runtimeEnvQuery.data?.loadedFiles.length ? (
+            <div className="stack-sm">
+              <strong>Loaded at startup</strong>
+              {runtimeEnvQuery.data.loadedFiles.map((filePath) => (
+                <code className="breakable-value" key={filePath}>
+                  {filePath}
+                </code>
+              ))}
+            </div>
+          ) : (
+            <p>No dotenv files were loaded at startup.</p>
+          )}
+          {runtimeEnvStatus ? <p>{runtimeEnvStatus}</p> : null}
+        </div>
+      </Panel>
+
+      <Panel
+        className="settings-panel"
         title="Tunnel"
         actions={
-          <div className="panel-action-row">
+          <div className="panel-action-row settings-panel__actions">
             {canInstallCloudflared ? (
               <Button
                 variant="ghost"
@@ -429,12 +609,16 @@ export function SettingsTab({
               }
             />
           </div>
-          <span>{tunnelUrl}</span>
+          <span className="breakable-value">{tunnelUrl}</span>
           {snapshot.tunnel.cloudflaredVersion ? (
-            <span>{snapshot.tunnel.cloudflaredVersion}</span>
+            <span className="breakable-value">{snapshot.tunnel.cloudflaredVersion}</span>
           ) : null}
-          {snapshot.tunnel.message ? <span>{snapshot.tunnel.message}</span> : null}
-          {snapshot.tunnel.lastError ? <span>{snapshot.tunnel.lastError}</span> : null}
+          {snapshot.tunnel.message ? (
+            <span className="breakable-value">{snapshot.tunnel.message}</span>
+          ) : null}
+          {snapshot.tunnel.lastError ? (
+            <span className="breakable-value">{snapshot.tunnel.lastError}</span>
+          ) : null}
           {meta?.qrCodeDataUrl ? (
             <img className="qr-code" src={meta.qrCodeDataUrl} alt="QR code for racer page" />
           ) : null}

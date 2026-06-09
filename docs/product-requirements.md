@@ -106,8 +106,10 @@ Requirements:
 - Manual countdown/start control must always exist. `Implemented`
 - Countdown start must never implicitly stage a race; staging and starting are separate actions.
   `Implemented`
-- The app must support OS2L / VirtualDJ cue-based race starts behind an admin toggle. `Partial`
-- OS2L listening must only matter when a race is staged and cue starts are enabled. `Partial`
+- The app must support OS2L / VirtualDJ cue-based race starts behind an admin toggle. `Implemented`
+- OS2L listening must only matter when a race is staged and cue starts are enabled. `Implemented`
+- If OS2L is enabled after a race has already been staged, the staged race must be armed for the
+  next valid cue without requiring the race to be re-staged. `Implemented`
 - OS2L cue payloads may include a `countdownMs` attribute that controls how many milliseconds to
   count down before activating the race. If the attribute is missing or invalid, the countdown must
   default to `3000` milliseconds, and the race display must continue to show whole-second countdown
@@ -117,6 +119,8 @@ Current delivery notes:
 
 - The cue-start seam, admin toggle, default countdown, cue-provided countdown duration, and local
   simulator script exist. `Implemented`
+- The local OS2L simulator supports `pnpm`'s forwarded `--` separator and has a `--dryRun` mode for
+  confirming the outgoing payload without contacting the app. `Implemented`
 - Real-world VirtualDJ cue behavior has not yet been fully validated in production use. `Partial`
 
 ## Admin Display
@@ -827,6 +831,14 @@ Current tooling requirements now include:
 - dotenv-based configuration for the Electron/backend runtime and the isolated photo booth agent,
   including booth-specific `.env.photo-booth` overrides while keeping shell variables highest
   priority
+- installed desktop builds must load per-user app config dotenv files, including `.env.local`, from
+  the platform app data folder so Windows and macOS users can configure secrets without launching
+  from a project checkout
+- the admin Settings UI must expose the runtime env file path and provide a way to create/open a
+  starter `.env.local` file when it does not exist
+- the generated `.env.local` file must contain plain-language setup comments suitable for
+  non-technical users, and the admin Settings UI must be able to generate Web Push VAPID keys and
+  write them into that file automatically
 - a root `pnpm db:studio` launcher that bootstraps the isolated Studio package on demand
 - root `pnpm cloudflared:install`, `pnpm cloudflared:doctor`, and `pnpm cloudflared:version`
   scripts for app-managed tunnel binary setup and diagnostics

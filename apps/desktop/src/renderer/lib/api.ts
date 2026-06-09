@@ -41,6 +41,12 @@ export class ApiError extends Error {
   }
 }
 
+export interface RuntimeEnvInfo {
+  path: string;
+  exists: boolean;
+  loadedFiles: string[];
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
@@ -128,6 +134,24 @@ export async function fetchMeta(): Promise<{
   qrCodeDataUrl: string;
 }> {
   return parseJson(await fetch(buildUrl("/api/meta")));
+}
+
+export async function fetchRuntimeEnvInfo(): Promise<RuntimeEnvInfo> {
+  return parseJson(await fetch(buildUrl("/api/runtime-env")));
+}
+
+export async function ensureRuntimeEnvFile(): Promise<RuntimeEnvInfo> {
+  return parseJson(await fetch(buildUrl("/api/runtime-env/ensure"), { method: "POST" }));
+}
+
+export async function openRuntimeEnvFile(): Promise<RuntimeEnvInfo> {
+  return parseJson(await fetch(buildUrl("/api/runtime-env/open"), { method: "POST" }));
+}
+
+export async function generateRuntimeEnvPushKeys(): Promise<RuntimeEnvInfo> {
+  return parseJson(
+    await fetch(buildUrl("/api/runtime-env/generate-push-keys"), { method: "POST" })
+  );
 }
 
 export async function fetchNotificationConfig(): Promise<NotificationConfig> {

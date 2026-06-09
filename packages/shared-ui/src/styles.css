@@ -25,6 +25,7 @@ textarea {
   display: grid;
   align-content: start;
   gap: var(--ui-panel-gap);
+  min-width: 0;
   border: 1px solid var(--theme-accent-soft);
   border-radius: var(--ui-radius-panel);
   background: var(--ui-panel-bg);
@@ -39,19 +40,29 @@ textarea {
 
 .panel__header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  min-width: 0;
+}
+
+.panel__header > div,
+.panel__actions {
+  min-width: 0;
 }
 
 .panel__title {
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  max-width: 100%;
+  min-width: 0;
   border: none;
   border-radius: var(--ui-radius-control);
   padding: 0.8rem 1.15rem;
@@ -59,6 +70,8 @@ textarea {
   color: var(--theme-surface);
   cursor: pointer;
   font-weight: 700;
+  text-align: center;
+  white-space: normal;
   box-shadow: var(--ui-control-shadow);
   transition:
     transform 140ms ease,

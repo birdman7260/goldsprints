@@ -1,19 +1,18 @@
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { app, BrowserWindow, screen } from "electron";
+import { app, BrowserWindow, screen, shell } from "electron";
 import { loadDotenvFiles } from "../backend/env";
 import { createBackendServer, type BackendServer } from "../backend/server";
 
 let backend: BackendServer | null = null;
 let adminWindow: BrowserWindow | null = null;
 let raceWindow: BrowserWindow | null = null;
+let loadedDotenvFiles: string[] = [];
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const workspaceRoot = findWorkspaceRoot();
-
-loadDotenvFiles({ rootDir: workspaceRoot });
 
 function findWorkspaceRoot(): string {
   let candidate = process.cwd();
@@ -59,6 +58,18 @@ function resolveRuntimeDataDir(): string {
   }
 
   return path.join(app.getPath("userData"), "runtime");
+}
+
+function resolveRuntimeEnvFilePath(): string {
+  return path.join(isDev() ? workspaceRoot : app.getPath("userData"), ".env.local");
+}
+
+function resolveDotenvSearchDirs(): string[] {
+  if (isDev()) {
+    return [workspaceRoot];
+  }
+
+  return [workspaceRoot, app.getPath("userData")];
 }
 
 function wireWindowDebugging(window: BrowserWindow, label: string): void {
@@ -134,13 +145,18 @@ async function createWindows(port: number): Promise<void> {
 }
 
 async function bootstrap(): Promise<void> {
+  loadedDotenvFiles = loadDotenvFiles({ searchDirs: resolveDotenvSearchDirs() });
+
   // The backend is embedded into the desktop app so SQLite, APIs, and the racer page ship together.
   const userDataDir = resolveRuntimeDataDir();
   backend = createBackendServer({
     dataDir: userDataDir,
+    loadedDotenvFiles,
+    openPath: (filePath) => shell.openPath(filePath),
     port: Number(process.env.ROLLER_RUMBLE_PORT ?? "3187"),
     rendererDistDir: resolveRendererDistDir(),
-    rendererDevUrl: process.env.ELECTRON_RENDERER_URL
+    rendererDevUrl: process.env.ELECTRON_RENDERER_URL,
+    runtimeEnvFilePath: resolveRuntimeEnvFilePath()
   });
 
   const { port } = await backend.start();

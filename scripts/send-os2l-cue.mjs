@@ -5,7 +5,13 @@ const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_PORT = 9996;
 const DEFAULT_TIMEOUT_MS = 2_000;
 
+const forwardedArgs = process.argv.slice(2);
+if (forwardedArgs[0] === "--") {
+  forwardedArgs.shift();
+}
+
 const { values } = parseArgs({
+  args: forwardedArgs,
   options: {
     action: {
       type: "string",
@@ -13,6 +19,10 @@ const { values } = parseArgs({
     },
     countdownMs: {
       type: "string"
+    },
+    dryRun: {
+      type: "boolean",
+      default: false
     },
     event: {
       type: "string",
@@ -59,9 +69,8 @@ if (values.countdownMs != null && (!Number.isFinite(countdownMs) || countdownMs 
   process.exit(1);
 }
 
-// The backend trigger only looks for a few cue-like substrings, so the default
-// JSON payload mirrors a simple start cue without requiring the full real-world
-// OS2L sender format from VirtualDJ.
+// The default JSON payload mirrors a simple start cue without requiring the full
+// real-world OS2L sender format from VirtualDJ.
 const payload =
   values.message ??
   JSON.stringify({
@@ -72,6 +81,11 @@ const payload =
     sentAt: new Date().toISOString(),
     source: "roller-rumble-os2l-simulator"
   });
+
+if (values.dryRun) {
+  console.log(payload);
+  process.exit(0);
+}
 
 const socket = net.createConnection(
   {

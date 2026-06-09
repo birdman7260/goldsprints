@@ -7,6 +7,7 @@ import type { Duplex } from "node:stream";
 import express from "express";
 import cors from "cors";
 import multer from "multer";
+import webpush from "web-push";
 import { WebSocketServer } from "ws";
 import { API_PREFIX, DEFAULT_SERVER_PORT, WS_PATH } from "@roller-rumble/shared/constants";
 import type { AppSnapshot } from "@roller-rumble/shared/types";
@@ -37,13 +38,17 @@ import {
   updatePhotoBoothStatusSchema,
   webPushSubscriptionSchema
 } from "@roller-rumble/shared/validation";
+import { ensureRuntimeEnvFile, getRuntimeEnvFileInfo, writeWebPushEnvValues } from "./env";
 import { AppHttpError, RollerRumbleApp } from "./services/app";
 
 interface BackendServerOptions {
   dataDir: string;
+  loadedDotenvFiles?: string[];
+  openPath?: (filePath: string) => Promise<string>;
   port?: number;
   rendererDistDir?: string;
   rendererDevUrl?: string;
+  runtimeEnvFilePath?: string;
 }
 
 const RACER_SESSION_COOKIE = "roller_rumble_racer_session";
@@ -301,6 +306,59 @@ export function createBackendServer(options: BackendServerOptions): BackendServe
       racerPageUrl: service.getRacerPageUrl(),
       qrCodeDataUrl: await service.getQrCodeDataUrl()
     });
+  });
+
+  app.get(`${API_PREFIX}/runtime-env`, (_req, res) => {
+    if (!options.runtimeEnvFilePath) {
+      res.status(404).json({ message: "Runtime env file path is not available." });
+      return;
+    }
+
+    res.json(getRuntimeEnvFileInfo(options.runtimeEnvFilePath, options.loadedDotenvFiles ?? []));
+  });
+
+  app.post(`${API_PREFIX}/runtime-env/ensure`, (_req, res) => {
+    if (!options.runtimeEnvFilePath) {
+      res.status(404).json({ message: "Runtime env file path is not available." });
+      return;
+    }
+
+    ensureRuntimeEnvFile(options.runtimeEnvFilePath);
+    res.json(getRuntimeEnvFileInfo(options.runtimeEnvFilePath, options.loadedDotenvFiles ?? []));
+  });
+
+  app.post(`${API_PREFIX}/runtime-env/open`, async (_req, res, next) => {
+    try {
+      if (!options.runtimeEnvFilePath || !options.openPath) {
+        res.status(404).json({ message: "Runtime env file opener is not available." });
+        return;
+      }
+
+      ensureRuntimeEnvFile(options.runtimeEnvFilePath);
+      const errorMessage = await options.openPath(options.runtimeEnvFilePath);
+      if (errorMessage) {
+        throw new AppHttpError(errorMessage, 500, "runtime_env_open_failed");
+      }
+
+      res.json(getRuntimeEnvFileInfo(options.runtimeEnvFilePath, options.loadedDotenvFiles ?? []));
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post(`${API_PREFIX}/runtime-env/generate-push-keys`, (_req, res) => {
+    if (!options.runtimeEnvFilePath) {
+      res.status(404).json({ message: "Runtime env file path is not available." });
+      return;
+    }
+
+    const keys = webpush.generateVAPIDKeys();
+    writeWebPushEnvValues(options.runtimeEnvFilePath, {
+      publicKey: keys.publicKey,
+      privateKey: keys.privateKey,
+      subject: "mailto:roller-rumble@localhost.local"
+    });
+    res.json(getRuntimeEnvFileInfo(options.runtimeEnvFilePath, options.loadedDotenvFiles ?? []));
   });
 
   app.get(`${API_PREFIX}/auth/session`, (req, res) => {

@@ -168,7 +168,8 @@ a {
   display: grid;
   align-items: start;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  min-width: 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
 }
 
 .racer-page-grid {
@@ -504,6 +505,7 @@ a {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
   gap: 1rem;
+  min-width: 0;
   height: 100vh;
   overflow: hidden;
   padding: 1.5rem;
@@ -514,6 +516,7 @@ a {
   display: grid;
   align-content: start;
   gap: 0.85rem;
+  min-width: 0;
   min-height: 0;
   overflow-y: auto;
   padding-right: 0.35rem;
@@ -584,16 +587,20 @@ a {
 
 .admin-workspace__header {
   display: flex;
+  flex-wrap: wrap;
   align-items: end;
   justify-content: space-between;
   gap: 1rem;
+  min-width: 0;
   padding: 0.25rem 0;
 }
 
 .admin-workspace__description {
+  min-width: 0;
   max-width: 28rem;
   color: var(--theme-text-muted);
   text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .admin-workspace__scroll {
@@ -695,6 +702,7 @@ p {
 .list {
   display: grid;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .stack-sm.align-end {
@@ -981,7 +989,8 @@ p {
 .stat-grid {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  min-width: 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
 }
 
 .panel-action-row {
@@ -989,6 +998,40 @@ p {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.panel-action-row .button {
+  min-width: 0;
+}
+
+.settings-page-grid {
+  align-items: start;
+  grid-auto-flow: dense;
+  grid-auto-rows: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+}
+
+.settings-panel {
+  min-width: 0;
+}
+
+.settings-panel__actions {
+  justify-content: flex-start;
+}
+
+.settings-panel__actions .button {
+  flex: 1 1 10rem;
+}
+
+.breakable-value,
+.settings-panel code {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .list {

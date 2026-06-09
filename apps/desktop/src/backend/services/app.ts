@@ -321,6 +321,7 @@ export class RollerRumbleApp extends EventEmitter {
       this.handleRotation(event.racerId, event.timestampMs, event.deltaRotations)
     );
     if (!this.maybeAutoStageNextRace()) {
+      this.syncOs2lArmingForCurrentRace(settings);
       this.emitSnapshot();
     }
   }
@@ -1894,6 +1895,7 @@ export class RollerRumbleApp extends EventEmitter {
       serverPort: this.serverPort
     });
     this.os2lTrigger.setEnabled(next.os2lEnabled);
+    this.syncOs2lArmingForCurrentRace(next);
     if (patch.targetDistanceMeters != null) {
       this.applyRaceDistanceSetting(next.targetDistanceMeters);
     }
@@ -1901,6 +1903,27 @@ export class RollerRumbleApp extends EventEmitter {
       this.emitSnapshot();
     }
     return this.getSnapshot();
+  }
+
+  private syncOs2lArmingForCurrentRace(settings = this.db.getAdminSettings()): void {
+    if (!settings.os2lEnabled) {
+      this.os2lTrigger.disarmRace();
+      return;
+    }
+
+    const activeEvent = this.db.getActiveEvent();
+    if (!activeEvent) {
+      this.os2lTrigger.disarmRace();
+      return;
+    }
+
+    const currentRace = this.db.getCurrentRace(activeEvent.id);
+    if (currentRace && ["scheduled", "staging", "interrupted"].includes(currentRace.state)) {
+      this.os2lTrigger.armRace(currentRace.id);
+      return;
+    }
+
+    this.os2lTrigger.disarmRace();
   }
 
   private shouldAutoStageNextRace(): boolean {

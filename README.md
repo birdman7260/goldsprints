@@ -146,17 +146,21 @@ phones, so use the Cloudflare tunnel URL for event use. Racers are prompted to e
 the first time they press a queue/challenge button, and admin-queued racers see the same enable
 button when they open their race card.
 
-Generate VAPID keys with:
+The easiest setup path is inside the admin app:
 
-```sh
-pnpm notifications:keys
-```
+1. Open `Settings -> Environment`.
+2. Click `Create & Open Env File` if the file does not exist yet.
+3. Click `Generate Push Keys`.
+4. Fully quit and reopen Roller Rumble.
 
-Then add the values to `.env.local`:
+That button writes these values into `.env.local` for you:
 
 - `ROLLER_RUMBLE_WEB_PUSH_PUBLIC_KEY`
 - `ROLLER_RUMBLE_WEB_PUSH_PRIVATE_KEY`
 - `ROLLER_RUMBLE_WEB_PUSH_SUBJECT`
+
+The command-line fallback is still available with `pnpm notifications:keys`, but installed-app users
+should use the Settings button.
 
 Automatic notifications currently include the “3rd match coming up” queue alert and tournament-start
 alerts for racers seeded into an active tournament. Admins can also send messages from the Settings
@@ -345,6 +349,25 @@ The Electron main process and embedded backend load dotenv files at startup. The
 Shell-provided environment variables always win. Values from `.env.local` can override values from
 `.env`, which keeps checked-in examples boring and local machine overrides easy.
 
+Installed desktop builds also read `.env` and `.env.local` from the app's per-user config folder.
+Those installed-app files are the easiest place to keep secrets and machine-specific values:
+
+- Windows: `%APPDATA%\Roller Rumble\.env.local`
+- macOS: `~/Library/Application Support/Roller Rumble/.env.local`
+
+In the installed app, open `Settings -> Environment` and use `Create & Open Env File` if the file
+does not exist yet. Roller Rumble creates a starter `.env.local` with common commented settings.
+Edit the file, save it, then restart Roller Rumble. Runtime environment values are read at startup,
+so changes do not take effect until the app restarts.
+
+The generated file includes plain-language instructions and examples. Use `Generate Push Keys` in
+that same Environment card to automatically fill in the Web Push notification keys.
+
+When both the launch folder and app config folder contain dotenv files, Roller Rumble reads the
+launch folder first and the app config folder second. That means installed-app `.env.local` values
+can override a plain `.env` file, while shell-provided environment variables still have final
+priority.
+
 The photo booth runner loads the same root files plus booth-specific files before launching the
 isolated Raspberry Pi package:
 
@@ -434,6 +457,8 @@ testing does not produce unrelated Vite websocket failures.
   - Prints the resolved `cloudflared --version` output using the same lookup order as the app.
 - `pnpm notifications:keys`
   - Generates VAPID keys for browser Web Push and prints the `.env.local` variables to add.
+  - The admin `Settings -> Environment -> Generate Push Keys` button is easier for installed-app
+    users because it writes the values into the correct `.env.local` file automatically.
   - The private key should stay local and must not be committed.
 - `pnpm dev:reset-data`
   - Deletes the repo-local dev runtime directory at `.roller-rumble-dev/runtime`.
@@ -487,9 +512,11 @@ testing does not produce unrelated Vite websocket failures.
   - If the payload includes `countdownMs`, Roller Rumble counts down for that many milliseconds
     before the race starts. If it is omitted, the countdown defaults to `3000` milliseconds.
   - Optional overrides can be passed through npm, for example:
+    - `pnpm os2l:cue -- --dryRun --countdownMs 5000`
     - `pnpm os2l:cue -- --event play`
     - `pnpm os2l:cue -- --countdownMs 5000`
     - `pnpm os2l:cue -- --message '{"evt":"cue","action":"start","id":"race-start","countdownMs":2500}'`
+  - `--dryRun` prints the payload without connecting to Roller Rumble.
 - `pnpm photo-booth:agent`
   - Starts the Raspberry Pi photo booth kiosk server.
   - Builds and serves the package-local React touchscreen kiosk before starting the booth agent.
@@ -682,7 +709,14 @@ Before editing songs:
 3. Stage a race. The race must be staged before VirtualDJ can start it.
 4. Open `Settings`.
 5. Turn on `Enable VirtualDJ cue start`.
-6. Optional quick test from Terminal:
+6. Optional quick test from Terminal. First confirm the simulator command can build the payload:
+
+```bash
+pnpm os2l:cue -- --dryRun --countdownMs 5000
+```
+
+That should print JSON containing `"id":"roller-rumble-start"` and `"countdownMs":5000`.
+Then send the cue to Roller Rumble:
 
 ```bash
 pnpm os2l:cue -- --countdownMs 5000
@@ -753,10 +787,14 @@ Troubleshooting:
 
 - If nothing happens, confirm the race is staged in Roller Rumble.
 - Confirm `Settings -> Enable VirtualDJ cue start` is turned on.
+- If you turned the setting on after staging the race, that is supported. If it still does not work,
+  restart `pnpm dev`, stage the race again, and retest with `pnpm os2l:cue -- --countdownMs 5000`.
 - Confirm VirtualDJ is running on the same computer as Roller Rumble.
 - Confirm the action contains `roller-rumble-start`.
 - Confirm `countdownMs` has no comma, decimal unit, or `ms` suffix. Use `5000`, not `5,000`,
   `5s`, or `5000ms`.
+- If the simulator fails with `Unexpected argument`, update your local code and try again. The
+  simulator supports the extra `--` separator that `pnpm` forwards to scripts.
 - If you changed the listener port with `ROLLER_RUMBLE_OS2L_PORT`, make sure any external OS2L
   sender is using the same port. The normal VirtualDJ same-computer setup should use the default.
 

@@ -11,11 +11,57 @@ const COUNTDOWN_ATTRIBUTE_NAMES = [
   "countdown_milliseconds"
 ] as const;
 
-function shouldTrigger(message: string): boolean {
+const START_CUE_MARKERS = ["roller-rumble-start", "race-start"] as const;
+
+function valueContainsStartCue(value: unknown): boolean {
+  if (typeof value === "string") {
+    const normalized = value.toLowerCase();
+    return START_CUE_MARKERS.some((marker) => normalized.includes(marker));
+  }
+
+  if (Array.isArray(value)) {
+    return value.some((child) => valueContainsStartCue(child));
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value).some((child) => valueContainsStartCue(child));
+  }
+
+  return false;
+}
+
+function objectLooksLikeStartCue(value: unknown): boolean {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  const eventName = String(record.evt ?? record.event ?? record.type ?? "").toLowerCase();
+  const action = String(record.action ?? record.command ?? record.cmd ?? "").toLowerCase();
+
+  if ((eventName === "cue" || eventName === "play") && (action === "" || action === "start")) {
+    return true;
+  }
+
+  if (action === "start") {
+    return true;
+  }
+
+  return Object.values(record).some((child) => objectLooksLikeStartCue(child));
+}
+
+export function isOs2lStartCueMessage(message: string): boolean {
+  const trimmed = message.trim();
+  try {
+    const parsed: unknown = JSON.parse(trimmed);
+    return valueContainsStartCue(parsed) || objectLooksLikeStartCue(parsed);
+  } catch {
+    // VirtualDJ OS2L actions are often plain commands instead of JSON.
+  }
+
   const normalized = message.toLowerCase();
   return (
-    normalized.includes("roller-rumble-start") ||
-    normalized.includes("race-start") ||
+    START_CUE_MARKERS.some((marker) => normalized.includes(marker)) ||
     normalized.includes('"evt":"play"') ||
     normalized.includes('"evt":"cue"') ||
     normalized.includes('"action":"start"')
@@ -103,7 +149,7 @@ export class Os2lRaceTriggerAdapter implements RaceTriggerAdapter {
         }
 
         const message = chunk.toString();
-        if (shouldTrigger(message)) {
+        if (isOs2lStartCueMessage(message)) {
           this.listener?.("os2l", {
             countdownDurationMs: parseOs2lCountdownDurationMs(message) ?? undefined
           });
