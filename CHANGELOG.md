@@ -8,6 +8,14 @@ All notable Roller Rumble changes should be recorded here before a release.
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## 0.1.7 - 2026-06-11
+
+### Added
+
 - Buttons in the settings to easily open the different lab pages
 
 ### Changed
